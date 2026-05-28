@@ -258,7 +258,6 @@ export async function createCreditOrder(formData: FormData) {
       externalReference,
     },
   });
-  let invoiceUrl: string | null = null;
 
   try {
     const customerId = await ensureAsaasCustomerWithDocument(user, cpfCnpj);
@@ -292,8 +291,6 @@ export async function createCreditOrder(formData: FormData) {
         },
       },
     });
-
-    invoiceUrl = payment.invoiceUrl;
   } catch (error) {
     await prisma.creditOrder.update({
       where: { id: order.id },
@@ -316,11 +313,7 @@ export async function createCreditOrder(formData: FormData) {
     redirect(`/creditos?erro=checkout&motivo=${encodeURIComponent(message)}`);
   }
 
-  if (invoiceUrl) {
-    redirect(invoiceUrl);
-  }
-
-  redirect("/creditos?erro=checkout");
+  redirect(`/creditos/checkout/${order.id}`);
 }
 
 export async function adminSaveCreditPackage(formData: FormData) {

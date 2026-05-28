@@ -113,7 +113,7 @@ export default async function AdminCreditsPage({
           <div className="panelTitle">
             <div>
               <h2>Pacotes vendidos ao cliente</h2>
-              <p>Defina o que o usuário compra por Pix ou cartão no checkout do Asaas.</p>
+              <p>Defina o que o usuario compra por Pix no checkout Tunix.</p>
             </div>
           </div>
 
@@ -305,7 +305,7 @@ export default async function AdminCreditsPage({
                 <th>Créditos</th>
                 <th>Valor</th>
                 <th>Status</th>
-                <th>Asaas</th>
+                <th>Pagamento</th>
               </tr>
             </thead>
             <tbody>

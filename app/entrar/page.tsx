@@ -16,36 +16,29 @@ export default async function LoginPage({
         <div>
           <p className="eyebrow">Acesso</p>
           <h1>Entrar na Tunix</h1>
-          <p>Use sua conta para gerenciar composições, interesses e catálogo.</p>
+          <p>Use sua conta para gerenciar composicoes, interesses e catalogo.</p>
         </div>
         <form className="authForm" action={loginUser}>
           {params.erro ? (
             <p className="formError">
               {params.erro === "limite"
                 ? "Muitas tentativas. Aguarde alguns minutos antes de tentar novamente."
-                : "Email ou senha inválidos. Confira os dados e tente novamente."}
+                : "Email ou senha invalidos. Confira os dados e tente novamente."}
             </p>
           ) : null}
           <label>
             Email
-            <input name="email" type="email" defaultValue="luan@tunix.local" />
+            <input name="email" type="email" autoComplete="email" required />
           </label>
           <label>
             Senha
-            <input name="password" type="password" defaultValue="demo123456" />
+            <input name="password" type="password" autoComplete="current-password" required />
           </label>
           <button className="primaryButton" type="submit">Entrar</button>
         </form>
         <p className="authHint">
-          Ainda não tem conta? <Link href="/criar-conta">Criar conta</Link>
+          Ainda nao tem conta? <Link href="/criar-conta">Criar conta</Link>
         </p>
-        <div className="demoAccounts">
-          <strong>Contas para testar os painéis</strong>
-          <span>Compositor: luan@tunix.local</span>
-          <span>Artista: duo@tunix.local</span>
-          <span>Admin: admin@tunix.com.br</span>
-          <small>Contas demo usam demo123456. Admin usa a senha definida para producao.</small>
-        </div>
       </section>
     </main>
   );

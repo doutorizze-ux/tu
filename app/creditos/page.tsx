@@ -28,7 +28,7 @@ function checkoutErrorMessage(error?: string, reason?: string) {
     return "Informe um CPF ou CNPJ valido para abrir o checkout.";
   }
 
-  return `Nao foi possivel abrir o checkout do Asaas.${reason ? ` Motivo: ${reason}` : " Verifique a integracao."}`;
+  return `Nao foi possivel preparar o Pix.${reason ? ` Motivo: ${reason}` : " Verifique a integracao."}`;
 }
 
 export default async function CreditsPage({
@@ -60,7 +60,7 @@ export default async function CreditsPage({
       <PageHeader
         eyebrow="Carteira"
         title="Creditos da conta"
-        description="Compre creditos por Pix ou cartao via Asaas e use em acoes comerciais da plataforma."
+        description="Compre creditos por Pix em uma experiencia Tunix e use em acoes comerciais da plataforma."
       />
 
       <section className="creditHero">
@@ -80,7 +80,7 @@ export default async function CreditsPage({
 
       {params.erro ? <p className="formError">{checkoutErrorMessage(params.erro, params.motivo)}</p> : null}
       {params.sucesso ? (
-        <p className="formSuccess">Checkout aberto. Os creditos entram automaticamente quando o Asaas confirmar o pagamento.</p>
+        <p className="formSuccess">Pedido criado. Os creditos entram automaticamente quando o pagamento for confirmado.</p>
       ) : null}
 
       {!asaasConfigured ? (
@@ -111,7 +111,7 @@ export default async function CreditsPage({
                 />
               </label>
               <button className="primaryButton" type="submit" disabled={!asaasConfigured}>
-                Comprar com Pix ou cartao
+                Comprar com Pix
               </button>
             </form>
           </article>
@@ -132,7 +132,7 @@ export default async function CreditsPage({
                     <th>Pacote</th>
                     <th>Status</th>
                     <th>Valor</th>
-                    <th>Link</th>
+                    <th>Pagamento</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -142,10 +142,12 @@ export default async function CreditsPage({
                       <td>{order.status}</td>
                       <td>{money(order.amount)}</td>
                       <td>
-                        {order.providerInvoiceUrl && order.status !== "PAID" ? (
-                          <Link href={order.providerInvoiceUrl}>Abrir</Link>
-                        ) : (
+                        {order.status === "PAID" ? (
                           "Concluido"
+                        ) : order.status === "PROVIDER_ERROR" ? (
+                          "Erro"
+                        ) : (
+                          <Link href={`/creditos/checkout/${order.id}`}>Pagar</Link>
                         )}
                       </td>
                     </tr>

@@ -17,6 +17,12 @@ type AsaasPayment = {
   status?: string;
 };
 
+type AsaasPixQrCode = {
+  encodedImage?: string;
+  payload?: string;
+  expirationDate?: string;
+};
+
 function apiKey() {
   return process.env.ASAAS_API_KEY?.trim() || process.env.ASAAS_ACCESS_TOKEN?.trim();
 }
@@ -125,7 +131,7 @@ export async function createAsaasCreditPayment({
     method: "POST",
     body: JSON.stringify({
       customer: customerId,
-      billingType: "UNDEFINED",
+      billingType: "PIX",
       value: amount,
       dueDate,
       description: `Compra de ${credits} créditos - Tunix`,
@@ -138,4 +144,10 @@ export async function createAsaasCreditPayment({
     invoiceUrl: payment.invoiceUrl ?? payment.bankSlipUrl ?? null,
     status: payment.status ?? "CREATED",
   };
+}
+
+export async function getAsaasPixQrCode(paymentId: string) {
+  return asaasRequest<AsaasPixQrCode>(`/payments/${paymentId}/pixQrCode`, {
+    method: "GET",
+  });
 }
