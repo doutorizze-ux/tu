@@ -1,8 +1,9 @@
-import { saveDistributionIntegration, testDistributionIntegration } from "../../actions";
+import { saveDistributionIntegration, startTooLostOAuth, testDistributionIntegration } from "../../actions";
 import { AppShell, PageHeader } from "../../components";
 import { requireUser } from "../../lib/auth";
 import { decryptSecret, maskSecret } from "../../lib/crypto-secrets";
 import { prisma } from "../../lib/prisma";
+import { isTooLostOAuthConfigured, tooLostRedirectUri, tooLostScopes } from "../../lib/toolost";
 
 export const dynamic = "force-dynamic";
 
@@ -29,7 +30,7 @@ export default async function DistributionIntegrationsPage({
       <AppShell>
         <section className="emptyState">
           <h2>Acesso restrito</h2>
-          <p>Somente administradores podem configurar credenciais de distribuição.</p>
+          <p>Somente administradores podem configurar credenciais de distribuicao.</p>
         </section>
       </AppShell>
     );
@@ -53,29 +54,70 @@ export default async function DistributionIntegrationsPage({
   });
   const decryptedApiKey = integration ? decryptSecret(integration.apiKeyEncrypted) : "";
   const decryptedWebhookSecret = integration ? decryptSecret(integration.webhookSecretEncrypted) : "";
+  const tooLostConfigured = isTooLostOAuthConfigured();
 
   return (
     <AppShell>
       <PageHeader
         eyebrow="Admin"
-        title="Integração da distribuidora"
-        description="Configure credenciais oficiais, teste conexão e acompanhe logs de envio para plataformas."
+        title="Integracao da distribuidora"
+        description="Configure credenciais oficiais, teste conexao e acompanhe logs de envio para plataformas."
       />
 
       <section className="adminGrid">
         <article className="adminPanel">
-          {params.erro ? <p className="formError">Confira provider, endpoint, API key e webhook secret.</p> : null}
+          {params.erro ? (
+            <p className="formError">
+              {params.erro === "toolost_env"
+                ? "Configure TOOLOST_CLIENT_ID e TOOLOST_CLIENT_SECRET no Coolify antes de conectar."
+                : params.erro === "toolost_oauth"
+                  ? `OAuth Too Lost nao foi concluido: ${params.status ?? "verifique o callback"}`
+                  : "Confira provider, endpoint, API key e webhook secret."}
+            </p>
+          ) : null}
           {params.sucesso ? (
             <p className="formSuccess">
               {params.sucesso === "salvo"
-                ? "Configuração salva."
-                : `Teste de conexão finalizado: ${params.status ?? "verifique logs"}.`}
+                ? "Configuracao salva."
+                : params.sucesso === "toolost_conectado"
+                  ? "Too Lost conectado com OAuth. Token salvo de forma criptografada."
+                  : `Teste de conexao finalizado: ${params.status ?? "verifique logs"}.`}
             </p>
           ) : null}
 
+          <div className="oauthProviderCard">
+            <div>
+              <p className="eyebrow">OAuth oficial</p>
+              <h2>Conectar Too Lost</h2>
+              <p>
+                Use o fluxo Authorization Code da documentacao oficial. O client secret fica somente no servidor.
+              </p>
+            </div>
+            <dl className="accessList">
+              <div>
+                <dt>Callback</dt>
+                <dd>{tooLostRedirectUri()}</dd>
+              </div>
+              <div>
+                <dt>Scopes</dt>
+                <dd>{tooLostScopes()}</dd>
+              </div>
+            </dl>
+            <form action={startTooLostOAuth}>
+              <button className="primaryButton" type="submit" disabled={!tooLostConfigured}>
+                Conectar Too Lost
+              </button>
+            </form>
+            {!tooLostConfigured ? (
+              <p className="mutedText">
+                Falta configurar TOOLOST_CLIENT_ID e TOOLOST_CLIENT_SECRET no Coolify.
+              </p>
+            ) : null}
+          </div>
+
           <div className="blockHeader">
             <h2>Credenciais oficiais</h2>
-            <span className="songStatus">{integration?.status ?? "Não configurada"}</span>
+            <span className="songStatus">{integration?.status ?? "Nao configurada"}</span>
           </div>
 
           <form className="compositionForm" action={saveDistributionIntegration}>
@@ -89,7 +131,7 @@ export default async function DistributionIntegrationsPage({
                 Ambiente
                 <select name="environment" defaultValue={integration?.environment ?? "SANDBOX"}>
                   <option value="SANDBOX">Sandbox</option>
-                  <option value="PRODUCTION">Produção</option>
+                  <option value="PRODUCTION">Producao</option>
                 </select>
               </label>
               <label>
@@ -112,18 +154,18 @@ export default async function DistributionIntegrationsPage({
             <div className="checkList">
               <label>
                 <input name="isActive" type="checkbox" defaultChecked={integration?.isActive ?? true} />
-                Usar esta integração como provider ativo
+                Usar esta integracao como provider ativo
               </label>
             </div>
             <div className="formActions">
-              <button className="primaryButton" type="submit">Salvar integração</button>
+              <button className="primaryButton" type="submit">Salvar integracao</button>
             </div>
           </form>
 
           {integration ? (
             <form className="inlineActionForm" action={testDistributionIntegration}>
               <input name="integrationId" type="hidden" value={integration.id} />
-              <button className="secondaryButton" type="submit">Testar conexão</button>
+              <button className="secondaryButton" type="submit">Testar conexao</button>
               <span>
                 Ultimo teste: {integration.lastTestedAt ? new Intl.DateTimeFormat("pt-BR", {
                   dateStyle: "short",
@@ -135,27 +177,27 @@ export default async function DistributionIntegrationsPage({
         </article>
 
         <aside className="adminPanel">
-          <h2>Contrato técnico</h2>
+          <h2>Contrato tecnico</h2>
           <dl className="accessList">
             <div>
-              <dt>Envio</dt>
-              <dd>POST endpoint configurado</dd>
+              <dt>OAuth</dt>
+              <dd>Authorization Code</dd>
             </div>
             <div>
-              <dt>Auth</dt>
-              <dd>Bearer API key</dd>
+              <dt>API</dt>
+              <dd>https://api.toolost.com/v1</dd>
             </div>
             <div>
-              <dt>Webhook</dt>
-              <dd>POST /api/distribution/webhook</dd>
+              <dt>Teste</dt>
+              <dd>GET /me</dd>
             </div>
             <div>
-              <dt>Header</dt>
-              <dd>x-distribution-secret</dd>
+              <dt>Callback</dt>
+              <dd>/api/toolost/oauth/callback</dd>
             </div>
           </dl>
           <p className="mutedText">
-            O payload inclui releaseId, título, artista, ISRC, UPC, arquivos, plataformas, créditos e splits.
+            A conexao oficial usa Bearer token criptografado. O envio automatico de releases depende do endpoint exato da API Reference da Too Lost.
           </p>
         </aside>
       </section>
@@ -167,7 +209,7 @@ export default async function DistributionIntegrationsPage({
             {integration?.logs.length ? integration.logs.map((log) => (
               <div key={log.id}>
                 <strong>{log.action} - {log.status}</strong>
-                <span>{log.message || "Sem mensagem"} · {log.responseStatus ?? "sem HTTP"}</span>
+                <span>{log.message || "Sem mensagem"} - {log.responseStatus ?? "sem HTTP"}</span>
               </div>
             )) : <p className="mutedText">Nenhum teste registrado.</p>}
           </div>
@@ -179,7 +221,7 @@ export default async function DistributionIntegrationsPage({
             {deliveries.length ? deliveries.map((delivery) => (
               <div key={delivery.id}>
                 <strong>{delivery.release.title} - {delivery.status}</strong>
-                <span>{delivery.provider} · {delivery.responseStatus ?? "sem HTTP"} · {delivery.errorMessage ?? "sem erro"}</span>
+                <span>{delivery.provider} - {delivery.responseStatus ?? "sem HTTP"} - {delivery.errorMessage ?? "sem erro"}</span>
               </div>
             )) : <p className="mutedText">Nenhuma tentativa registrada.</p>}
           </div>

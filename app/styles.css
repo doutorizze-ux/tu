@@ -1854,6 +1854,32 @@ textarea {
   font-size: 1.25rem;
 }
 
+.oauthProviderCard {
+  display: grid;
+  gap: 16px;
+  border: 1px solid rgba(15, 107, 95, 0.18);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(15, 107, 95, 0.08), transparent 48%),
+    var(--paper);
+  padding: 18px;
+}
+
+.oauthProviderCard h2 {
+  margin: 0;
+  font-size: 1.45rem;
+}
+
+.oauthProviderCard p {
+  color: var(--muted);
+  line-height: 1.55;
+  margin: 8px 0 0;
+}
+
+.oauthProviderCard button {
+  width: 100%;
+}
+
 .notificationList {
   display: grid;
   gap: 12px;

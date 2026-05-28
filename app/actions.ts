@@ -13,6 +13,7 @@ import {
   getDistributionProviderConfig,
   submitToDistributionPartner,
 } from "./lib/distribution-provider";
+import { createTooLostAuthorizeUrl, isTooLostOAuthConfigured } from "./lib/toolost";
 import { prisma } from "./lib/prisma";
 import { saveReleaseAsset } from "./lib/release-storage";
 import { validateReleasePackage } from "./lib/release-validator";
@@ -2243,6 +2244,30 @@ export async function saveDistributionIntegration(formData: FormData) {
   redirect("/admin/integracoes?sucesso=salvo");
 }
 
+export async function startTooLostOAuth() {
+  const user = await requireAdmin();
+
+  if (!isTooLostOAuthConfigured()) {
+    redirect("/admin/integracoes?erro=toolost_env");
+  }
+
+  const state = randomUUID();
+
+  await prisma.auditLog.create({
+    data: {
+      userId: user.id,
+      action: "TOOLOST_OAUTH_STARTED",
+      entity: "DistributionIntegration",
+      entityId: state,
+      metadata: {
+        redirect: "toolost_authorize",
+      },
+    },
+  });
+
+  redirect(createTooLostAuthorizeUrl(state));
+}
+
 export async function testDistributionIntegration(formData: FormData) {
   const user = await requireAdmin();
   const integrationId = formString(formData, "integrationId");
@@ -2261,19 +2286,28 @@ export async function testDistributionIntegration(formData: FormData) {
   let message = "";
 
   try {
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${decryptSecret(integration.apiKeyEncrypted)}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        type: "healthcheck",
-        provider: integration.provider,
-        environment: integration.environment,
-        timestamp: new Date().toISOString(),
-      }),
-    });
+    const isTooLost = integration.provider.toLowerCase().replace(/\s+/g, "").includes("toolost");
+    const response = await fetch(isTooLost ? "https://api.toolost.com/v1/me" : endpoint, isTooLost
+      ? {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${decryptSecret(integration.apiKeyEncrypted)}`,
+            accept: "application/json",
+          },
+        }
+      : {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${decryptSecret(integration.apiKeyEncrypted)}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            type: "healthcheck",
+            provider: integration.provider,
+            environment: integration.environment,
+            timestamp: new Date().toISOString(),
+          }),
+        });
     responseStatus = response.status;
     const body = await response.text();
     status = response.ok ? "OK" : "ERROR";
