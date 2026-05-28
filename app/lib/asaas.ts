@@ -82,6 +82,33 @@ export async function ensureAsaasCustomer(user: Pick<User, "id" | "name" | "emai
   return customer.id;
 }
 
+export async function ensureAsaasCustomerWithDocument(
+  user: Pick<User, "id" | "name" | "email" | "asaasCustomerId">,
+  cpfCnpj: string,
+) {
+  if (user.asaasCustomerId) {
+    return user.asaasCustomerId;
+  }
+
+  const customer = await asaasRequest<AsaasCustomer>("/customers", {
+    method: "POST",
+    body: JSON.stringify({
+      name: user.name,
+      email: user.email,
+      cpfCnpj,
+      externalReference: user.id,
+      notificationDisabled: false,
+    }),
+  });
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { asaasCustomerId: customer.id },
+  });
+
+  return customer.id;
+}
+
 export async function createAsaasCreditPayment({
   amount,
   credits,

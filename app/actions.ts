@@ -3,7 +3,7 @@
 import { randomUUID } from "node:crypto";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { createAsaasCreditPayment, ensureAsaasCustomer, isAsaasConfigured } from "./lib/asaas";
+import { createAsaasCreditPayment, ensureAsaasCustomerWithDocument, isAsaasConfigured } from "./lib/asaas";
 import { createSession, destroySession, hashPassword, requireUser, verifyPassword } from "./lib/auth";
 import { saveAudioGuide } from "./lib/audio-storage";
 import { decryptSecret, encryptSecret } from "./lib/crypto-secrets";
@@ -223,10 +223,15 @@ export async function logoutUser() {
 export async function createCreditOrder(formData: FormData) {
   const user = await requireUser();
   const packageCode = formString(formData, "packageCode");
+  const cpfCnpj = formString(formData, "cpfCnpj").replace(/\D/g, "");
   const selectedPackage = await getCreditPackage(packageCode);
 
   if (!selectedPackage) {
     redirect("/creditos?erro=pacote");
+  }
+
+  if (![11, 14].includes(cpfCnpj.length)) {
+    redirect("/creditos?erro=documento");
   }
 
   if (!isAsaasConfigured()) {
@@ -257,7 +262,7 @@ export async function createCreditOrder(formData: FormData) {
   let invoiceUrl: string | null = null;
 
   try {
-    const customerId = await ensureAsaasCustomer(user);
+    const customerId = await ensureAsaasCustomerWithDocument(user, cpfCnpj);
     const payment = await createAsaasCreditPayment({
       amount: selectedPackage.amount,
       credits: selectedPackage.credits,
@@ -309,7 +314,8 @@ export async function createCreditOrder(formData: FormData) {
         },
       },
     });
-    redirect("/creditos?erro=checkout");
+    const message = error instanceof Error ? error.message : "Erro desconhecido no Asaas.";
+    redirect(`/creditos?erro=checkout&motivo=${encodeURIComponent(message)}`);
   }
 
   if (invoiceUrl) {

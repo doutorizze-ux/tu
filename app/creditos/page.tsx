@@ -15,10 +15,26 @@ function money(value: number) {
   }).format(value);
 }
 
+function checkoutErrorMessage(error?: string, reason?: string) {
+  if (error === "asaas") {
+    return "Configure ASAAS_API_KEY no servidor antes de vender creditos reais.";
+  }
+
+  if (error === "creditos") {
+    return "Saldo insuficiente. Compre creditos para continuar.";
+  }
+
+  if (error === "documento") {
+    return "Informe um CPF ou CNPJ valido para abrir o checkout.";
+  }
+
+  return `Nao foi possivel abrir o checkout do Asaas.${reason ? ` Motivo: ${reason}` : " Verifique a integracao."}`;
+}
+
 export default async function CreditsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ erro?: string; sucesso?: string }>;
+  searchParams: Promise<{ erro?: string; motivo?: string; sucesso?: string }>;
 }) {
   const user = await requireUser();
   const params = await searchParams;
@@ -43,15 +59,15 @@ export default async function CreditsPage({
     <AppShell>
       <PageHeader
         eyebrow="Carteira"
-        title="Créditos da conta"
-        description="Compre créditos por Pix ou cartão via Asaas e use em ações comerciais da plataforma."
+        title="Creditos da conta"
+        description="Compre creditos por Pix ou cartao via Asaas e use em acoes comerciais da plataforma."
       />
 
       <section className="creditHero">
         <div>
-          <span>Saldo disponível</span>
+          <span>Saldo disponivel</span>
           <strong>{formatCredits(balance)}</strong>
-          <p>Cada uso importante gera um lançamento no extrato para auditoria e conciliação.</p>
+          <p>Cada uso importante gera um lancamento no extrato para auditoria e conciliacao.</p>
         </div>
         <div className="creditCosts">
           {actionCosts.filter((item) => item.isActive).map((item) => (
@@ -62,17 +78,9 @@ export default async function CreditsPage({
         </div>
       </section>
 
-      {params.erro ? (
-        <p className="formError">
-          {params.erro === "asaas"
-            ? "Configure ASAAS_API_KEY no servidor antes de vender créditos reais."
-            : params.erro === "creditos"
-              ? "Saldo insuficiente. Compre créditos para continuar."
-              : "Não foi possível abrir o checkout do Asaas. Verifique a integração."}
-        </p>
-      ) : null}
+      {params.erro ? <p className="formError">{checkoutErrorMessage(params.erro, params.motivo)}</p> : null}
       {params.sucesso ? (
-        <p className="formSuccess">Checkout aberto. Os créditos entram automaticamente quando o Asaas confirmar o pagamento.</p>
+        <p className="formSuccess">Checkout aberto. Os creditos entram automaticamente quando o Asaas confirmar o pagamento.</p>
       ) : null}
 
       {!asaasConfigured ? (
@@ -92,8 +100,18 @@ export default async function CreditsPage({
             <strong>{money(item.amount)}</strong>
             <form action={createCreditOrder}>
               <input name="packageCode" type="hidden" value={item.code} />
+              <label>
+                CPF ou CNPJ
+                <input
+                  name="cpfCnpj"
+                  inputMode="numeric"
+                  minLength={11}
+                  placeholder="Somente numeros"
+                  required
+                />
+              </label>
               <button className="primaryButton" type="submit" disabled={!asaasConfigured}>
-                Comprar com Pix ou cartão
+                Comprar com Pix ou cartao
               </button>
             </form>
           </article>
@@ -127,7 +145,7 @@ export default async function CreditsPage({
                         {order.providerInvoiceUrl && order.status !== "PAID" ? (
                           <Link href={order.providerInvoiceUrl}>Abrir</Link>
                         ) : (
-                          "Concluído"
+                          "Concluido"
                         )}
                       </td>
                     </tr>
@@ -136,7 +154,7 @@ export default async function CreditsPage({
               </table>
             </div>
           ) : (
-            <p className="mutedText">Nenhum pedido de crédito ainda.</p>
+            <p className="mutedText">Nenhum pedido de credito ainda.</p>
           )}
         </article>
 
@@ -157,7 +175,7 @@ export default async function CreditsPage({
               ))}
             </div>
           ) : (
-            <p className="mutedText">Seu extrato aparecerá aqui assim que houver compra ou uso.</p>
+            <p className="mutedText">Seu extrato aparecera aqui assim que houver compra ou uso.</p>
           )}
         </article>
       </section>
