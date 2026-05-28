@@ -114,13 +114,11 @@ export async function createAsaasCreditPayment({
   credits,
   customerId,
   externalReference,
-  returnUrl,
 }: {
   amount: number;
   credits: number;
   customerId: string;
   externalReference: string;
-  returnUrl: string;
 }) {
   const dueDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
   const payment = await asaasRequest<AsaasPayment>("/payments", {
@@ -132,10 +130,6 @@ export async function createAsaasCreditPayment({
       dueDate,
       description: `Compra de ${credits} créditos - Tunix`,
       externalReference,
-      callback: {
-        successUrl: returnUrl,
-        autoRedirect: false,
-      },
     }),
   });
 

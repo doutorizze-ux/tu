@@ -258,7 +258,6 @@ export async function createCreditOrder(formData: FormData) {
       externalReference,
     },
   });
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || "http://127.0.0.1:3000";
   let invoiceUrl: string | null = null;
 
   try {
@@ -268,7 +267,6 @@ export async function createCreditOrder(formData: FormData) {
       credits: selectedPackage.credits,
       customerId,
       externalReference,
-      returnUrl: `${appUrl}/creditos?sucesso=checkout`,
     });
 
     await prisma.creditOrder.update({
