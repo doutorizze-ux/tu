@@ -147,12 +147,23 @@ model Release {
   id              String   @id @default(cuid())
   ownerId         String
   title           String
+  trackTitle      String?
+  versionTitle    String?
   artistName      String
+  primaryArtistLegalName String?
   labelName       String?
+  rightsHolderName String?
+  rightsHolderDocument String?
   genre           String
   language        String   @default("pt-BR")
   releaseType     String   @default("SINGLE")
   releaseDate     DateTime?
+  explicitContent Boolean  @default(false)
+  pLine           String?
+  cLine           String?
+  copyrightYear   Int?
+  territories     String   @default("WORLDWIDE")
+  previewStartSec Int?
   isrc            String?
   upc             String?
   masterFileName  String?

@@ -27,40 +27,61 @@ export default async function NewReleasePage({
   return (
     <AppShell>
       <PageHeader
-        eyebrow="Novo lançamento"
-        title="Distribuir música"
-        description="Monte o pacote profissional do fonograma para envio simultâneo às plataformas digitais."
+        eyebrow="Novo lancamento"
+        title="Distribuir musica"
+        description="Monte um pacote profissional com metadados, arquivos, direitos e validacao operacional antes do envio."
       />
 
       <form className="compositionForm" action={createRelease}>
         {params.erro ? (
           <p className="formError">
             {params.erro === "declaracao"
-              ? "Aceite as declarações de titularidade e autorização antes de preparar a distribuição."
+              ? "Aceite as declaracoes de titularidade e autorizacao antes de preparar a distribuicao."
               : params.erro === "creditos"
-                ? "Saldo insuficiente. Compre créditos para preparar o lançamento."
-                : "Informe título, artista, gênero e pelo menos uma plataforma."}
+                ? "Saldo insuficiente. Compre creditos para preparar o lancamento."
+                : "Confira titulo, artista, genero, idioma, titular, copyright e plataformas."}
           </p>
         ) : null}
 
         <section className="formSection">
-          <h2>Dados do fonograma</h2>
+          <h2>Identificacao do lancamento</h2>
           <div className="formGrid">
             <label>
-              Título do lançamento
-              <input name="title" placeholder="Ex: Meu Novo Single" />
+              Titulo do lancamento
+              <input name="title" placeholder="Ex: Meu Novo Single" required />
+            </label>
+            <label>
+              Titulo da faixa principal
+              <input name="trackTitle" placeholder="Ex: Meu Novo Single" required />
+            </label>
+            <label>
+              Versao
+              <input name="versionTitle" placeholder="Original, remix, ao vivo..." />
             </label>
             <label>
               Artista principal
-              <input name="artistName" placeholder="Nome artistico" />
+              <input name="artistName" placeholder="Nome artistico" required />
+            </label>
+            <label>
+              Nome legal do artista
+              <input name="primaryArtistLegalName" placeholder="Nome completo ou razao social" />
             </label>
             <label>
               Selo/gravadora
               <input name="labelName" placeholder="Independente, selo ou gravadora" />
             </label>
             <label>
-              Gênero
-              <input name="genre" placeholder="Sertanejo, gospel, trap..." />
+              Genero
+              <input name="genre" placeholder="Sertanejo, gospel, trap..." required />
+            </label>
+            <label>
+              Idioma
+              <select name="language" defaultValue="pt-BR" required>
+                <option value="pt-BR">Portugues (Brasil)</option>
+                <option value="en">Ingles</option>
+                <option value="es">Espanhol</option>
+                <option value="instrumental">Instrumental</option>
+              </select>
             </label>
             <label>
               Tipo
@@ -71,22 +92,66 @@ export default async function NewReleasePage({
               </select>
             </label>
             <label>
-              Data de lançamento
+              Data de lancamento
               <input name="releaseDate" type="date" />
             </label>
             <label>
               ISRC
-              <input name="isrc" placeholder="Opcional nesta etapa" />
+              <input name="isrc" placeholder="Obrigatorio antes do envio final" />
             </label>
             <label>
               UPC
-              <input name="upc" placeholder="Opcional nesta etapa" />
+              <input name="upc" placeholder="Obrigatorio antes do envio final" />
             </label>
           </div>
         </section>
 
         <section className="formSection">
-          <h2>Arquivos do lançamento</h2>
+          <h2>Direitos e territorios</h2>
+          <div className="formGrid">
+            <label>
+              Titular dos direitos
+              <input name="rightsHolderName" placeholder="Pessoa, selo ou empresa responsavel" required />
+            </label>
+            <label>
+              CPF/CNPJ do titular
+              <input name="rightsHolderDocument" inputMode="numeric" placeholder="Somente numeros" />
+            </label>
+            <label>
+              Ano de copyright
+              <input name="copyrightYear" type="number" min="1900" max="2100" placeholder="2026" required />
+            </label>
+            <label>
+              Linha P
+              <input name="pLine" placeholder="2026 Nome do titular" required />
+            </label>
+            <label>
+              Linha C
+              <input name="cLine" placeholder="2026 Nome do titular" required />
+            </label>
+            <label>
+              Territorios
+              <select name="territories" defaultValue="WORLDWIDE" required>
+                <option value="WORLDWIDE">Mundial</option>
+                <option value="BRAZIL">Brasil</option>
+                <option value="CUSTOM">Restrito / revisar com operacao</option>
+              </select>
+            </label>
+            <label>
+              Inicio do preview
+              <input name="previewStartSec" type="number" min="0" placeholder="Ex: 30 segundos" />
+            </label>
+          </div>
+          <div className="checkList legalChecks">
+            <label>
+              <input name="explicitContent" type="checkbox" />
+              <span>Este lancamento possui conteudo explicito.</span>
+            </label>
+          </div>
+        </section>
+
+        <section className="formSection">
+          <h2>Arquivos do lancamento</h2>
           <div className="formGrid">
             <label>
               Master final
@@ -112,38 +177,37 @@ export default async function NewReleasePage({
         </section>
 
         <section className="formSection">
-          <h2>Créditos e splits</h2>
+          <h2>Creditos e splits</h2>
           {[0, 1, 2].map((index) => (
             <div className="splitRow" key={index}>
               <input name="contributorName" placeholder={index === 0 ? "Nome do artista/compositor" : "Nome"} />
-              <input name="contributorRole" placeholder="Função: artista, compositor, produtor" />
+              <input name="contributorRole" placeholder="Funcao: artista, compositor, produtor" />
               <input name="contributorShare" type="number" min="0" max="100" placeholder="%" />
             </div>
           ))}
           <label>
-            Observações para revisão
-            <textarea name="notes" rows={4} placeholder="Ex: confirmar ISRC com distribuidora parceira" />
+            Observacoes para revisao
+            <textarea name="notes" rows={4} placeholder="Ex: confirmar ISRC com operacao antes do envio" />
           </label>
         </section>
 
         <section className="formSection">
-          <h2>Declarações e envio</h2>
+          <h2>Declaracoes e envio</h2>
           <p className="mutedText">
-            Esta etapa prepara o pacote para envio. A entrega real para DSPs entra por integração com
-            agregadora/distribuidora parceira.
+            Esta etapa prepara o pacote para revisao operacional e entrega digital sob a marca Tunix.
           </p>
           <div className="checkList legalChecks">
             <label>
               <input name="rightsDeclaration" type="checkbox" />
-              <span>Declaro que sou titular ou possuo autorização para distribuir o fonograma, capa, créditos e metadados informados.</span>
+              <span>Declaro que sou titular ou possuo autorizacao para distribuir o fonograma, capa, creditos e metadados informados.</span>
             </label>
             <label>
               <input name="distributionAgreement" type="checkbox" />
-              <span>Autorizo a Tunix a processar este pacote para revisão operacional e distribuição conforme contrato aplicável.</span>
+              <span>Autorizo a Tunix a processar este pacote para revisao operacional e distribuicao conforme contrato aplicavel.</span>
             </label>
           </div>
           <div className="formActions">
-            <button className="primaryButton" type="submit">Preparar distribuição</button>
+            <button className="primaryButton" type="submit">Preparar distribuicao</button>
           </div>
         </section>
       </form>

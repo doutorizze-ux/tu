@@ -698,12 +698,23 @@ export async function expressInterest(formData: FormData) {
 export async function createRelease(formData: FormData) {
   const user = await requireUser();
   const title = formString(formData, "title");
+  const trackTitle = formString(formData, "trackTitle") || title;
+  const versionTitle = formString(formData, "versionTitle");
   const artistName = formString(formData, "artistName");
+  const primaryArtistLegalName = formString(formData, "primaryArtistLegalName");
   const labelName = formString(formData, "labelName");
+  const rightsHolderName = formString(formData, "rightsHolderName") || labelName || artistName;
+  const rightsHolderDocument = formString(formData, "rightsHolderDocument").replace(/\D/g, "");
   const genre = formString(formData, "genre");
   const language = formString(formData, "language") || "pt-BR";
   const releaseType = formString(formData, "releaseType") || "SINGLE";
   const releaseDateValue = formString(formData, "releaseDate");
+  const explicitContent = formData.get("explicitContent") === "on";
+  const pLine = formString(formData, "pLine");
+  const cLine = formString(formData, "cLine");
+  const copyrightYear = Number(formData.get("copyrightYear"));
+  const territories = formString(formData, "territories") || "WORLDWIDE";
+  const previewStartSec = Number(formData.get("previewStartSec"));
   const isrc = formString(formData, "isrc");
   const upc = formString(formData, "upc");
   const notes = formString(formData, "notes");
@@ -716,7 +727,7 @@ export async function createRelease(formData: FormData) {
   const acceptedRights = formData.get("rightsDeclaration") === "on";
   const acceptedDistribution = formData.get("distributionAgreement") === "on";
 
-  if (!title || !artistName || !genre || !platforms.length) {
+  if (!title || !trackTitle || !artistName || !genre || !language || !rightsHolderName || !pLine || !cLine || !Number.isFinite(copyrightYear) || copyrightYear < 1900 || !platforms.length) {
     redirect("/lancamentos/novo?erro=dados");
   }
 
@@ -729,12 +740,23 @@ export async function createRelease(formData: FormData) {
       data: {
         ownerId: user.id,
         title,
+        trackTitle,
+        versionTitle: versionTitle || null,
         artistName,
+        primaryArtistLegalName: primaryArtistLegalName || null,
         labelName: labelName || null,
+        rightsHolderName,
+        rightsHolderDocument: rightsHolderDocument || null,
         genre,
         language,
         releaseType,
         releaseDate: releaseDateValue ? new Date(`${releaseDateValue}T12:00:00`) : null,
+        explicitContent,
+        pLine,
+        cLine,
+        copyrightYear: Math.round(copyrightYear),
+        territories,
+        previewStartSec: Number.isFinite(previewStartSec) ? Math.max(0, Math.round(previewStartSec)) : null,
         isrc: isrc || null,
         upc: upc || null,
         masterFileName: masterFile instanceof File && masterFile.size > 0 ? masterFile.name : null,
@@ -781,7 +803,9 @@ export async function createRelease(formData: FormData) {
         entityId: createdRelease.id,
         metadata: {
           title,
+          trackTitle,
           artistName,
+          rightsHolderName,
           platforms,
           chargedCredits: cost?.credits ?? 0,
         },
@@ -798,7 +822,9 @@ export async function createRelease(formData: FormData) {
           assertions: {
             accepted: RELEASE_RIGHTS_ASSERTIONS,
             title,
+            trackTitle,
             artistName,
+            rightsHolderName,
             acceptedAt: new Date().toISOString(),
           },
         },
@@ -869,12 +895,23 @@ export async function updateRelease(formData: FormData) {
   const user = await requireUser();
   const releaseId = formString(formData, "releaseId");
   const title = formString(formData, "title");
+  const trackTitle = formString(formData, "trackTitle") || title;
+  const versionTitle = formString(formData, "versionTitle");
   const artistName = formString(formData, "artistName");
+  const primaryArtistLegalName = formString(formData, "primaryArtistLegalName");
   const labelName = formString(formData, "labelName");
+  const rightsHolderName = formString(formData, "rightsHolderName") || labelName || artistName;
+  const rightsHolderDocument = formString(formData, "rightsHolderDocument").replace(/\D/g, "");
   const genre = formString(formData, "genre");
   const language = formString(formData, "language") || "pt-BR";
   const releaseType = formString(formData, "releaseType") || "SINGLE";
   const releaseDateValue = formString(formData, "releaseDate");
+  const explicitContent = formData.get("explicitContent") === "on";
+  const pLine = formString(formData, "pLine");
+  const cLine = formString(formData, "cLine");
+  const copyrightYear = Number(formData.get("copyrightYear"));
+  const territories = formString(formData, "territories") || "WORLDWIDE";
+  const previewStartSec = Number(formData.get("previewStartSec"));
   const isrc = formString(formData, "isrc");
   const upc = formString(formData, "upc");
   const notes = formString(formData, "notes");
@@ -901,7 +938,7 @@ export async function updateRelease(formData: FormData) {
     redirect(`/lancamentos/${release.id}/editar?erro=status`);
   }
 
-  if (!title || !artistName || !genre || !platforms.length) {
+  if (!title || !trackTitle || !artistName || !genre || !language || !rightsHolderName || !pLine || !cLine || !Number.isFinite(copyrightYear) || copyrightYear < 1900 || !platforms.length) {
     redirect(`/lancamentos/${release.id}/editar?erro=dados`);
   }
 
@@ -921,12 +958,23 @@ export async function updateRelease(formData: FormData) {
       where: { id: release.id },
       data: {
         title,
+        trackTitle,
+        versionTitle: versionTitle || null,
         artistName,
+        primaryArtistLegalName: primaryArtistLegalName || null,
         labelName: labelName || null,
+        rightsHolderName,
+        rightsHolderDocument: rightsHolderDocument || null,
         genre,
         language,
         releaseType,
         releaseDate: releaseDateValue ? new Date(`${releaseDateValue}T12:00:00`) : null,
+        explicitContent,
+        pLine,
+        cLine,
+        copyrightYear: Math.round(copyrightYear),
+        territories,
+        previewStartSec: Number.isFinite(previewStartSec) ? Math.max(0, Math.round(previewStartSec)) : null,
         isrc: isrc || null,
         upc: upc || null,
         masterFileName: masterFile instanceof File && masterFile.size > 0 ? masterFile.name : release.masterFileName,

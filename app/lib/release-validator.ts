@@ -11,7 +11,19 @@ export type ReleaseValidationIssue = {
 
 type ReleaseForValidation = Pick<
   Release,
-  "artistName" | "genre" | "isrc" | "releaseDate" | "title" | "upc"
+  | "artistName"
+  | "cLine"
+  | "copyrightYear"
+  | "genre"
+  | "isrc"
+  | "language"
+  | "pLine"
+  | "releaseDate"
+  | "rightsHolderName"
+  | "territories"
+  | "title"
+  | "trackTitle"
+  | "upc"
 > & {
   assets: ReleaseAsset[];
   contributors: ReleaseContributor[];
@@ -62,12 +74,32 @@ export function validateReleasePackage(release: ReleaseForValidation) {
     issues.push(validationIssue("BLOCKER", "TITLE_REQUIRED", "Titulo obrigatorio", "Informe o titulo comercial do lancamento."));
   }
 
+  if (!release.trackTitle?.trim()) {
+    issues.push(validationIssue("BLOCKER", "TRACK_TITLE_REQUIRED", "Titulo da faixa obrigatorio", "Informe o titulo da faixa principal."));
+  }
+
   if (!release.artistName.trim()) {
     issues.push(validationIssue("BLOCKER", "ARTIST_REQUIRED", "Artista obrigatorio", "Informe o nome artistico principal."));
   }
 
   if (!release.genre.trim()) {
     issues.push(validationIssue("BLOCKER", "GENRE_REQUIRED", "Genero obrigatorio", "Informe o genero principal do lancamento."));
+  }
+
+  if (!release.language.trim()) {
+    issues.push(validationIssue("BLOCKER", "LANGUAGE_REQUIRED", "Idioma obrigatorio", "Informe o idioma principal do fonograma."));
+  }
+
+  if (!release.rightsHolderName?.trim()) {
+    issues.push(validationIssue("BLOCKER", "RIGHTS_HOLDER_REQUIRED", "Titular obrigatorio", "Informe o titular comercial ou selo responsavel pelo lancamento."));
+  }
+
+  if (!release.pLine?.trim() || !release.cLine?.trim() || !release.copyrightYear) {
+    issues.push(validationIssue("BLOCKER", "COPYRIGHT_REQUIRED", "Copyright incompleto", "Informe linhas P e C e o ano de copyright."));
+  }
+
+  if (!release.territories.trim()) {
+    issues.push(validationIssue("BLOCKER", "TERRITORIES_REQUIRED", "Territorios obrigatorios", "Informe se a distribuicao e mundial ou restrita."));
   }
 
   if (!master) {

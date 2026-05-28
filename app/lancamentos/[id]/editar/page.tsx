@@ -122,15 +122,27 @@ export default async function EditReleasePage({
           ) : null}
 
           <section className="formSection">
-            <h2>Dados do fonograma</h2>
+            <h2>Identificacao do lancamento</h2>
             <div className="formGrid">
               <label>
                 Titulo do lancamento
                 <input name="title" defaultValue={release.title} />
               </label>
               <label>
+                Titulo da faixa principal
+                <input name="trackTitle" defaultValue={release.trackTitle ?? release.title} />
+              </label>
+              <label>
+                Versao
+                <input name="versionTitle" defaultValue={release.versionTitle ?? ""} placeholder="Original, remix, ao vivo..." />
+              </label>
+              <label>
                 Artista principal
                 <input name="artistName" defaultValue={release.artistName} />
+              </label>
+              <label>
+                Nome legal do artista
+                <input name="primaryArtistLegalName" defaultValue={release.primaryArtistLegalName ?? ""} />
               </label>
               <label>
                 Selo/gravadora
@@ -139,6 +151,15 @@ export default async function EditReleasePage({
               <label>
                 Genero
                 <input name="genre" defaultValue={release.genre} />
+              </label>
+              <label>
+                Idioma
+                <select name="language" defaultValue={release.language}>
+                  <option value="pt-BR">Portugues (Brasil)</option>
+                  <option value="en">Ingles</option>
+                  <option value="es">Espanhol</option>
+                  <option value="instrumental">Instrumental</option>
+                </select>
               </label>
               <label>
                 Tipo
@@ -159,6 +180,50 @@ export default async function EditReleasePage({
               <label>
                 UPC
                 <input name="upc" defaultValue={release.upc ?? ""} placeholder="7890000000000" />
+              </label>
+            </div>
+          </section>
+
+          <section className="formSection">
+            <h2>Direitos e territorios</h2>
+            <div className="formGrid">
+              <label>
+                Titular dos direitos
+                <input name="rightsHolderName" defaultValue={release.rightsHolderName ?? release.labelName ?? release.artistName} />
+              </label>
+              <label>
+                CPF/CNPJ do titular
+                <input name="rightsHolderDocument" inputMode="numeric" defaultValue={release.rightsHolderDocument ?? ""} />
+              </label>
+              <label>
+                Ano de copyright
+                <input name="copyrightYear" type="number" min="1900" max="2100" defaultValue={release.copyrightYear ?? new Date().getFullYear()} />
+              </label>
+              <label>
+                Linha P
+                <input name="pLine" defaultValue={release.pLine ?? ""} />
+              </label>
+              <label>
+                Linha C
+                <input name="cLine" defaultValue={release.cLine ?? ""} />
+              </label>
+              <label>
+                Territorios
+                <select name="territories" defaultValue={release.territories}>
+                  <option value="WORLDWIDE">Mundial</option>
+                  <option value="BRAZIL">Brasil</option>
+                  <option value="CUSTOM">Restrito / revisar com operacao</option>
+                </select>
+              </label>
+              <label>
+                Inicio do preview
+                <input name="previewStartSec" type="number" min="0" defaultValue={release.previewStartSec ?? ""} />
+              </label>
+            </div>
+            <div className="checkList legalChecks">
+              <label>
+                <input name="explicitContent" type="checkbox" defaultChecked={release.explicitContent} />
+                <span>Este lancamento possui conteudo explicito.</span>
               </label>
             </div>
           </section>

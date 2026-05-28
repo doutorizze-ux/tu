@@ -22,12 +22,27 @@ export function buildDistributionPayload(release: ReleaseWithRelations) {
   return {
     externalReleaseId: release.id,
     title: release.title,
+    trackTitle: release.trackTitle ?? release.title,
+    versionTitle: release.versionTitle,
     artistName: release.artistName,
+    primaryArtistLegalName: release.primaryArtistLegalName,
     labelName: release.labelName,
+    rightsHolder: {
+      name: release.rightsHolderName,
+      document: release.rightsHolderDocument,
+    },
     genre: release.genre,
     language: release.language,
     releaseType: release.releaseType,
     releaseDate: release.releaseDate?.toISOString() ?? null,
+    explicitContent: release.explicitContent,
+    copyright: {
+      pLine: release.pLine,
+      cLine: release.cLine,
+      year: release.copyrightYear,
+    },
+    territories: release.territories,
+    previewStartSec: release.previewStartSec,
     identifiers: {
       isrc: release.isrc,
       upc: release.upc,
