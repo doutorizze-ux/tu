@@ -19,7 +19,7 @@ export function MarketingHeader() {
       <Brand />
       <nav className="nav">
         <Link href="/catalogo">Catálogo</Link>
-        <Link href="/painel">Painel</Link>
+        <Link href="/creditos">Creditos</Link>
         <Link href="/composicoes/nova">Cadastrar música</Link>
       </nav>
       <Link className="ghostButton linkButton" href="/entrar">

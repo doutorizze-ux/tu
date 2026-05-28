@@ -3,9 +3,48 @@ import { MarketingHeader, SongMeta } from "./components";
 import { compositions, filters } from "./data";
 
 const metrics = [
-  { label: "Composicoes cadastradas", value: "128" },
-  { label: "Interesses enviados", value: "43" },
-  { label: "Artistas buscando repertorio", value: "19" },
+  { label: "Obras no catalogo", value: "128" },
+  { label: "Interesses qualificados", value: "43" },
+  { label: "Lancamentos em preparo", value: "19" },
+];
+
+const operatingStack = [
+  {
+    label: "Catalogo",
+    title: "Repertorio organizado para decisao comercial.",
+    text: "Composicoes com audio, metadados, filtros profissionais e historico de interesse em um fluxo unico.",
+  },
+  {
+    label: "Creditos",
+    title: "Uso por saldo, sem plano mensal.",
+    text: "O cliente compra creditos e usa em acoes da plataforma, como cadastrar composicoes e preparar lancamentos.",
+  },
+  {
+    label: "Distribuicao",
+    title: "Pacotes prontos para sair do painel.",
+    text: "Master, capa, ISRC, UPC, splits, plataformas e revisao operacional antes do envio.",
+  },
+];
+
+const creditPacks = [
+  {
+    name: "Inicial",
+    amount: "20 creditos",
+    price: "R$ 49,90",
+    note: "Para validar repertorio e iniciar os primeiros cadastros.",
+  },
+  {
+    name: "Profissional",
+    amount: "80 creditos",
+    price: "R$ 169,90",
+    note: "Para artistas, compositores e selos com operacao constante.",
+  },
+  {
+    name: "Gravadora",
+    amount: "220 creditos",
+    price: "R$ 399,90",
+    note: "Para catalogos maiores e equipes que trabalham em volume.",
+  },
 ];
 
 export default function Home() {
@@ -15,11 +54,11 @@ export default function Home() {
 
       <section className="hero">
         <div className="heroCopy">
-          <p className="eyebrow">Startup musical brasileira</p>
-          <h1>O lugar onde musicas ineditas encontram artistas prontos para gravar.</h1>
+          <p className="eyebrow">Infraestrutura musical brasileira</p>
+          <h1>A plataforma para transformar repertorio em operacao.</h1>
           <p>
-            Organize composicoes, proteja o historico da obra, encontre repertorios
-            com filtros profissionais e prepare o caminho para negociacao e lancamento.
+            A Tunix organiza composicoes, interesses, creditos e lancamentos em
+            um ambiente de trabalho serio para compositores, artistas, selos e produtores.
           </p>
           <div className="heroActions">
             <Link className="primaryButton linkButton" href="/composicoes/nova">
@@ -29,14 +68,33 @@ export default function Home() {
               Buscar repertorio
             </Link>
           </div>
+          <div className="trustStrip" aria-label="Modulos principais">
+            <span>Catalogo auditavel</span>
+            <span>Compra de creditos</span>
+            <span>Distribuicao musical</span>
+          </div>
         </div>
 
         <section className="studioPanel" aria-label="Painel demonstrativo">
           <div className="panelHeader">
-            <span>Radar de oportunidades</span>
-            <strong>R$ 38.400</strong>
+            <span>Centro operacional</span>
+            <strong>Ativo</strong>
           </div>
-          <div className="soundWave" aria-hidden="true">
+          <div className="dealBoard" aria-hidden="true">
+            <div>
+              <span>Saldo em creditos</span>
+              <strong>220</strong>
+            </div>
+            <div>
+              <span>Fila de revisao</span>
+              <strong>12</strong>
+            </div>
+            <div>
+              <span>Pacotes enviados</span>
+              <strong>7</strong>
+            </div>
+          </div>
+          <div className="soundWave compactWave" aria-hidden="true">
             {Array.from({ length: 24 }).map((_, index) => (
               <span key={index} style={{ height: `${24 + ((index * 17) % 58)}px` }} />
             ))}
@@ -50,6 +108,22 @@ export default function Home() {
             ))}
           </div>
         </section>
+      </section>
+
+      <section className="businessSection" id="operacao">
+        <div className="sectionTitle">
+          <p className="eyebrow">Produto de verdade</p>
+          <h2>Uma base corporativa para operar catalogo, saldo e distribuicao.</h2>
+        </div>
+        <div className="businessGrid">
+          {operatingStack.map((item) => (
+            <article key={item.label}>
+              <span>{item.label}</span>
+              <h3>{item.title}</h3>
+              <p>{item.text}</p>
+            </article>
+          ))}
+        </div>
       </section>
 
       <section className="section" id="catalogo">
@@ -79,8 +153,8 @@ export default function Home() {
 
       <section className="workflow" id="fluxo">
         <div>
-          <p className="eyebrow">Fluxo inicial</p>
-          <h2>Da obra guardada ao interesse de gravacao.</h2>
+          <p className="eyebrow">Fluxo operacional</p>
+          <h2>Da obra cadastrada ao pacote pronto para lancamento.</h2>
         </div>
         <ol>
           <li>
@@ -88,37 +162,33 @@ export default function Home() {
             <span>Letra, audio guia, genero, tema, clima, BPM, voz e autores.</span>
           </li>
           <li>
-            <strong>Artista encontra</strong>
-            <span>Busca repertorio com filtros e salva as melhores opcoes.</span>
+            <strong>Credito movimenta</strong>
+            <span>Cada acao relevante consome saldo definido pelo admin, sem assinatura mensal.</span>
           </li>
           <li>
-            <strong>Interesse registrado</strong>
-            <span>A plataforma guarda historico, mensagem e status da negociacao.</span>
+            <strong>Operacao valida</strong>
+            <span>A plataforma registra historico, revisao, pendencias e status antes do envio.</span>
           </li>
         </ol>
       </section>
 
-      <section className="plans" id="planos">
+      <section className="plans" id="creditos">
         <div className="sectionTitle">
-          <p className="eyebrow">Monetizacao</p>
-          <h2>Planos pensados para validar receita desde cedo.</h2>
+          <p className="eyebrow">Compra de creditos</p>
+          <h2>Pacotes flexiveis para usar conforme a operacao cresce.</h2>
         </div>
         <div className="planGrid">
-          <article>
-            <h3>Compositor Start</h3>
-            <p>Para publicar as primeiras obras e medir interesse.</p>
-            <strong>Gratis</strong>
-          </article>
-          <article>
-            <h3>Compositor Pro</h3>
-            <p>Catalogo maior, destaques e estatisticas.</p>
-            <strong>R$ 39/mes</strong>
-          </article>
-          <article>
-            <h3>Produtor</h3>
-            <p>Busca avancada, listas e interesses ilimitados.</p>
-            <strong>R$ 59/mes</strong>
-          </article>
+          {creditPacks.map((pack) => (
+            <article key={pack.name}>
+              <span>{pack.amount}</span>
+              <h3>{pack.name}</h3>
+              <p>{pack.note}</p>
+              <strong>{pack.price}</strong>
+              <Link className="secondaryButton linkButton" href="/creditos">
+                Comprar creditos
+              </Link>
+            </article>
+          ))}
         </div>
       </section>
     </main>
