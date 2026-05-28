@@ -22,6 +22,7 @@ export default async function CreditsPage({
 }) {
   const user = await requireUser();
   const params = await searchParams;
+  const asaasConfigured = isAsaasConfigured();
   const [balance, packages, actionCosts, orders, ledger] = await Promise.all([
     getCreditBalance(user.id),
     getActiveCreditPackages(),
@@ -74,6 +75,12 @@ export default async function CreditsPage({
         <p className="formSuccess">Checkout aberto. Os créditos entram automaticamente quando o Asaas confirmar o pagamento.</p>
       ) : null}
 
+      {!asaasConfigured ? (
+        <p className="formError">
+          Pagamento indisponivel: configure ASAAS_API_KEY no Coolify e reinicie o deploy.
+        </p>
+      ) : null}
+
       <section className="creditPackages">
         {packages.map((item) => (
           <article className="creditPackage" key={item.code}>
@@ -85,7 +92,7 @@ export default async function CreditsPage({
             <strong>{money(item.amount)}</strong>
             <form action={createCreditOrder}>
               <input name="packageCode" type="hidden" value={item.code} />
-              <button className="primaryButton" type="submit" disabled={!isAsaasConfigured()}>
+              <button className="primaryButton" type="submit" disabled={!asaasConfigured}>
                 Comprar com Pix ou cartão
               </button>
             </form>

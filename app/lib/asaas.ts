@@ -18,7 +18,7 @@ type AsaasPayment = {
 };
 
 function apiKey() {
-  return process.env.ASAAS_API_KEY?.trim();
+  return process.env.ASAAS_API_KEY?.trim() || process.env.ASAAS_ACCESS_TOKEN?.trim();
 }
 
 export function isAsaasConfigured() {
