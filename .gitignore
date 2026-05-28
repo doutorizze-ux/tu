@@ -1,0 +1,10 @@
+.env
+.next/
+node_modules/
+*.log
+.codex-*.png
+prisma/dev.db
+storage/audio/*
+!storage/audio/.gitkeep
+storage/releases/*
+!storage/releases/.gitkeep

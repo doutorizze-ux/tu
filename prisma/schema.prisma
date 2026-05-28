@@ -1,0 +1,506 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profile      Profile?
+  roles        UserRole[]
+  sessions     UserSession[]
+  releases     Release[]
+  compositions Composition[] @relation("ComposerCompositions")
+  favorites    Favorite[]
+  interests    Interest[]    @relation("InterestedUser")
+  auditLogs     AuditLog[]
+  releaseReviews ReleaseReview[]
+  notifications Notification[]
+  agreements    UserAgreement[]
+  releaseDeclarations ReleaseDeclaration[]
+  compositionDeclarations CompositionDeclaration[]
+  releaseRequests ReleaseRequest[]
+  supportTickets SupportTicket[]
+  creditOrders   CreditOrder[]
+  creditLedger   CreditLedgerEntry[]
+  asaasCustomerId String?
+}
+
+model UserRole {
+  id        String   @id @default(cuid())
+  userId    String
+  role      String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, role])
+}
+
+model UserSession {
+  id           String   @id @default(cuid())
+  userId       String
+  sessionToken String   @unique
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Profile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  displayName String
+  city        String?
+  state       String?
+  bio         String?
+  website     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Composition {
+  id                 String            @id @default(cuid())
+  composerId         String
+  title              String
+  lyrics             String?
+  genre              String
+  theme              String?
+  mood               String?
+  bpm                Int?
+  language           String            @default("pt-BR")
+  voiceType          String?
+  status             String            @default("DRAFT")
+  isPublished        Boolean           @default(false)
+  authorsDeclaration Boolean           @default(false)
+  lyricsVisibility   String            @default("INTERESTED")
+  audioVisibility    String            @default("INTERESTED")
+  accessNote         String?
+  publishedAt        DateTime?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+
+  composer  User                 @relation("ComposerCompositions", fields: [composerId], references: [id], onDelete: Cascade)
+  versions  CompositionVersion[]
+  audio     AudioAsset?
+  declarations CompositionDeclaration[]
+  tags      CompositionTag[]
+  favorites Favorite[]
+  interests Interest[]
+
+  @@unique([composerId, title])
+}
+
+model CompositionDeclaration {
+  id              String   @id @default(cuid())
+  compositionId   String
+  userId          String
+  declarationType String
+  version         String
+  authorshipRole  String
+  aiUsage         String
+  aiDisclosure    String?
+  rightsNotes     String?
+  assertions      Json
+  acceptedAt      DateTime @default(now())
+
+  composition Composition @relation(fields: [compositionId], references: [id], onDelete: Cascade)
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model CompositionVersion {
+  id            String   @id @default(cuid())
+  compositionId String
+  title         String
+  lyrics        String?
+  metadata      Json
+  createdAt     DateTime @default(now())
+
+  composition Composition @relation(fields: [compositionId], references: [id], onDelete: Cascade)
+}
+
+model AudioAsset {
+  id            String   @id @default(cuid())
+  compositionId String   @unique
+  storageKey    String
+  fileName      String
+  mimeType      String
+  sizeBytes     Int
+  durationSec   Int?
+  createdAt     DateTime @default(now())
+
+  composition Composition @relation(fields: [compositionId], references: [id], onDelete: Cascade)
+}
+
+model Release {
+  id              String   @id @default(cuid())
+  ownerId         String
+  title           String
+  artistName      String
+  labelName       String?
+  genre           String
+  language        String   @default("pt-BR")
+  releaseType     String   @default("SINGLE")
+  releaseDate     DateTime?
+  isrc            String?
+  upc             String?
+  masterFileName  String?
+  coverFileName   String?
+  status          String   @default("DRAFT")
+  notes           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  owner        User                 @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  platforms    ReleasePlatform[]
+  contributors ReleaseContributor[]
+  deliveries   DistributionDelivery[]
+  assets       ReleaseAsset[]
+  reviews      ReleaseReview[]
+  royaltyStatements RoyaltyStatement[]
+  declarations ReleaseDeclaration[]
+  requests     ReleaseRequest[]
+}
+
+model UserAgreement {
+  id              String   @id @default(cuid())
+  userId          String
+  documentType    String
+  documentVersion String
+  acceptedAt      DateTime @default(now())
+  context         String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, documentType, documentVersion])
+}
+
+model ReleaseDeclaration {
+  id              String   @id @default(cuid())
+  releaseId       String
+  userId          String
+  declarationType String
+  version         String
+  assertions      Json
+  acceptedAt      DateTime @default(now())
+
+  release Release @relation(fields: [releaseId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([releaseId, declarationType, version])
+}
+
+model ReleaseRequest {
+  id            String    @id @default(cuid())
+  releaseId     String
+  requestedById String
+  type          String
+  status        String    @default("OPEN")
+  reason        String
+  details       String?
+  adminNote     String?
+  resolvedAt    DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  release     Release @relation(fields: [releaseId], references: [id], onDelete: Cascade)
+  requestedBy User    @relation(fields: [requestedById], references: [id], onDelete: Cascade)
+}
+
+model SupportTicket {
+  id        String   @id @default(cuid())
+  userId    String
+  subject   String
+  category  String
+  priority  String   @default("NORMAL")
+  status    String   @default("OPEN")
+  message   String
+  adminNote String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model CreditOrder {
+  id              String    @id @default(cuid())
+  userId          String
+  packageCode     String
+  credits         Int
+  amount          Float
+  currency        String    @default("BRL")
+  status          String    @default("PENDING")
+  provider        String    @default("ASAAS")
+  providerPaymentId String?
+  providerInvoiceUrl String?
+  externalReference String    @unique
+  paidAt          DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model CreditPackage {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  name        String
+  credits     Int
+  amount      Float
+  description String
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model CreditActionCost {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  label       String
+  credits     Int
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model CreditLedgerEntry {
+  id          String   @id @default(cuid())
+  userId      String
+  orderId     String?
+  type        String
+  amount      Int
+  balanceAfter Int
+  reason      String
+  entity      String?
+  entityId    String?
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PaymentWebhookEvent {
+  id          String   @id @default(cuid())
+  provider    String
+  eventId     String   @unique
+  eventType   String
+  payload     Json
+  processedAt DateTime @default(now())
+}
+
+model ReleaseAsset {
+  id         String   @id @default(cuid())
+  releaseId  String
+  type       String
+  storageKey String
+  fileName   String
+  mimeType   String
+  sizeBytes  Int
+  checksum   String?
+  createdAt  DateTime @default(now())
+
+  release Release @relation(fields: [releaseId], references: [id], onDelete: Cascade)
+
+  @@unique([releaseId, type])
+}
+
+model ReleasePlatform {
+  id        String   @id @default(cuid())
+  releaseId String
+  platform  String
+  status    String   @default("PENDING")
+  createdAt DateTime @default(now())
+
+  release Release @relation(fields: [releaseId], references: [id], onDelete: Cascade)
+
+  @@unique([releaseId, platform])
+}
+
+model ReleaseContributor {
+  id           String   @id @default(cuid())
+  releaseId    String
+  name         String
+  role         String
+  royaltyShare Float?
+  createdAt    DateTime @default(now())
+
+  release Release @relation(fields: [releaseId], references: [id], onDelete: Cascade)
+}
+
+model ReleaseReview {
+  id         String   @id @default(cuid())
+  releaseId  String
+  reviewerId String
+  decision   String
+  note       String?
+  createdAt  DateTime @default(now())
+
+  release  Release @relation(fields: [releaseId], references: [id], onDelete: Cascade)
+  reviewer User    @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id          String    @id @default(cuid())
+  userId      String
+  type        String
+  title       String
+  body        String
+  href        String?
+  entity      String?
+  entityId    String?
+  readAt      DateTime?
+  createdAt   DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model RoyaltyStatement {
+  id           String   @id @default(cuid())
+  releaseId    String
+  platform     String
+  periodStart  DateTime
+  periodEnd    DateTime
+  currency     String   @default("BRL")
+  grossAmount  Float
+  netAmount    Float
+  status       String   @default("OPEN")
+  source       String?
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  release      Release              @relation(fields: [releaseId], references: [id], onDelete: Cascade)
+  participants RoyaltyParticipant[]
+
+  @@unique([releaseId, platform, periodStart, periodEnd, currency])
+}
+
+model RoyaltyParticipant {
+  id          String   @id @default(cuid())
+  statementId String
+  name        String
+  role        String
+  share       Float
+  amount      Float
+  status      String   @default("PENDING")
+  createdAt   DateTime @default(now())
+
+  statement RoyaltyStatement @relation(fields: [statementId], references: [id], onDelete: Cascade)
+}
+
+model DistributionDelivery {
+  id             String   @id @default(cuid())
+  releaseId      String
+  provider       String
+  endpoint       String?
+  status         String   @default("CREATED")
+  requestPayload Json
+  responseStatus Int?
+  responseBody   String?
+  errorMessage   String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  release Release @relation(fields: [releaseId], references: [id], onDelete: Cascade)
+}
+
+model DistributionIntegration {
+  id                     String   @id @default(cuid())
+  provider               String
+  environment            String   @default("SANDBOX")
+  endpoint               String
+  testEndpoint           String?
+  apiKeyEncrypted        String
+  webhookSecretEncrypted String
+  isActive               Boolean  @default(false)
+  status                 String   @default("NOT_TESTED")
+  lastTestStatus         Int?
+  lastTestMessage        String?
+  lastTestedAt           DateTime?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  logs DistributionIntegrationLog[]
+}
+
+model DistributionIntegrationLog {
+  id            String   @id @default(cuid())
+  integrationId String
+  action        String
+  status        String
+  responseStatus Int?
+  message       String?
+  createdAt     DateTime @default(now())
+
+  integration DistributionIntegration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+
+  compositions CompositionTag[]
+}
+
+model CompositionTag {
+  compositionId String
+  tagId         String
+
+  composition Composition @relation(fields: [compositionId], references: [id], onDelete: Cascade)
+  tag         Tag         @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([compositionId, tagId])
+}
+
+model Favorite {
+  id            String   @id @default(cuid())
+  userId        String
+  compositionId String
+  createdAt     DateTime @default(now())
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  composition Composition @relation(fields: [compositionId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, compositionId])
+}
+
+model Interest {
+  id            String          @id @default(cuid())
+  userId        String
+  compositionId String
+  purpose       String
+  status        String   @default("SENT")
+  message       String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  user        User        @relation("InterestedUser", fields: [userId], references: [id], onDelete: Cascade)
+  composition Composition @relation(fields: [compositionId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, compositionId])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String
+  entity    String
+  entityId  String
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
