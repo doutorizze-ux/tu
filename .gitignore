@@ -3,7 +3,7 @@
 node_modules/
 *.log
 .codex-*.png
-prisma/dev.db
+prisma/dev.db*
 storage/audio/*
 !storage/audio/.gitkeep
 storage/releases/*

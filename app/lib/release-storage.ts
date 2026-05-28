@@ -1,10 +1,9 @@
 import "server-only";
 
 import { createHash, randomUUID } from "node:crypto";
-import { mkdir, writeFile } from "node:fs/promises";
-import { extname, join } from "node:path";
+import { extname } from "node:path";
+import { putObject } from "./object-storage";
 
-const STORAGE_ROOT = join(process.cwd(), "storage", "releases");
 const MAX_MASTER_SIZE = 200 * 1024 * 1024;
 const MAX_COVER_SIZE = 20 * 1024 * 1024;
 const ALLOWED_MASTER_TYPES = new Set([
@@ -97,15 +96,13 @@ function validateReleaseAsset(file: File, type: "MASTER" | "COVER") {
 }
 
 export function releaseStoragePath(storageKey: string) {
-  return join(STORAGE_ROOT, storageKey);
+  return `releases/${storageKey}`;
 }
 
 export async function saveReleaseAsset(file: File, releaseId: string, type: "MASTER" | "COVER") {
   if (!validateReleaseAsset(file, type)) {
     return null;
   }
-
-  await mkdir(STORAGE_ROOT, { recursive: true });
 
   const originalName = sanitizeFileName(file.name || type.toLowerCase());
   const extension = extname(originalName);
@@ -122,7 +119,11 @@ export async function saveReleaseAsset(file: File, releaseId: string, type: "MAS
 
   const checksum = createHash("sha256").update(bytes).digest("hex");
 
-  await writeFile(releaseStoragePath(storageKey), bytes);
+  await putObject({
+    key: releaseStoragePath(storageKey),
+    body: bytes,
+    contentType: file.type,
+  });
 
   return {
     type,

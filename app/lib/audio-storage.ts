@@ -1,11 +1,10 @@
 import "server-only";
 
 import { randomUUID } from "node:crypto";
-import { mkdir, writeFile } from "node:fs/promises";
-import { extname, join } from "node:path";
+import { extname } from "node:path";
+import { putObject } from "./object-storage";
 
 const MAX_AUDIO_SIZE = 25 * 1024 * 1024;
-const STORAGE_ROOT = join(process.cwd(), "storage", "audio");
 const ALLOWED_AUDIO_TYPES = new Set([
   "audio/mpeg",
   "audio/mp3",
@@ -54,7 +53,7 @@ function sanitizeFileName(fileName: string) {
 }
 
 export function audioStoragePath(storageKey: string) {
-  return join(STORAGE_ROOT, storageKey);
+  return `audio/${storageKey}`;
 }
 
 export async function saveAudioGuide(file: File, compositionId: string) {
@@ -70,8 +69,6 @@ export async function saveAudioGuide(file: File, compositionId: string) {
     throw new Error("Formato de audio nao suportado.");
   }
 
-  await mkdir(STORAGE_ROOT, { recursive: true });
-
   const originalName = sanitizeFileName(file.name || "audio-guia");
   const extension = extname(originalName);
   const storageKey = `${compositionId}-${randomUUID()}${extension || ".audio"}`;
@@ -81,7 +78,11 @@ export async function saveAudioGuide(file: File, compositionId: string) {
     throw new Error("Assinatura do arquivo de audio nao corresponde ao formato informado.");
   }
 
-  await writeFile(audioStoragePath(storageKey), bytes);
+  await putObject({
+    key: audioStoragePath(storageKey),
+    body: bytes,
+    contentType: file.type,
+  });
 
   return {
     storageKey,

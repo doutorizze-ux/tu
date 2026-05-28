@@ -16,7 +16,7 @@ revisao juridica, banco de producao, storage profissional, monitoramento e homol
 ## 2. Arquivos
 
 - Desenvolvimento: `storage/audio` e `storage/releases`.
-- Producao recomendada: S3, Cloudflare R2, MinIO ou Supabase Storage.
+- Staging/producao: S3 compativel configurado por `S3_BUCKET`, `S3_ENDPOINT`, `S3_REGION`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` e `S3_FORCE_PATH_STYLE`.
 - O sistema ja valida MIME type, tamanho, nome sanitizado, checksum e assinatura basica de audio/imagem.
 - Obrigatorio antes de cliente real: URL assinada, antivirus/scan assíncrono, backup e politica de retencao.
 

@@ -1,8 +1,8 @@
-import { readFile } from "node:fs/promises";
 import { NextResponse } from "next/server";
 import { canAccessProtectedContent } from "../../../lib/access";
 import { audioStoragePath } from "../../../lib/audio-storage";
 import { getCurrentUser } from "../../../lib/auth";
+import { getObject } from "../../../lib/object-storage";
 import { prisma } from "../../../lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -41,7 +41,7 @@ export async function GET(
     return new NextResponse("Acesso negado.", { status: 403 });
   }
 
-  const bytes = await readFile(audioStoragePath(composition.audio.storageKey));
+  const bytes = await getObject(audioStoragePath(composition.audio.storageKey));
 
   return new NextResponse(bytes, {
     headers: {
