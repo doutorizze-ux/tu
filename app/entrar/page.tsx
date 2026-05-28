@@ -43,8 +43,8 @@ export default async function LoginPage({
           <strong>Contas para testar os painéis</strong>
           <span>Compositor: luan@tunix.local</span>
           <span>Artista: duo@tunix.local</span>
-          <span>Admin: admin@tunix.local</span>
-          <small>Senha de todas: demo123456</small>
+          <span>Admin: admin@tunix.com.br</span>
+          <small>Contas demo usam demo123456. Admin usa a senha definida para producao.</small>
         </div>
       </section>
     </main>

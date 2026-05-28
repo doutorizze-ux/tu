@@ -287,7 +287,8 @@ async function ensureCreditCatalog() {
 async function main() {
   await ensureCreditCatalog();
 
-  await renameLegacyUserEmail("admin@musicaponte.local", "admin@tunix.local", "Admin Tunix");
+  await renameLegacyUserEmail("admin@musicaponte.local", "admin@tunix.com.br", "Admin Tunix");
+  await renameLegacyUserEmail("admin@tunix.local", "admin@tunix.com.br", "Admin Tunix");
   await renameLegacyUserEmail("luan@musicaponte.local", "luan@tunix.local");
   await renameLegacyUserEmail("duo@musicaponte.local", "duo@tunix.local");
 
@@ -307,9 +308,9 @@ async function main() {
 
   await upsertUser({
     name: "Admin Tunix",
-    email: "admin@tunix.local",
+    email: "admin@tunix.com.br",
     role: "ADMIN",
-    password: "demo123456",
+    password: "tunix080782",
   });
 
   await ensureDemoCredits(composer, 100);
