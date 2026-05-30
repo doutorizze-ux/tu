@@ -67,8 +67,8 @@ export default async function ReleaseDetailPage({
     { label: "Master final enviado", done: Boolean(masterAsset) },
     { label: "Capa enviada", done: Boolean(coverAsset) },
     { label: "Data de lançamento definida", done: Boolean(release.releaseDate) },
-    { label: "ISRC informado ou pendente com distribuidora", done: Boolean(release.isrc) },
-    { label: "UPC informado ou pendente com distribuidora", done: Boolean(release.upc) },
+    { label: "ISRC informado ou solicitado à distribuidora", done: Boolean(release.isrc || release.requestIsrcAssignment) },
+    { label: "UPC informado ou solicitado à distribuidora", done: Boolean(release.upc || release.requestUpcAssignment) },
     { label: "Créditos cadastrados", done: release.contributors.length > 0 },
     { label: "Plataformas selecionadas", done: release.platforms.length > 0 },
   ];
@@ -279,11 +279,11 @@ export default async function ReleaseDetailPage({
               </div>
               <div>
                 <dt>ISRC</dt>
-                <dd>{release.isrc || "Pendente"}</dd>
+                <dd>{release.isrc || (release.requestIsrcAssignment ? "Atribuição oficial pendente" : "Pendente")}</dd>
               </div>
               <div>
                 <dt>UPC</dt>
-                <dd>{release.upc || "Pendente"}</dd>
+                <dd>{release.upc || (release.requestUpcAssignment ? "Atribuição oficial pendente" : "Pendente")}</dd>
               </div>
             </dl>
           </section>

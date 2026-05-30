@@ -166,6 +166,10 @@ model Release {
   previewStartSec Int?
   isrc            String?
   upc             String?
+  requestIsrcAssignment Boolean @default(true)
+  requestUpcAssignment  Boolean @default(true)
+  providerReleaseId String?
+  providerTrackId   String?
   masterFileName  String?
   coverFileName   String?
   status          String   @default("DRAFT")

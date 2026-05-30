@@ -1,5 +1,8 @@
 import "server-only";
 
+import { getObject } from "./object-storage";
+import { releaseStoragePath } from "./release-storage";
+
 const TOOLOST_APP_URL = "https://toolost.com";
 const TOOLOST_TOKEN_URL = "https://toolost.com/oauth/token";
 export const TOOLOST_API_BASE_URL = "https://api.toolost.com/v1";
@@ -21,6 +24,7 @@ type TooLostProfile = {
 
 type TooLostRequestPayload = {
   externalReleaseId?: string;
+  providerReleaseId?: string | null;
   title?: string;
   trackTitle?: string;
   versionTitle?: string | null;
@@ -40,6 +44,15 @@ type TooLostRequestPayload = {
   identifiers?: {
     isrc?: string | null;
     upc?: string | null;
+    requestIsrcAssignment?: boolean;
+    requestUpcAssignment?: boolean;
+  };
+  files?: {
+    master?: {
+      storageKey: string;
+      fileName: string;
+      mimeType: string;
+    } | null;
   };
   platforms?: string[];
   contributors?: Array<{
@@ -48,6 +61,27 @@ type TooLostRequestPayload = {
     royaltyShare: number | null;
   }>;
 };
+
+type TooLostTrack = {
+  id?: number;
+  isrc?: string | null;
+};
+
+type TooLostRelease = {
+  id: number;
+  upc?: string | null;
+  tracks?: TooLostTrack[];
+};
+
+export class TooLostDistributionError extends Error {
+  releaseId: number;
+
+  constructor(message: string, releaseId: number) {
+    super(message);
+    this.name = "TooLostDistributionError";
+    this.releaseId = releaseId;
+  }
+}
 
 export function tooLostClientId() {
   return process.env.TOOLOST_CLIENT_ID?.trim() || "";
@@ -114,7 +148,7 @@ async function apiRequest<T>({
 }: {
   accessToken: string;
   body?: unknown;
-  method: "GET" | "POST" | "PATCH";
+  method: "GET" | "POST" | "PATCH" | "PUT";
   path: string;
 }) {
   const response = await fetch(`${TOOLOST_API_BASE_URL}${path}`, {
@@ -217,21 +251,128 @@ function primaryParticipant(payload: TooLostRequestPayload) {
   }];
 }
 
-export async function submitTooLostDistribution(accessToken: string, payload: TooLostRequestPayload) {
-  const created = await apiRequest<{ data: { id: number } }>({
+function writerParticipants(payload: TooLostRequestPayload) {
+  return (payload.contributors ?? [])
+    .filter((item) => /composer|compositor|writer|autor/i.test(item.role))
+    .map((item) => ({
+      name: item.name,
+      role: ["composer"],
+    }));
+}
+
+function yyyyMmDd(value?: string | null) {
+  return value?.slice(0, 10) || undefined;
+}
+
+async function uploadMaster(accessToken: string, releaseId: number, master: NonNullable<TooLostRequestPayload["files"]>["master"]) {
+  if (!master) {
+    throw new Error("Master FLAC obrigatório para envio à distribuidora.");
+  }
+
+  if (master.mimeType !== "audio/flac" && !master.fileName.toLowerCase().endsWith(".flac")) {
+    throw new Error("A Too Lost exige master final no formato FLAC.");
+  }
+
+  const upload = await apiRequest<{
+    data: {
+      uploadUrl: string;
+      fileKey: string;
+      headers?: Record<string, string>;
+    };
+  }>({
     accessToken,
     method: "POST",
-    path: "/releases",
+    path: `/releases/${releaseId}/tracks/upload-url`,
+    body: {
+      kind: "audio",
+      fileName: master.fileName,
+      contentType: "audio/flac",
+    },
+  });
+  const bytes = await getObject(releaseStoragePath(master.storageKey));
+  const response = await fetch(upload.payload.data.uploadUrl, {
+    method: "PUT",
+    headers: {
+      ...(upload.payload.data.headers ?? {}),
+      "Content-Type": "audio/flac",
+    },
+    body: bytes,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Falha no upload seguro do master FLAC: HTTP ${response.status}.`);
+  }
+
+  return upload.payload.data.fileKey;
+}
+
+function providerIdentifiers(release: TooLostRelease) {
+  return {
+    isrc: release.tracks?.[0]?.isrc ?? null,
+    trackId: release.tracks?.[0]?.id ? String(release.tracks[0].id) : null,
+    upc: release.upc ?? null,
+  };
+}
+
+export async function submitTooLostDistribution(accessToken: string, payload: TooLostRequestPayload) {
+  const existingReleaseId = Number(payload.providerReleaseId);
+  const created = Number.isInteger(existingReleaseId) && existingReleaseId > 0
+    ? null
+    : await apiRequest<{ data: { id: number } }>({
+      accessToken,
+      method: "POST",
+      path: "/releases",
+      body: {
+        type: releaseType(payload.releaseType),
+        title: payload.title,
+        label: payload.labelName || payload.artistName || "Tunix",
+        participants: primaryParticipant(payload),
+      },
+    });
+  const releaseId = created?.payload.data.id ?? existingReleaseId;
+
+  try {
+    const metadata = await apiRequest({
+    accessToken,
+    method: "PATCH",
+    path: `/releases/${releaseId}/metadata`,
     body: {
       type: releaseType(payload.releaseType),
       title: payload.title,
+      version: payload.versionTitle || undefined,
       label: payload.labelName || payload.artistName || "Tunix",
+      primaryGenre: payload.genre,
+      language: payload.language,
+      releaseDate: yyyyMmDd(payload.releaseDate),
+      licenseType: "Copyright",
+      cYear: payload.copyright?.year,
+      cLine: payload.copyright?.cLine,
+      pYear: payload.copyright?.year,
+      pLine: payload.copyright?.pLine,
+      upc: payload.identifiers?.requestUpcAssignment ? undefined : payload.identifiers?.upc || undefined,
       participants: primaryParticipant(payload),
     },
   });
-  const releaseId = created.payload.data.id;
+    const audioFileKey = await uploadMaster(accessToken, releaseId, payload.files?.master);
+    const track = {
+    title: payload.trackTitle || payload.title,
+    version: payload.versionTitle || undefined,
+    language: payload.language,
+    audioFileKey,
+    artists: primaryParticipant(payload),
+    writers: writerParticipants(payload),
+    ...(!payload.identifiers?.requestIsrcAssignment && payload.identifiers?.isrc
+      ? { isrc: payload.identifiers.isrc }
+      : {}),
+  };
+    const tracks = await apiRequest<{ data: TooLostRelease }>({
+    accessToken,
+    method: "PUT",
+    path: `/releases/${releaseId}/tracks`,
+    body: { tracks: [track] },
+  });
 
-  const delivery = await apiRequest({
+    const delivery = await apiRequest({
     accessToken,
     method: "PATCH",
     path: `/releases/${releaseId}/delivery`,
@@ -247,22 +388,43 @@ export async function submitTooLostDistribution(accessToken: string, payload: To
     },
   });
 
-  const submitted = await apiRequest({
+    const submitted = await apiRequest({
     accessToken,
     method: "POST",
     path: `/releases/${releaseId}/submit`,
     body: {
+      acceptTerms: true,
+      confirmRights: true,
+      confirmYoutubeRights: payload.platforms?.some((platform) => platform.toLowerCase().includes("youtube")) ?? false,
       idempotencyKey: `tunix-${payload.externalReleaseId ?? releaseId}`,
     },
   });
+    const current = await apiRequest<{ data: TooLostRelease }>({
+    accessToken,
+    method: "GET",
+    path: `/releases/${releaseId}`,
+  });
+    const identifiers = providerIdentifiers(current.payload.data);
 
-  return {
-    releaseId,
-    status: submitted.status,
-    responseBody: JSON.stringify({
-      created: created.payload,
-      delivery: delivery.payload,
-      submitted: submitted.payload,
-    }),
-  };
+    return {
+      releaseId,
+      trackId: identifiers.trackId,
+      isrc: identifiers.isrc,
+      upc: identifiers.upc,
+      status: submitted.status,
+      responseBody: JSON.stringify({
+        created: created?.payload ?? null,
+        metadata: metadata.payload,
+        tracks: tracks.payload,
+        delivery: delivery.payload,
+        submitted: submitted.payload,
+        identifiers,
+      }),
+    };
+  } catch (error) {
+    throw new TooLostDistributionError(
+      error instanceof Error ? error.message : "Falha desconhecida durante o envio à Too Lost.",
+      releaseId,
+    );
+  }
 }

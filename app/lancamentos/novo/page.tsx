@@ -89,11 +89,21 @@ export default async function NewReleasePage({
             </label>
             <label>
               ISRC
-              <input name="isrc" placeholder="Obrigatorio antes do envio final" />
+              <input name="isrc" placeholder="Preencha somente se já possuir um ISRC oficial" />
             </label>
             <label>
               UPC
-              <input name="upc" placeholder="Obrigatorio antes do envio final" />
+              <input name="upc" placeholder="Preencha somente se já possuir um UPC/EAN oficial" />
+            </label>
+          </div>
+          <div className="checkList legalChecks">
+            <label>
+              <input name="requestIsrcAssignment" type="checkbox" defaultChecked />
+              <span>Solicitar ISRC oficial à distribuidora caso o campo esteja vazio.</span>
+            </label>
+            <label>
+              <input name="requestUpcAssignment" type="checkbox" defaultChecked />
+              <span>Solicitar UPC/EAN oficial à distribuidora caso o campo esteja vazio.</span>
             </label>
           </div>
         </section>
@@ -147,7 +157,8 @@ export default async function NewReleasePage({
           <div className="formGrid">
             <label>
               Master final
-              <input name="master" type="file" accept="audio/*" />
+              <input name="master" type="file" accept="audio/flac,.flac" />
+              <small>Arquivo FLAC obrigatório para a entrega oficial.</small>
             </label>
             <label>
               Capa

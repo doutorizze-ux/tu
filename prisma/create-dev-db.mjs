@@ -131,6 +131,10 @@ db.exec(`
     releaseDate DATETIME,
     isrc TEXT,
     upc TEXT,
+    requestIsrcAssignment BOOLEAN NOT NULL DEFAULT true,
+    requestUpcAssignment BOOLEAN NOT NULL DEFAULT true,
+    providerReleaseId TEXT,
+    providerTrackId TEXT,
     masterFileName TEXT,
     coverFileName TEXT,
     status TEXT NOT NULL DEFAULT 'DRAFT',
@@ -455,6 +459,10 @@ addColumnIfMissing("Composition", "lyricsVisibility", "TEXT NOT NULL DEFAULT 'IN
 addColumnIfMissing("Composition", "audioVisibility", "TEXT NOT NULL DEFAULT 'INTERESTED'");
 addColumnIfMissing("Composition", "accessNote", "TEXT");
 addColumnIfMissing("User", "asaasCustomerId", "TEXT");
+addColumnIfMissing("Release", "requestIsrcAssignment", "BOOLEAN NOT NULL DEFAULT true");
+addColumnIfMissing("Release", "requestUpcAssignment", "BOOLEAN NOT NULL DEFAULT true");
+addColumnIfMissing("Release", "providerReleaseId", "TEXT");
+addColumnIfMissing("Release", "providerTrackId", "TEXT");
 
 db.close();
 console.log(`Created development database at ${dbPath}`);

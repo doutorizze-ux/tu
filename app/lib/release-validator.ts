@@ -18,6 +18,8 @@ type ReleaseForValidation = Pick<
   | "isrc"
   | "language"
   | "pLine"
+  | "requestIsrcAssignment"
+  | "requestUpcAssignment"
   | "releaseDate"
   | "rightsHolderName"
   | "territories"
@@ -106,6 +108,8 @@ export function validateReleasePackage(release: ReleaseForValidation) {
     issues.push(validationIssue("BLOCKER", "MASTER_REQUIRED", "Master final obrigatorio", "Envie o arquivo final de audio do pacote."));
   } else if (!master.checksum) {
     issues.push(validationIssue("BLOCKER", "MASTER_CHECKSUM_REQUIRED", "Checksum do master ausente", "O master precisa ter hash SHA-256 para rastreabilidade."));
+  } else if (master.mimeType !== "audio/flac" && !master.fileName.toLowerCase().endsWith(".flac")) {
+    issues.push(validationIssue("BLOCKER", "MASTER_FLAC_REQUIRED", "Master precisa estar em FLAC", "A distribuidora oficial recebe o master final em FLAC para entrega às plataformas."));
   }
 
   if (!cover) {
@@ -127,13 +131,17 @@ export function validateReleasePackage(release: ReleaseForValidation) {
   }
 
   if (!isrc) {
-    issues.push(validationIssue("BLOCKER", "ISRC_REQUIRED", "ISRC obrigatorio", "Informe o ISRC ou gere o codigo antes do envio final."));
+    issues.push(release.requestIsrcAssignment
+      ? validationIssue("WARNING", "ISRC_PROVIDER_ASSIGNMENT_PENDING", "ISRC oficial será atribuído pela distribuidora", "A Tunix solicitará um ISRC real ao provider credenciado durante o envio.")
+      : validationIssue("BLOCKER", "ISRC_REQUIRED", "ISRC obrigatorio", "Informe um ISRC existente ou autorize a atribuição oficial pela distribuidora."));
   } else if (!ISRC_PATTERN.test(isrc)) {
     issues.push(validationIssue("BLOCKER", "ISRC_INVALID", "ISRC invalido", "Use o formato internacional de 12 caracteres, como BRABC2600001."));
   }
 
   if (!upc) {
-    issues.push(validationIssue("BLOCKER", "UPC_REQUIRED", "UPC obrigatorio", "Informe o UPC/EAN do lancamento antes do envio final."));
+    issues.push(release.requestUpcAssignment
+      ? validationIssue("WARNING", "UPC_PROVIDER_ASSIGNMENT_PENDING", "UPC oficial será atribuído pela distribuidora", "A Tunix solicitará um UPC/EAN real ao provider credenciado durante o envio.")
+      : validationIssue("BLOCKER", "UPC_REQUIRED", "UPC obrigatorio", "Informe um UPC/EAN existente ou autorize a atribuição oficial pela distribuidora."));
   } else if (!UPC_PATTERN.test(upc)) {
     issues.push(validationIssue("BLOCKER", "UPC_INVALID", "UPC invalido", "Use apenas numeros, com 12 a 14 digitos."));
   }

@@ -155,11 +155,11 @@ export default async function ReleaseReportPage({
             </div>
             <div>
               <dt>ISRC</dt>
-              <dd>{release.isrc || "Pendente"}</dd>
+              <dd>{release.isrc || (release.requestIsrcAssignment ? "Atribuição oficial pendente" : "Pendente")}</dd>
             </div>
             <div>
               <dt>UPC</dt>
-              <dd>{release.upc || "Pendente"}</dd>
+              <dd>{release.upc || (release.requestUpcAssignment ? "Atribuição oficial pendente" : "Pendente")}</dd>
             </div>
           </dl>
         </section>

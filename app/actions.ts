@@ -13,6 +13,7 @@ import {
   getDistributionProviderConfig,
   submitToDistributionPartner,
 } from "./lib/distribution-provider";
+import type { PartnerDeliveryResult } from "./lib/distribution-provider";
 import { createTooLostAuthorizeUrl, isTooLostOAuthConfigured } from "./lib/toolost";
 import { prisma } from "./lib/prisma";
 import { saveReleaseAsset } from "./lib/release-storage";
@@ -30,6 +31,36 @@ type StoredReleaseAsset = NonNullable<Awaited<ReturnType<typeof saveReleaseAsset
 
 function isStoredReleaseAsset(asset: StoredReleaseAsset | null): asset is StoredReleaseAsset {
   return Boolean(asset);
+}
+
+function providerReleaseUpdate(release: {
+  isrc: string | null;
+  providerReleaseId: string | null;
+  providerTrackId: string | null;
+  requestIsrcAssignment: boolean;
+  requestUpcAssignment: boolean;
+  upc: string | null;
+}, result: PartnerDeliveryResult) {
+  return {
+    status: "SUBMITTED",
+    providerReleaseId: result.providerReleaseId ?? release.providerReleaseId,
+    providerTrackId: result.providerTrackId ?? release.providerTrackId,
+    isrc: result.isrc ?? release.isrc,
+    upc: result.upc ?? release.upc,
+    requestIsrcAssignment: result.isrc ? false : release.requestIsrcAssignment,
+    requestUpcAssignment: result.upc ? false : release.requestUpcAssignment,
+  };
+}
+
+async function rememberProviderDraft(releaseId: string, result: PartnerDeliveryResult) {
+  if (!result.providerReleaseId) {
+    return;
+  }
+
+  await prisma.release.update({
+    where: { id: releaseId },
+    data: { providerReleaseId: result.providerReleaseId },
+  });
 }
 
 async function upsertReleaseAsset(releaseId: string, file: FormDataEntryValue | null, type: "MASTER" | "COVER") {
@@ -712,6 +743,8 @@ export async function createRelease(formData: FormData) {
   const previewStartSec = Number(formData.get("previewStartSec"));
   const isrc = formString(formData, "isrc");
   const upc = formString(formData, "upc");
+  const requestIsrcAssignment = formData.get("requestIsrcAssignment") === "on";
+  const requestUpcAssignment = formData.get("requestUpcAssignment") === "on";
   const notes = formString(formData, "notes");
   const masterFile = formData.get("master");
   const coverFile = formData.get("cover");
@@ -754,6 +787,8 @@ export async function createRelease(formData: FormData) {
         previewStartSec: Number.isFinite(previewStartSec) ? Math.max(0, Math.round(previewStartSec)) : null,
         isrc: isrc || null,
         upc: upc || null,
+        requestIsrcAssignment: !isrc && requestIsrcAssignment,
+        requestUpcAssignment: !upc && requestUpcAssignment,
         masterFileName: masterFile instanceof File && masterFile.size > 0 ? masterFile.name : null,
         coverFileName: coverFile instanceof File && coverFile.size > 0 ? coverFile.name : null,
         status: "REVIEW",
@@ -909,6 +944,8 @@ export async function updateRelease(formData: FormData) {
   const previewStartSec = Number(formData.get("previewStartSec"));
   const isrc = formString(formData, "isrc");
   const upc = formString(formData, "upc");
+  const requestIsrcAssignment = formData.get("requestIsrcAssignment") === "on";
+  const requestUpcAssignment = formData.get("requestUpcAssignment") === "on";
   const notes = formString(formData, "notes");
   const masterFile = formData.get("master");
   const coverFile = formData.get("cover");
@@ -972,6 +1009,8 @@ export async function updateRelease(formData: FormData) {
         previewStartSec: Number.isFinite(previewStartSec) ? Math.max(0, Math.round(previewStartSec)) : null,
         isrc: isrc || null,
         upc: upc || null,
+        requestIsrcAssignment: !isrc && requestIsrcAssignment,
+        requestUpcAssignment: !upc && requestUpcAssignment,
         masterFileName: masterFile instanceof File && masterFile.size > 0 ? masterFile.name : release.masterFileName,
         coverFileName: coverFile instanceof File && coverFile.size > 0 ? coverFile.name : release.coverFileName,
         status: "REVIEW",
@@ -1512,6 +1551,7 @@ export async function submitReleaseToPartner(formData: FormData) {
   });
 
   if (!result.ok) {
+    await rememberProviderDraft(release.id, result);
     await prisma.auditLog.create({
       data: {
         userId: user.id,
@@ -1533,7 +1573,7 @@ export async function submitReleaseToPartner(formData: FormData) {
 
   await prisma.release.update({
     where: { id: release.id },
-    data: { status: "SUBMITTED" },
+    data: providerReleaseUpdate(release, result),
   });
 
   await prisma.releasePlatform.updateMany({
@@ -1550,6 +1590,10 @@ export async function submitReleaseToPartner(formData: FormData) {
       metadata: {
         provider: providerConfig.provider,
         platforms: release.platforms.map((item) => item.platform),
+        providerReleaseId: result.providerReleaseId ?? null,
+        providerTrackId: result.providerTrackId ?? null,
+        isrc: result.isrc ?? null,
+        upc: result.upc ?? null,
       },
     },
   });
@@ -1608,6 +1652,7 @@ export async function adminSubmitReleaseToPartner(formData: FormData) {
   });
 
   if (!result.ok) {
+    await rememberProviderDraft(release.id, result);
     await prisma.auditLog.create({
       data: {
         userId: user.id,
@@ -1630,7 +1675,7 @@ export async function adminSubmitReleaseToPartner(formData: FormData) {
 
   await prisma.release.update({
     where: { id: release.id },
-    data: { status: "SUBMITTED" },
+    data: providerReleaseUpdate(release, result),
   });
 
   await prisma.releasePlatform.updateMany({
@@ -1647,6 +1692,10 @@ export async function adminSubmitReleaseToPartner(formData: FormData) {
       metadata: {
         provider: providerConfig.provider,
         platforms: release.platforms.map((item) => item.platform),
+        providerReleaseId: result.providerReleaseId ?? null,
+        providerTrackId: result.providerTrackId ?? null,
+        isrc: result.isrc ?? null,
+        upc: result.upc ?? null,
       },
     },
   });
@@ -1736,6 +1785,7 @@ export async function adminRetryReleaseDelivery(formData: FormData) {
   });
 
   if (!result.ok) {
+    await rememberProviderDraft(release.id, result);
     revalidatePath(`/admin/lancamentos/${release.id}/status`);
     revalidatePath(`/lancamentos/${release.id}`);
     redirect(`/admin/lancamentos/${release.id}/status?erro=provider`);
@@ -1743,7 +1793,7 @@ export async function adminRetryReleaseDelivery(formData: FormData) {
 
   await prisma.release.update({
     where: { id: release.id },
-    data: { status: "SUBMITTED" },
+    data: providerReleaseUpdate(release, result),
   });
 
   await prisma.releasePlatform.updateMany({

@@ -4,7 +4,7 @@ import type { Release, ReleaseAsset, ReleaseContributor, ReleasePlatform } from 
 import { decryptSecret } from "./crypto-secrets";
 import { normalizePlatformValue } from "./platforms";
 import { prisma } from "./prisma";
-import { submitTooLostDistribution, TOOLOST_API_BASE_URL } from "./toolost";
+import { submitTooLostDistribution, TOOLOST_API_BASE_URL, TooLostDistributionError } from "./toolost";
 
 type ReleaseWithRelations = Release & {
   assets?: ReleaseAsset[];
@@ -18,11 +18,16 @@ export type PartnerDeliveryResult = {
   responseStatus?: number;
   responseBody?: string;
   errorMessage?: string;
+  providerReleaseId?: string;
+  providerTrackId?: string | null;
+  isrc?: string | null;
+  upc?: string | null;
 };
 
 export function buildDistributionPayload(release: ReleaseWithRelations) {
   return {
     externalReleaseId: release.id,
+    providerReleaseId: release.providerReleaseId,
     title: release.title,
     trackTitle: release.trackTitle ?? release.title,
     versionTitle: release.versionTitle,
@@ -48,6 +53,8 @@ export function buildDistributionPayload(release: ReleaseWithRelations) {
     identifiers: {
       isrc: release.isrc,
       upc: release.upc,
+      requestIsrcAssignment: release.requestIsrcAssignment,
+      requestUpcAssignment: release.requestUpcAssignment,
     },
     files: {
       master: release.assets?.find((asset) => asset.type === "MASTER") ?? null,
@@ -109,6 +116,10 @@ export async function submitToDistributionPartner(payload: unknown): Promise<Par
         status: "SENT",
         responseStatus: result.status,
         responseBody: result.responseBody,
+        providerReleaseId: String(result.releaseId),
+        providerTrackId: result.trackId,
+        isrc: result.isrc,
+        upc: result.upc,
       };
     }
 
@@ -134,6 +145,7 @@ export async function submitToDistributionPartner(payload: unknown): Promise<Par
       ok: false,
       status: "PROVIDER_ERROR",
       errorMessage: error instanceof Error ? error.message : "Erro desconhecido ao chamar provider.",
+      providerReleaseId: error instanceof TooLostDistributionError ? String(error.releaseId) : undefined,
     };
   }
 }
