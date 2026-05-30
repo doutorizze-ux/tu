@@ -1,0 +1,6752 @@
+Too Lost
+Public API for third-party developers. Authenticate using OAuth 2.0 Bearer tokens obtained via the Authorization Code flow.
+
+Server
+Server:
+https://api.toolost.com/v1
+API
+
+
+Authentication
+Required
+Selected Auth Type:oauth2
+OAuth 2.0 Authorization Code flow with PKCE. Register an application in the Developer Portal to obtain client credentials.
+More
+Auth URL
+:
+https://toolost.com/oauth/authorize
+Clear Value
+Token URL
+:
+https://toolost.com/oauth/token
+Clear Value
+Redirect URL
+:
+https://developer.toolost.com/example/oauth/callback
+Clear Value
+Client ID
+:
+12345
+Use PKCE
+:
+
+SHA-256
+Clear Value
+Credentials Location
+:
+
+header
+Clear Value
+Scopes Selected 10 / 10
+Add Scope
+Deselect All
+
+
+Authorize
+Client Libraries
+Shell Curl
+User ​Copy link
+Endpoints for retrieving authenticated user information. Requires a valid OAuth 2.0 Bearer token.
+
+UserOperations
+get
+/me
+Get authenticated user​Copy link
+
+Auth Required
+Returns the profile of the user who authorized the OAuth token. Requires scope: read:profile.
+
+Responses
+200Copy link to 200
+Type:object
+UserResource
+
+dataCopy link to data
+Type:object · UserResource
+required
+Show UserResourcefor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+Request Example forget/me
+Shell Curl
+curl https://api.toolost.com/v1/me \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /me)
+Status:200
+Status:401
+{
+  "data": {
+    "id": 42,
+    "first_name": "John",
+    "last_name": "Doe",
+    "username": "johndoe",
+    "email": "john@example.com",
+    "avatar": "https://cdn.example.com/avatars/johndoe.jpg",
+    "type": "artist",
+    "confirmed": true,
+    "created_at": "2024-01-15T10:30:00.000000Z",
+    "updated_at": "2025-06-20T14:22:00.000000Z"
+  }
+}
+
+UserResource
+
+Releases ​Copy link
+User release management endpoints for external API clients.
+
+ReleasesOperations
+delete
+/releases/{releaseId}
+get
+/releases
+get
+/releases/{releaseId}
+patch
+/releases/{releaseId}/metadata
+patch
+/releases/{releaseId}/delivery
+patch
+/releases/{releaseId}/video
+post
+/releases
+post
+/releases/{releaseId}/submit
+post
+/releases/validate/upc
+Delete release (draft)​Copy link
+
+Auth Required
+Deletes a draft release owned by the authenticated user. Requires scope: write:releases.
+
+Path Parameters
+releaseIdCopy link to releaseId
+Type:integer
+required
+Example
+Release ID.
+
+Responses
+200Copy link to 200
+Type:object
+messageCopy link to message
+Type:string
+required
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+Request Example fordelete/releases/{releaseId}
+Shell Curl
+curl https://api.toolost.com/v1/releases/73518 \
+  --request DELETE \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(delete /releases/{releaseId})
+Status:200
+Status:401
+{
+  "message": "string"
+}
+
+List releases​Copy link
+
+Auth Required
+Returns paginated releases for the authenticated user. Requires scope: read:releases.
+
+Query Parameters
+statusCopy link to status
+Type:string | null
+enum
+Example
+values
+draft
+in_review
+live
+takedown_pending
+takedown_complete
+typeCopy link to type
+Type:string | null
+enum
+Example
+values
+Single
+EP
+Album
+Compilation
+MusicVideo
+Music Video
+searchCopy link to search
+Type:string | null
+max length:  
+120
+Example
+pageCopy link to page
+Type:integer | null
+min:  
+1
+Example
+Integer numbers.
+
+perPageCopy link to perPage
+Type:number
+min:  
+1
+max:  
+100
+Example
+Responses
+200Copy link to 200
+Type:object
+currentPageCopy link to currentPage
+Type:integer
+required
+Integer numbers.
+
+dataCopy link to data
+Type:array object[] · ReleaseCollection
+required
+Show ReleaseResourcefor data
+perPageCopy link to perPage
+Type:integer
+required
+Integer numbers.
+
+totalItemsCopy link to totalItems
+Type:integer
+required
+Integer numbers.
+
+totalPagesCopy link to totalPages
+Type:integer
+required
+Integer numbers.
+
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+422Copy link to 422
+Type:object
+Validation error
+
+errorsCopy link to errors
+Type:object
+required
+A detailed description of each field that failed validation.
+
+Show Child Attributesfor errors
+messageCopy link to message
+Type:string
+required
+Errors overview.
+
+application/json
+Request Example forget/releases
+Shell Curl
+curl 'https://api.toolost.com/v1/releases?status=draft&type=Album&search=Nova&page=1&perPage=20' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /releases)
+Status:200
+Status:401
+Status:422
+{
+  "data": [
+    {
+      "id": 73518,
+      "type": "Album",
+      "status": "draft",
+      "title": "API Validation Test Release",
+      "upc": null,
+      "catalogNumber": "TOOLOST3000073518",
+      "version": null,
+      "remixTitle": null,
+      "coverSongs": [],
+      "label": "Bela",
+      "primaryGenre": "Alternative/Gothic",
+      "secondaryGenre": "Alternative/Grunge",
+      "language": "en",
+      "releaseDate": "2026-04-04",
+      "originalReleaseDate": null,
+      "applePreorder": false,
+      "applePreorderDate": null,
+      "licenseType": "Copyright",
+      "licenseInfo": null,
+      "cYear": "2026",
+      "cLine": "Bela cline",
+      "pYear": "2026",
+      "pLine": "Bela pline",
+      "coverUrl": "https://s3.amazonaws.com/bucket/artwork.jpg",
+      "compressedArtwork": "https://s3.amazonaws.com/bucket/artwork_small.jpg",
+      "isAiGeneratedArtwork": false,
+      "aiContentApproved": false,
+      "participants": "string",
+      "releaseTime": {
+        "time": null,
+        "timeZone": null
+      },
+      "motionArt": {
+        "motionArt1x1": [],
+        "motionArt3x4": []
+      },
+      "delivery": {
+        "youtube": true,
+        "facebook": true,
+        "soundcloud": true,
+        "soundExchange": true,
+        "beatPort": true,
+        "beatPortHasAccount": true,
+        "beatPortLink": null,
+        "beatPortLabelLogo": null,
+        "junoDownloads": true,
+        "trackLibs": true,
+        "hook": true,
+        "lyricfind": true,
+        "even": true
+      },
+      "platforms": "string",
+      "territories": "string",
+      "review": {
+        "note": null,
+        "fileName": null,
+        "fileUrl": null,
+        "fileType": null
+      },
+      "aiDocumentation": {
+        "fileName": null,
+        "fileUrl": null
+      },
+      "tracks": [
+        {
+          "id": 98341,
+          "title": "Track One",
+          "version": "Extended Mix",
+          "linerNote": "Recorded in New York.",
+          "isrc": "USABC1234567",
+          "iswc": "T0345246801",
+          "language": "en",
+          "audioFileKey": "external/tracks/v1/releases/73518/audio/2f7f1147-d5b0-4cd9-818b-236d05bd8263.flac",
+          "audioUrl": "string",
+          "instrumentalFileKey": "external/tracks/v1/releases/73518/instrumental/a818d714-547a-43f9-b5aa-b64af03917eb.flac",
+          "instrumentalUrl": "string",
+          "dolbyFileKey": "external/tracks/v1/releases/73518/dolby/63e99108-950d-4dc2-bf0d-f8ad32fcd883.flac",
+          "dolbyUrl": "string",
+          "tiktokStartTime": "00:30",
+          "lyrics": {
+            "content": null,
+            "explicit": true,
+            "cleanVersion": true
+          },
+          "aiAssisted": true,
+          "aiAssistedFileUrl": null,
+          "aiAssistedFileName": null,
+          "artists": "string",
+          "writers": "string",
+          "credits": "string",
+          "createdAt": null,
+          "updatedAt": null
+        }
+      ],
+      "video": {
+        "videoUrl": null,
+        "md5hash": null,
+        "videoType": "string",
+        "ageRestriction": "string",
+        "isCoverVersion": true,
+        "referenceUpc": null,
+        "referenceIsrc": null,
+        "metadata": [],
+        "delivery": {
+          "appleMusic": true,
+          "vevo": true
+        },
+        "participants": "string",
+        "writers": "string",
+        "credits": "string"
+      },
+      "submittedAt": null,
+      "createdAt": null,
+      "updatedAt": null
+    }
+  ],
+  "currentPage": 1,
+  "perPage": 1,
+  "totalItems": 1,
+  "totalPages": 1
+}
+
+Get release​Copy link
+
+Auth Required
+Returns a single release owned by the authenticated user. Requires scope: read:releases.
+
+Path Parameters
+releaseIdCopy link to releaseId
+Type:integer
+required
+Example
+Release ID.
+
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:object · ReleaseResource
+required
+Show ReleaseResourcefor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+Request Example forget/releases/{releaseId}
+Shell Curl
+curl https://api.toolost.com/v1/releases/73518 \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /releases/{releaseId})
+Status:200
+Status:401
+{
+  "data": {
+    "id": 73518,
+    "type": "Album",
+    "status": "draft",
+    "title": "API Validation Test Release",
+    "upc": null,
+    "catalogNumber": "TOOLOST3000073518",
+    "version": null,
+    "remixTitle": null,
+    "coverSongs": [],
+    "label": "Bela",
+    "primaryGenre": "Alternative/Gothic",
+    "secondaryGenre": "Alternative/Grunge",
+    "language": "en",
+    "releaseDate": "2026-04-04",
+    "originalReleaseDate": null,
+    "applePreorder": false,
+    "applePreorderDate": null,
+    "licenseType": "Copyright",
+    "licenseInfo": null,
+    "cYear": "2026",
+    "cLine": "Bela cline",
+    "pYear": "2026",
+    "pLine": "Bela pline",
+    "coverUrl": "https://s3.amazonaws.com/bucket/artwork.jpg",
+    "compressedArtwork": "https://s3.amazonaws.com/bucket/artwork_small.jpg",
+    "isAiGeneratedArtwork": false,
+    "aiContentApproved": false,
+    "participants": "string",
+    "releaseTime": {
+      "time": null,
+      "timeZone": null
+    },
+    "motionArt": {
+      "motionArt1x1": [],
+      "motionArt3x4": []
+    },
+    "delivery": {
+      "youtube": true,
+      "facebook": true,
+      "soundcloud": true,
+      "soundExchange": true,
+      "beatPort": true,
+      "beatPortHasAccount": true,
+      "beatPortLink": null,
+      "beatPortLabelLogo": null,
+      "junoDownloads": true,
+      "trackLibs": true,
+      "hook": true,
+      "lyricfind": true,
+      "even": true
+    },
+    "platforms": "string",
+    "territories": "string",
+    "review": {
+      "note": null,
+      "fileName": null,
+      "fileUrl": null,
+      "fileType": null
+    },
+    "aiDocumentation": {
+      "fileName": null,
+      "fileUrl": null
+    },
+    "tracks": [
+      {
+        "id": 98341,
+        "title": "Track One",
+        "version": "Extended Mix",
+        "linerNote": "Recorded in New York.",
+        "isrc": "USABC1234567",
+        "iswc": "T0345246801",
+        "language": "en",
+        "audioFileKey": "external/tracks/v1/releases/73518/audio/2f7f1147-d5b0-4cd9-818b-236d05bd8263.flac",
+        "audioUrl": "string",
+        "instrumentalFileKey": "external/tracks/v1/releases/73518/instrumental/a818d714-547a-43f9-b5aa-b64af03917eb.flac",
+        "instrumentalUrl": "string",
+        "dolbyFileKey": "external/tracks/v1/releases/73518/dolby/63e99108-950d-4dc2-bf0d-f8ad32fcd883.flac",
+        "dolbyUrl": "string",
+        "tiktokStartTime": "00:30",
+        "lyrics": {
+          "content": null,
+          "explicit": true,
+          "cleanVersion": true
+        },
+        "aiAssisted": true,
+        "aiAssistedFileUrl": null,
+        "aiAssistedFileName": null,
+        "artists": "string",
+        "writers": "string",
+        "credits": "string",
+        "createdAt": null,
+        "updatedAt": null
+      }
+    ],
+    "video": {
+      "videoUrl": null,
+      "md5hash": null,
+      "videoType": "string",
+      "ageRestriction": "string",
+      "isCoverVersion": true,
+      "referenceUpc": null,
+      "referenceIsrc": null,
+      "metadata": [],
+      "delivery": {
+        "appleMusic": true,
+        "vevo": true
+      },
+      "participants": "string",
+      "writers": "string",
+      "credits": "string"
+    },
+    "submittedAt": null,
+    "createdAt": null,
+    "updatedAt": null
+  }
+}
+
+Release information​Copy link
+
+Auth Required
+Updates release-level metadata fields on a draft release. Requires scope: write:releases.
+
+Path Parameters
+releaseIdCopy link to releaseId
+Type:integer
+required
+Example
+Release ID.
+
+Body
+·UpdateReleaseMetadataRequest
+application/json
+aiDocumentationCopy link to aiDocumentation
+Type:object
+Example
+Show Child Attributesfor aiDocumentation
+applePreorderCopy link to applePreorder
+Type:boolean | null
+Example
+applePreorderDateCopy link to applePreorderDate
+Type:string | null
+Format:date
+Example
+full-date notation as defined by RFC 3339, section 5.6, for example, 2017-07-21
+
+cLineCopy link to cLine
+Type:string | null
+max length:  
+120
+Example
+compressedArtworkCopy link to compressedArtwork
+Type:string
+max length:  
+2048
+Format:uri
+Example
+coverSongsCopy link to coverSongs
+Type:array string[]
+Example
+coverUrlCopy link to coverUrl
+Type:string
+max length:  
+2048
+Format:uri
+Example
+cYearCopy link to cYear
+Type:number
+min:  
+1900
+max:  
+2100
+Example
+isAiGeneratedCopy link to isAiGenerated
+Type:boolean | null
+Example
+labelCopy link to label
+Type:string | null
+max length:  
+120
+Example
+languageCopy link to language
+Type:string | null
+max length:  
+40
+Example
+licenseInfoCopy link to licenseInfo
+Type:string | null
+max length:  
+500
+Example
+Show additional propertiesfor Request Body
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:object · ReleaseResource
+required
+Show ReleaseResourcefor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+422Copy link to 422
+Type:object
+Validation error
+
+errorsCopy link to errors
+Type:object
+required
+A detailed description of each field that failed validation.
+
+Show Child Attributesfor errors
+messageCopy link to message
+Type:string
+required
+Errors overview.
+
+application/json
+Request Example forpatch/releases/{releaseId}/metadata
+Shell Curl
+curl https://api.toolost.com/v1/releases/73518/metadata \
+  --request PATCH \
+  --header 'Content-Type: application/json' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN' \
+  --data '{
+  "type": "Album",
+  "title": "Midnight Echoes",
+  "version": "Deluxe",
+  "remixTitle": "Nova Waves Remix",
+  "label": "Too Lost Records",
+  "primaryGenre": "Alternative/Gothic",
+  "secondaryGenre": "Alternative/Grunge",
+  "language": "en",
+  "releaseDate": "2026-04-04",
+  "originalReleaseDate": "2025-01-01",
+  "applePreorder": false,
+  "applePreorderDate": "2026-03-28",
+  "licenseType": "Copyright",
+  "licenseInfo": "Owned by artist and label.",
+  "cYear": 2026,
+  "cLine": "2026 Too Lost Records",
+  "pYear": 2026,
+  "pLine": "2026 Too Lost Records",
+  "upc": "123456789012",
+  "coverUrl": "https://bucket.s3.amazonaws.com/artworks/a.jpg",
+  "compressedArtwork": "https://bucket.s3.amazonaws.com/artworks/a_small.jpg",
+  "isAiGenerated": true,
+  "releaseTime": "05:55",
+  "timeZone": "Pacific/Niue",
+  "motionArt1x1": {
+    "url": "https://bucket.s3.amazonaws.com/motion/1.json",
+    "md5hash": "abc"
+  },
+  "motionArt3x4": {
+    "url": "https://bucket.s3.amazonaws.com/motion/2.json",
+    "md5hash": "def"
+  },
+  "coverSongs": [
+    "Song A",
+    "Song B"
+  ],
+  "aiDocumentation": {
+    "fileName": "ai_proof.pdf",
+    "fileUrl": "https://bucket.s3.amazonaws.com/docs/ai.pdf"
+  },
+  "review": {
+    "note": "Contains a cover song clearance.",
+    "fileName": "clearance.pdf",
+    "fileUrl": "https://bucket.s3.amazonaws.com/review/clearance.pdf"
+  },
+  "participants": [
+    {
+      "name": "Nova Waves",
+      "artistId": 123,
+      "role": [
+        "primary"
+      ]
+    }
+  ]
+}'
+
+
+Test Request
+(patch /releases/{releaseId}/metadata)
+Status:200
+Status:401
+Status:422
+{
+  "data": {
+    "id": 73518,
+    "type": "Album",
+    "status": "draft",
+    "title": "API Validation Test Release",
+    "upc": null,
+    "catalogNumber": "TOOLOST3000073518",
+    "version": null,
+    "remixTitle": null,
+    "coverSongs": [],
+    "label": "Bela",
+    "primaryGenre": "Alternative/Gothic",
+    "secondaryGenre": "Alternative/Grunge",
+    "language": "en",
+    "releaseDate": "2026-04-04",
+    "originalReleaseDate": null,
+    "applePreorder": false,
+    "applePreorderDate": null,
+    "licenseType": "Copyright",
+    "licenseInfo": null,
+    "cYear": "2026",
+    "cLine": "Bela cline",
+    "pYear": "2026",
+    "pLine": "Bela pline",
+    "coverUrl": "https://s3.amazonaws.com/bucket/artwork.jpg",
+    "compressedArtwork": "https://s3.amazonaws.com/bucket/artwork_small.jpg",
+    "isAiGeneratedArtwork": false,
+    "aiContentApproved": false,
+    "participants": "string",
+    "releaseTime": {
+      "time": null,
+      "timeZone": null
+    },
+    "motionArt": {
+      "motionArt1x1": [],
+      "motionArt3x4": []
+    },
+    "delivery": {
+      "youtube": true,
+      "facebook": true,
+      "soundcloud": true,
+      "soundExchange": true,
+      "beatPort": true,
+      "beatPortHasAccount": true,
+      "beatPortLink": null,
+      "beatPortLabelLogo": null,
+      "junoDownloads": true,
+      "trackLibs": true,
+      "hook": true,
+      "lyricfind": true,
+      "even": true
+    },
+    "platforms": "string",
+    "territories": "string",
+    "review": {
+      "note": null,
+      "fileName": null,
+      "fileUrl": null,
+      "fileType": null
+    },
+    "aiDocumentation": {
+      "fileName": null,
+      "fileUrl": null
+    },
+    "tracks": [
+      {
+        "id": 98341,
+        "title": "Track One",
+        "version": "Extended Mix",
+        "linerNote": "Recorded in New York.",
+        "isrc": "USABC1234567",
+        "iswc": "T0345246801",
+        "language": "en",
+        "audioFileKey": "external/tracks/v1/releases/73518/audio/2f7f1147-d5b0-4cd9-818b-236d05bd8263.flac",
+        "audioUrl": "string",
+        "instrumentalFileKey": "external/tracks/v1/releases/73518/instrumental/a818d714-547a-43f9-b5aa-b64af03917eb.flac",
+        "instrumentalUrl": "string",
+        "dolbyFileKey": "external/tracks/v1/releases/73518/dolby/63e99108-950d-4dc2-bf0d-f8ad32fcd883.flac",
+        "dolbyUrl": "string",
+        "tiktokStartTime": "00:30",
+        "lyrics": {
+          "content": null,
+          "explicit": true,
+          "cleanVersion": true
+        },
+        "aiAssisted": true,
+        "aiAssistedFileUrl": null,
+        "aiAssistedFileName": null,
+        "artists": "string",
+        "writers": "string",
+        "credits": "string",
+        "createdAt": null,
+        "updatedAt": null
+      }
+    ],
+    "video": {
+      "videoUrl": null,
+      "md5hash": null,
+      "videoType": "string",
+      "ageRestriction": "string",
+      "isCoverVersion": true,
+      "referenceUpc": null,
+      "referenceIsrc": null,
+      "metadata": [],
+      "delivery": {
+        "appleMusic": true,
+        "vevo": true
+      },
+      "participants": "string",
+      "writers": "string",
+      "credits": "string"
+    },
+    "submittedAt": null,
+    "createdAt": null,
+    "updatedAt": null
+  }
+}
+
+Release delivery​Copy link
+
+Auth Required
+Updates platforms, territories, and additional delivery options. Requires scope: write:releases.
+
+Path Parameters
+releaseIdCopy link to releaseId
+Type:integer
+required
+Example
+Release ID.
+
+Body
+·UpdateReleaseDeliveryRequest
+required
+application/json
+deliveryCopy link to delivery
+Type:object
+required
+Example
+Show Child Attributesfor delivery
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:object · ReleaseResource
+required
+Show ReleaseResourcefor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+422Copy link to 422
+Type:object
+Validation error
+
+errorsCopy link to errors
+Type:object
+required
+A detailed description of each field that failed validation.
+
+Show Child Attributesfor errors
+messageCopy link to message
+Type:string
+required
+Errors overview.
+
+application/json
+Request Example forpatch/releases/{releaseId}/delivery
+Shell Curl
+curl https://api.toolost.com/v1/releases/73518/delivery \
+  --request PATCH \
+  --header 'Content-Type: application/json' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN' \
+  --data '{
+  "delivery": {
+    "platforms": [
+      "Spotify",
+      "Apple Music"
+    ],
+    "territories": [
+      "US",
+      "CA"
+    ],
+    "additional": {
+      "youtube": true
+    }
+  }
+}'
+
+
+Test Request
+(patch /releases/{releaseId}/delivery)
+Status:200
+Status:401
+Status:422
+{
+  "data": {
+    "id": 73518,
+    "type": "Album",
+    "status": "draft",
+    "title": "API Validation Test Release",
+    "upc": null,
+    "catalogNumber": "TOOLOST3000073518",
+    "version": null,
+    "remixTitle": null,
+    "coverSongs": [],
+    "label": "Bela",
+    "primaryGenre": "Alternative/Gothic",
+    "secondaryGenre": "Alternative/Grunge",
+    "language": "en",
+    "releaseDate": "2026-04-04",
+    "originalReleaseDate": null,
+    "applePreorder": false,
+    "applePreorderDate": null,
+    "licenseType": "Copyright",
+    "licenseInfo": null,
+    "cYear": "2026",
+    "cLine": "Bela cline",
+    "pYear": "2026",
+    "pLine": "Bela pline",
+    "coverUrl": "https://s3.amazonaws.com/bucket/artwork.jpg",
+    "compressedArtwork": "https://s3.amazonaws.com/bucket/artwork_small.jpg",
+    "isAiGeneratedArtwork": false,
+    "aiContentApproved": false,
+    "participants": "string",
+    "releaseTime": {
+      "time": null,
+      "timeZone": null
+    },
+    "motionArt": {
+      "motionArt1x1": [],
+      "motionArt3x4": []
+    },
+    "delivery": {
+      "youtube": true,
+      "facebook": true,
+      "soundcloud": true,
+      "soundExchange": true,
+      "beatPort": true,
+      "beatPortHasAccount": true,
+      "beatPortLink": null,
+      "beatPortLabelLogo": null,
+      "junoDownloads": true,
+      "trackLibs": true,
+      "hook": true,
+      "lyricfind": true,
+      "even": true
+    },
+    "platforms": "string",
+    "territories": "string",
+    "review": {
+      "note": null,
+      "fileName": null,
+      "fileUrl": null,
+      "fileType": null
+    },
+    "aiDocumentation": {
+      "fileName": null,
+      "fileUrl": null
+    },
+    "tracks": [
+      {
+        "id": 98341,
+        "title": "Track One",
+        "version": "Extended Mix",
+        "linerNote": "Recorded in New York.",
+        "isrc": "USABC1234567",
+        "iswc": "T0345246801",
+        "language": "en",
+        "audioFileKey": "external/tracks/v1/releases/73518/audio/2f7f1147-d5b0-4cd9-818b-236d05bd8263.flac",
+        "audioUrl": "string",
+        "instrumentalFileKey": "external/tracks/v1/releases/73518/instrumental/a818d714-547a-43f9-b5aa-b64af03917eb.flac",
+        "instrumentalUrl": "string",
+        "dolbyFileKey": "external/tracks/v1/releases/73518/dolby/63e99108-950d-4dc2-bf0d-f8ad32fcd883.flac",
+        "dolbyUrl": "string",
+        "tiktokStartTime": "00:30",
+        "lyrics": {
+          "content": null,
+          "explicit": true,
+          "cleanVersion": true
+        },
+        "aiAssisted": true,
+        "aiAssistedFileUrl": null,
+        "aiAssistedFileName": null,
+        "artists": "string",
+        "writers": "string",
+        "credits": "string",
+        "createdAt": null,
+        "updatedAt": null
+      }
+    ],
+    "video": {
+      "videoUrl": null,
+      "md5hash": null,
+      "videoType": "string",
+      "ageRestriction": "string",
+      "isCoverVersion": true,
+      "referenceUpc": null,
+      "referenceIsrc": null,
+      "metadata": [],
+      "delivery": {
+        "appleMusic": true,
+        "vevo": true
+      },
+      "participants": "string",
+      "writers": "string",
+      "credits": "string"
+    },
+    "submittedAt": null,
+    "createdAt": null,
+    "updatedAt": null
+  }
+}
+
+Music Video​Copy link
+
+Auth Required
+Updates video metadata for a draft Music Video release. Requires scope: write:releases.
+
+Path Parameters
+releaseIdCopy link to releaseId
+Type:integer
+required
+Example
+Release ID.
+
+Body
+·UpdateReleaseVideoRequest
+required
+application/json
+videoCopy link to video
+Type:object
+required
+Example
+Show Child Attributesfor video
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:object · ReleaseResource
+required
+Show ReleaseResourcefor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+422Copy link to 422
+Type:object
+Validation error
+
+errorsCopy link to errors
+Type:object
+required
+A detailed description of each field that failed validation.
+
+Show Child Attributesfor errors
+messageCopy link to message
+Type:string
+required
+Errors overview.
+
+application/json
+Request Example forpatch/releases/{releaseId}/video
+Shell Curl
+curl https://api.toolost.com/v1/releases/73518/video \
+  --request PATCH \
+  --header 'Content-Type: application/json' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN' \
+  --data '{
+  "video": {
+    "videoUrl": "https://bucket.s3.amazonaws.com/video/main.mp4",
+    "md5hash": "abc123",
+    "videoType": "official_music_video",
+    "ageRestriction": "all_ages"
+  }
+}'
+
+
+Test Request
+(patch /releases/{releaseId}/video)
+Status:200
+Status:401
+Status:422
+{
+  "data": {
+    "id": 73518,
+    "type": "Album",
+    "status": "draft",
+    "title": "API Validation Test Release",
+    "upc": null,
+    "catalogNumber": "TOOLOST3000073518",
+    "version": null,
+    "remixTitle": null,
+    "coverSongs": [],
+    "label": "Bela",
+    "primaryGenre": "Alternative/Gothic",
+    "secondaryGenre": "Alternative/Grunge",
+    "language": "en",
+    "releaseDate": "2026-04-04",
+    "originalReleaseDate": null,
+    "applePreorder": false,
+    "applePreorderDate": null,
+    "licenseType": "Copyright",
+    "licenseInfo": null,
+    "cYear": "2026",
+    "cLine": "Bela cline",
+    "pYear": "2026",
+    "pLine": "Bela pline",
+    "coverUrl": "https://s3.amazonaws.com/bucket/artwork.jpg",
+    "compressedArtwork": "https://s3.amazonaws.com/bucket/artwork_small.jpg",
+    "isAiGeneratedArtwork": false,
+    "aiContentApproved": false,
+    "participants": "string",
+    "releaseTime": {
+      "time": null,
+      "timeZone": null
+    },
+    "motionArt": {
+      "motionArt1x1": [],
+      "motionArt3x4": []
+    },
+    "delivery": {
+      "youtube": true,
+      "facebook": true,
+      "soundcloud": true,
+      "soundExchange": true,
+      "beatPort": true,
+      "beatPortHasAccount": true,
+      "beatPortLink": null,
+      "beatPortLabelLogo": null,
+      "junoDownloads": true,
+      "trackLibs": true,
+      "hook": true,
+      "lyricfind": true,
+      "even": true
+    },
+    "platforms": "string",
+    "territories": "string",
+    "review": {
+      "note": null,
+      "fileName": null,
+      "fileUrl": null,
+      "fileType": null
+    },
+    "aiDocumentation": {
+      "fileName": null,
+      "fileUrl": null
+    },
+    "tracks": [
+      {
+        "id": 98341,
+        "title": "Track One",
+        "version": "Extended Mix",
+        "linerNote": "Recorded in New York.",
+        "isrc": "USABC1234567",
+        "iswc": "T0345246801",
+        "language": "en",
+        "audioFileKey": "external/tracks/v1/releases/73518/audio/2f7f1147-d5b0-4cd9-818b-236d05bd8263.flac",
+        "audioUrl": "string",
+        "instrumentalFileKey": "external/tracks/v1/releases/73518/instrumental/a818d714-547a-43f9-b5aa-b64af03917eb.flac",
+        "instrumentalUrl": "string",
+        "dolbyFileKey": "external/tracks/v1/releases/73518/dolby/63e99108-950d-4dc2-bf0d-f8ad32fcd883.flac",
+        "dolbyUrl": "string",
+        "tiktokStartTime": "00:30",
+        "lyrics": {
+          "content": null,
+          "explicit": true,
+          "cleanVersion": true
+        },
+        "aiAssisted": true,
+        "aiAssistedFileUrl": null,
+        "aiAssistedFileName": null,
+        "artists": "string",
+        "writers": "string",
+        "credits": "string",
+        "createdAt": null,
+        "updatedAt": null
+      }
+    ],
+    "video": {
+      "videoUrl": null,
+      "md5hash": null,
+      "videoType": "string",
+      "ageRestriction": "string",
+      "isCoverVersion": true,
+      "referenceUpc": null,
+      "referenceIsrc": null,
+      "metadata": [],
+      "delivery": {
+        "appleMusic": true,
+        "vevo": true
+      },
+      "participants": "string",
+      "writers": "string",
+      "credits": "string"
+    },
+    "submittedAt": null,
+    "createdAt": null,
+    "updatedAt": null
+  }
+}
+
+Create release (draft)​Copy link
+
+Auth Required
+Creates a new draft release for the authenticated user. Requires scope: write:releases.
+
+Body
+·StoreReleaseRequest
+required
+application/json
+participantsCopy link to participants
+Type:array object[]
+1…
+required
+Example
+Show Child Attributesfor participants
+titleCopy link to title
+Type:string
+max length:  
+120
+required
+Example
+typeCopy link to type
+Type:string
+enum
+required
+Example
+values
+Single
+EP
+Album
+Compilation
+MusicVideo
+Music Video
+labelCopy link to label
+Type:string | null
+max length:  
+120
+Example
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:object · ReleaseResource
+required
+Show ReleaseResourcefor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+422Copy link to 422
+Type:object
+Validation error
+
+errorsCopy link to errors
+Type:object
+required
+A detailed description of each field that failed validation.
+
+Show Child Attributesfor errors
+messageCopy link to message
+Type:string
+required
+Errors overview.
+
+application/json
+Request Example forpost/releases
+Shell Curl
+curl https://api.toolost.com/v1/releases \
+  --request POST \
+  --header 'Content-Type: application/json' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN' \
+  --data '{
+  "type": "Album",
+  "title": "Midnight Echoes",
+  "label": "Too Lost Records",
+  "participants": [
+    {
+      "name": "Nova Waves",
+      "artistId": 123,
+      "role": [
+        "primary"
+      ]
+    }
+  ]
+}'
+
+
+Test Request
+(post /releases)
+Status:200
+Status:401
+Status:422
+{
+  "data": {
+    "id": 73518,
+    "type": "Album",
+    "status": "draft",
+    "title": "API Validation Test Release",
+    "upc": null,
+    "catalogNumber": "TOOLOST3000073518",
+    "version": null,
+    "remixTitle": null,
+    "coverSongs": [],
+    "label": "Bela",
+    "primaryGenre": "Alternative/Gothic",
+    "secondaryGenre": "Alternative/Grunge",
+    "language": "en",
+    "releaseDate": "2026-04-04",
+    "originalReleaseDate": null,
+    "applePreorder": false,
+    "applePreorderDate": null,
+    "licenseType": "Copyright",
+    "licenseInfo": null,
+    "cYear": "2026",
+    "cLine": "Bela cline",
+    "pYear": "2026",
+    "pLine": "Bela pline",
+    "coverUrl": "https://s3.amazonaws.com/bucket/artwork.jpg",
+    "compressedArtwork": "https://s3.amazonaws.com/bucket/artwork_small.jpg",
+    "isAiGeneratedArtwork": false,
+    "aiContentApproved": false,
+    "participants": "string",
+    "releaseTime": {
+      "time": null,
+      "timeZone": null
+    },
+    "motionArt": {
+      "motionArt1x1": [],
+      "motionArt3x4": []
+    },
+    "delivery": {
+      "youtube": true,
+      "facebook": true,
+      "soundcloud": true,
+      "soundExchange": true,
+      "beatPort": true,
+      "beatPortHasAccount": true,
+      "beatPortLink": null,
+      "beatPortLabelLogo": null,
+      "junoDownloads": true,
+      "trackLibs": true,
+      "hook": true,
+      "lyricfind": true,
+      "even": true
+    },
+    "platforms": "string",
+    "territories": "string",
+    "review": {
+      "note": null,
+      "fileName": null,
+      "fileUrl": null,
+      "fileType": null
+    },
+    "aiDocumentation": {
+      "fileName": null,
+      "fileUrl": null
+    },
+    "tracks": [
+      {
+        "id": 98341,
+        "title": "Track One",
+        "version": "Extended Mix",
+        "linerNote": "Recorded in New York.",
+        "isrc": "USABC1234567",
+        "iswc": "T0345246801",
+        "language": "en",
+        "audioFileKey": "external/tracks/v1/releases/73518/audio/2f7f1147-d5b0-4cd9-818b-236d05bd8263.flac",
+        "audioUrl": "string",
+        "instrumentalFileKey": "external/tracks/v1/releases/73518/instrumental/a818d714-547a-43f9-b5aa-b64af03917eb.flac",
+        "instrumentalUrl": "string",
+        "dolbyFileKey": "external/tracks/v1/releases/73518/dolby/63e99108-950d-4dc2-bf0d-f8ad32fcd883.flac",
+        "dolbyUrl": "string",
+        "tiktokStartTime": "00:30",
+        "lyrics": {
+          "content": null,
+          "explicit": true,
+          "cleanVersion": true
+        },
+        "aiAssisted": true,
+        "aiAssistedFileUrl": null,
+        "aiAssistedFileName": null,
+        "artists": "string",
+        "writers": "string",
+        "credits": "string",
+        "createdAt": null,
+        "updatedAt": null
+      }
+    ],
+    "video": {
+      "videoUrl": null,
+      "md5hash": null,
+      "videoType": "string",
+      "ageRestriction": "string",
+      "isCoverVersion": true,
+      "referenceUpc": null,
+      "referenceIsrc": null,
+      "metadata": [],
+      "delivery": {
+        "appleMusic": true,
+        "vevo": true
+      },
+      "participants": "string",
+      "writers": "string",
+      "credits": "string"
+    },
+    "submittedAt": null,
+    "createdAt": null,
+    "updatedAt": null
+  }
+}
+
+Submit release​Copy link
+
+Auth Required
+Submits a draft release into review state. Requires scope: write:releases.
+
+Path Parameters
+releaseIdCopy link to releaseId
+Type:integer
+required
+Example
+Release ID.
+
+Body
+·SubmitReleaseRequest
+required
+application/json
+acceptTermsCopy link to acceptTerms
+Type:string
+required
+Example
+confirmRightsCopy link to confirmRights
+Type:string
+required
+Example
+confirmYoutubeRightsCopy link to confirmYoutubeRights
+Type:boolean | null
+Example
+idempotencyKeyCopy link to idempotencyKey
+Type:string | null
+max length:  
+128
+Example
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:object · ReleaseResource
+required
+Show ReleaseResourcefor data
+messageCopy link to message
+Type:string
+required
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+422Copy link to 422
+Type:object
+Validation error
+
+errorsCopy link to errors
+Type:object
+required
+A detailed description of each field that failed validation.
+
+Show Child Attributesfor errors
+messageCopy link to message
+Type:string
+required
+Errors overview.
+
+application/json
+Request Example forpost/releases/{releaseId}/submit
+Shell Curl
+curl https://api.toolost.com/v1/releases/73518/submit \
+  --request POST \
+  --header 'Content-Type: application/json' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN' \
+  --data '{
+  "acceptTerms": true,
+  "confirmRights": true,
+  "confirmYoutubeRights": true,
+  "idempotencyKey": "rel-submit-73518-20260320"
+}'
+
+
+Test Request
+(post /releases/{releaseId}/submit)
+Status:200
+Status:401
+Status:422
+{
+  "data": {
+    "id": 73518,
+    "type": "Album",
+    "status": "draft",
+    "title": "API Validation Test Release",
+    "upc": null,
+    "catalogNumber": "TOOLOST3000073518",
+    "version": null,
+    "remixTitle": null,
+    "coverSongs": [],
+    "label": "Bela",
+    "primaryGenre": "Alternative/Gothic",
+    "secondaryGenre": "Alternative/Grunge",
+    "language": "en",
+    "releaseDate": "2026-04-04",
+    "originalReleaseDate": null,
+    "applePreorder": false,
+    "applePreorderDate": null,
+    "licenseType": "Copyright",
+    "licenseInfo": null,
+    "cYear": "2026",
+    "cLine": "Bela cline",
+    "pYear": "2026",
+    "pLine": "Bela pline",
+    "coverUrl": "https://s3.amazonaws.com/bucket/artwork.jpg",
+    "compressedArtwork": "https://s3.amazonaws.com/bucket/artwork_small.jpg",
+    "isAiGeneratedArtwork": false,
+    "aiContentApproved": false,
+    "participants": "string",
+    "releaseTime": {
+      "time": null,
+      "timeZone": null
+    },
+    "motionArt": {
+      "motionArt1x1": [],
+      "motionArt3x4": []
+    },
+    "delivery": {
+      "youtube": true,
+      "facebook": true,
+      "soundcloud": true,
+      "soundExchange": true,
+      "beatPort": true,
+      "beatPortHasAccount": true,
+      "beatPortLink": null,
+      "beatPortLabelLogo": null,
+      "junoDownloads": true,
+      "trackLibs": true,
+      "hook": true,
+      "lyricfind": true,
+      "even": true
+    },
+    "platforms": "string",
+    "territories": "string",
+    "review": {
+      "note": null,
+      "fileName": null,
+      "fileUrl": null,
+      "fileType": null
+    },
+    "aiDocumentation": {
+      "fileName": null,
+      "fileUrl": null
+    },
+    "tracks": [
+      {
+        "id": 98341,
+        "title": "Track One",
+        "version": "Extended Mix",
+        "linerNote": "Recorded in New York.",
+        "isrc": "USABC1234567",
+        "iswc": "T0345246801",
+        "language": "en",
+        "audioFileKey": "external/tracks/v1/releases/73518/audio/2f7f1147-d5b0-4cd9-818b-236d05bd8263.flac",
+        "audioUrl": "string",
+        "instrumentalFileKey": "external/tracks/v1/releases/73518/instrumental/a818d714-547a-43f9-b5aa-b64af03917eb.flac",
+        "instrumentalUrl": "string",
+        "dolbyFileKey": "external/tracks/v1/releases/73518/dolby/63e99108-950d-4dc2-bf0d-f8ad32fcd883.flac",
+        "dolbyUrl": "string",
+        "tiktokStartTime": "00:30",
+        "lyrics": {
+          "content": null,
+          "explicit": true,
+          "cleanVersion": true
+        },
+        "aiAssisted": true,
+        "aiAssistedFileUrl": null,
+        "aiAssistedFileName": null,
+        "artists": "string",
+        "writers": "string",
+        "credits": "string",
+        "createdAt": null,
+        "updatedAt": null
+      }
+    ],
+    "video": {
+      "videoUrl": null,
+      "md5hash": null,
+      "videoType": "string",
+      "ageRestriction": "string",
+      "isCoverVersion": true,
+      "referenceUpc": null,
+      "referenceIsrc": null,
+      "metadata": [],
+      "delivery": {
+        "appleMusic": true,
+        "vevo": true
+      },
+      "participants": "string",
+      "writers": "string",
+      "credits": "string"
+    },
+    "submittedAt": null,
+    "createdAt": null,
+    "updatedAt": null
+  },
+  "message": "string"
+}
+
+Validate UPC​Copy link
+
+Auth Required
+Validates UPC format and uniqueness. Requires scope: write:releases.
+
+Body
+·ValidateUpcRequest
+required
+application/json
+upcCopy link to upc
+Type:string
+Pattern:^\d{12,13}$
+required
+Example
+releaseIdCopy link to releaseId
+Type:integer | null
+min:  
+1
+Example
+Integer numbers.
+
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:object
+required
+Show Child Attributesfor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+422Copy link to 422
+Type:object
+Validation error
+
+errorsCopy link to errors
+Type:object
+required
+A detailed description of each field that failed validation.
+
+Show Child Attributesfor errors
+messageCopy link to message
+Type:string
+required
+Errors overview.
+
+application/json
+Request Example forpost/releases/validate/upc
+Shell Curl
+curl https://api.toolost.com/v1/releases/validate/upc \
+  --request POST \
+  --header 'Content-Type: application/json' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN' \
+  --data '{
+  "releaseId": 73518,
+  "upc": "123456789012"
+}'
+
+
+Test Request
+(post /releases/validate/upc)
+Status:200
+Status:401
+Status:422
+{
+  "data": {
+    "valid": true
+  }
+}
+
+Release Tracks ​Copy link
+Track-level endpoints for release tracks and track-specific validations.
+
+Release TracksOperations
+get
+/releases/{releaseId}/tracks
+get
+/releases/{releaseId}/tracks/{trackId}
+patch
+/releases/{releaseId}/tracks/{trackId}/file
+post
+/releases/{releaseId}/tracks/upload-url
+post
+/releases/validate/isrc
+put
+/releases/{releaseId}/tracks
+List tracks​Copy link
+
+Auth Required
+Returns all tracks for a release owned by the authenticated user, ordered by track position. Requires scope: read:releases.
+
+Path Parameters
+releaseIdCopy link to releaseId
+Type:integer
+required
+Example
+Release ID.
+
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:array object[] · TrackResource[]
+required
+Show TrackResourcefor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+Request Example forget/releases/{releaseId}/tracks
+Shell Curl
+curl https://api.toolost.com/v1/releases/73518/tracks \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /releases/{releaseId}/tracks)
+Status:200
+Status:401
+{
+  "data": [
+    {
+      "id": 98341,
+      "title": "Track One",
+      "version": "Extended Mix",
+      "linerNote": "Recorded in New York.",
+      "isrc": "USABC1234567",
+      "iswc": "T0345246801",
+      "language": "en",
+      "audioFileKey": "external/tracks/v1/releases/73518/audio/2f7f1147-d5b0-4cd9-818b-236d05bd8263.flac",
+      "audioUrl": "string",
+      "instrumentalFileKey": "external/tracks/v1/releases/73518/instrumental/a818d714-547a-43f9-b5aa-b64af03917eb.flac",
+      "instrumentalUrl": "string",
+      "dolbyFileKey": "external/tracks/v1/releases/73518/dolby/63e99108-950d-4dc2-bf0d-f8ad32fcd883.flac",
+      "dolbyUrl": "string",
+      "tiktokStartTime": "00:30",
+      "lyrics": {
+        "content": null,
+        "explicit": true,
+        "cleanVersion": true
+      },
+      "aiAssisted": true,
+      "aiAssistedFileUrl": null,
+      "aiAssistedFileName": null,
+      "artists": "string",
+      "writers": "string",
+      "credits": "string",
+      "createdAt": null,
+      "updatedAt": null
+    }
+  ]
+}
+
+Get track​Copy link
+
+Auth Required
+Returns a single track belonging to a release owned by the authenticated user. Requires scope: read:releases.
+
+Path Parameters
+releaseIdCopy link to releaseId
+Type:integer
+required
+Example
+Release ID.
+
+trackIdCopy link to trackId
+Type:integer
+required
+Example
+Track ID.
+
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:object · TrackResource
+required
+Show TrackResourcefor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+Request Example forget/releases/{releaseId}/tracks/{trackId}
+Shell Curl
+curl https://api.toolost.com/v1/releases/73518/tracks/98341 \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /releases/{releaseId}/tracks/{trackId})
+Status:200
+Status:401
+{
+  "data": {
+    "id": 98341,
+    "title": "Track One",
+    "version": "Extended Mix",
+    "linerNote": "Recorded in New York.",
+    "isrc": "USABC1234567",
+    "iswc": "T0345246801",
+    "language": "en",
+    "audioFileKey": "external/tracks/v1/releases/73518/audio/2f7f1147-d5b0-4cd9-818b-236d05bd8263.flac",
+    "audioUrl": "string",
+    "instrumentalFileKey": "external/tracks/v1/releases/73518/instrumental/a818d714-547a-43f9-b5aa-b64af03917eb.flac",
+    "instrumentalUrl": "string",
+    "dolbyFileKey": "external/tracks/v1/releases/73518/dolby/63e99108-950d-4dc2-bf0d-f8ad32fcd883.flac",
+    "dolbyUrl": "string",
+    "tiktokStartTime": "00:30",
+    "lyrics": {
+      "content": null,
+      "explicit": true,
+      "cleanVersion": true
+    },
+    "aiAssisted": true,
+    "aiAssistedFileUrl": null,
+    "aiAssistedFileName": null,
+    "artists": "string",
+    "writers": "string",
+    "credits": "string",
+    "createdAt": null,
+    "updatedAt": null
+  }
+}
+
+Update single track file​Copy link
+
+Auth Required
+Replaces one file (audio, instrumental, or dolby) on a draft track using fileKey from the upload-url endpoint. Response includes file keys plus temporary signed file URLs. Requires scope: write:releases.
+
+Path Parameters
+releaseIdCopy link to releaseId
+Type:integer
+required
+Example
+Release ID.
+
+trackIdCopy link to trackId
+Type:integer
+required
+Example
+Track ID.
+
+Body
+·ReplaceSingleTrackFileRequest
+required
+application/json
+fileKeyCopy link to fileKey
+Type:string
+max length:  
+512
+Pattern:^external\/tracks\/v1\/releases\/\d+\/(audio|instrumental|dolby)\/[A-Za-z0-9\-_]+\.(flac)$
+required
+Example
+kindCopy link to kind
+Type:string
+enum
+required
+Example
+values
+audio
+instrumental
+dolby
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:object · ReleaseResource
+required
+Show ReleaseResourcefor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+422Copy link to 422
+Type:object
+Validation error
+
+errorsCopy link to errors
+Type:object
+required
+A detailed description of each field that failed validation.
+
+Show Child Attributesfor errors
+messageCopy link to message
+Type:string
+required
+Errors overview.
+
+application/json
+Request Example forpatch/releases/{releaseId}/tracks/{trackId}/file
+Shell Curl
+curl https://api.toolost.com/v1/releases/73518/tracks/98341/file \
+  --request PATCH \
+  --header 'Content-Type: application/json' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN' \
+  --data '{
+  "kind": "audio",
+  "fileKey": "external/tracks/v1/releases/73518/audio/2f7f1147-d5b0-4cd9-818b-236d05bd8263.flac"
+}'
+
+
+Test Request
+(patch /releases/{releaseId}/tracks/{trackId}/file)
+Status:200
+Status:401
+Status:422
+{
+  "data": {
+    "id": 73518,
+    "type": "Album",
+    "status": "draft",
+    "title": "API Validation Test Release",
+    "upc": null,
+    "catalogNumber": "TOOLOST3000073518",
+    "version": null,
+    "remixTitle": null,
+    "coverSongs": [],
+    "label": "Bela",
+    "primaryGenre": "Alternative/Gothic",
+    "secondaryGenre": "Alternative/Grunge",
+    "language": "en",
+    "releaseDate": "2026-04-04",
+    "originalReleaseDate": null,
+    "applePreorder": false,
+    "applePreorderDate": null,
+    "licenseType": "Copyright",
+    "licenseInfo": null,
+    "cYear": "2026",
+    "cLine": "Bela cline",
+    "pYear": "2026",
+    "pLine": "Bela pline",
+    "coverUrl": "https://s3.amazonaws.com/bucket/artwork.jpg",
+    "compressedArtwork": "https://s3.amazonaws.com/bucket/artwork_small.jpg",
+    "isAiGeneratedArtwork": false,
+    "aiContentApproved": false,
+    "participants": "string",
+    "releaseTime": {
+      "time": null,
+      "timeZone": null
+    },
+    "motionArt": {
+      "motionArt1x1": [],
+      "motionArt3x4": []
+    },
+    "delivery": {
+      "youtube": true,
+      "facebook": true,
+      "soundcloud": true,
+      "soundExchange": true,
+      "beatPort": true,
+      "beatPortHasAccount": true,
+      "beatPortLink": null,
+      "beatPortLabelLogo": null,
+      "junoDownloads": true,
+      "trackLibs": true,
+      "hook": true,
+      "lyricfind": true,
+      "even": true
+    },
+    "platforms": "string",
+    "territories": "string",
+    "review": {
+      "note": null,
+      "fileName": null,
+      "fileUrl": null,
+      "fileType": null
+    },
+    "aiDocumentation": {
+      "fileName": null,
+      "fileUrl": null
+    },
+    "tracks": [
+      {
+        "id": 98341,
+        "title": "Track One",
+        "version": "Extended Mix",
+        "linerNote": "Recorded in New York.",
+        "isrc": "USABC1234567",
+        "iswc": "T0345246801",
+        "language": "en",
+        "audioFileKey": "external/tracks/v1/releases/73518/audio/2f7f1147-d5b0-4cd9-818b-236d05bd8263.flac",
+        "audioUrl": "string",
+        "instrumentalFileKey": "external/tracks/v1/releases/73518/instrumental/a818d714-547a-43f9-b5aa-b64af03917eb.flac",
+        "instrumentalUrl": "string",
+        "dolbyFileKey": "external/tracks/v1/releases/73518/dolby/63e99108-950d-4dc2-bf0d-f8ad32fcd883.flac",
+        "dolbyUrl": "string",
+        "tiktokStartTime": "00:30",
+        "lyrics": {
+          "content": null,
+          "explicit": true,
+          "cleanVersion": true
+        },
+        "aiAssisted": true,
+        "aiAssistedFileUrl": null,
+        "aiAssistedFileName": null,
+        "artists": "string",
+        "writers": "string",
+        "credits": "string",
+        "createdAt": null,
+        "updatedAt": null
+      }
+    ],
+    "video": {
+      "videoUrl": null,
+      "md5hash": null,
+      "videoType": "string",
+      "ageRestriction": "string",
+      "isCoverVersion": true,
+      "referenceUpc": null,
+      "referenceIsrc": null,
+      "metadata": [],
+      "delivery": {
+        "appleMusic": true,
+        "vevo": true
+      },
+      "participants": "string",
+      "writers": "string",
+      "credits": "string"
+    },
+    "submittedAt": null,
+    "createdAt": null,
+    "updatedAt": null
+  }
+}
+
+Create track upload URL​Copy link
+
+Auth Required
+Generates a pre-signed upload URL for a FLAC track file. Step 2: perform PUT {uploadUrl} directly to S3 with raw binary body and header Content-Type: audio/flac. This second step is not a Toolost API route; it is an external S3 PUT using the returned uploadUrl. Step 3: call release tracks APIs with the returned fileKey. Requires scope: write:releases.
+
+Path Parameters
+releaseIdCopy link to releaseId
+Type:integer
+required
+Example
+Release ID.
+
+Body
+·CreateTrackUploadUrlRequest
+required
+application/json
+contentTypeCopy link to contentType
+enum
+const:  
+audio/flac
+required
+Example
+values
+audio/flac
+fileNameCopy link to fileName
+Type:string
+max length:  
+255
+Pattern:\.flac$
+required
+Example
+kindCopy link to kind
+Type:string
+enum
+required
+Example
+values
+audio
+instrumental
+dolby
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:object
+required
+Show Child Attributesfor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+422Copy link to 422
+Type:object
+Validation error
+
+errorsCopy link to errors
+Type:object
+required
+A detailed description of each field that failed validation.
+
+Show Child Attributesfor errors
+messageCopy link to message
+Type:string
+required
+Errors overview.
+
+application/json
+Request Example forpost/releases/{releaseId}/tracks/upload-url
+Shell Curl
+curl https://api.toolost.com/v1/releases/73518/tracks/upload-url \
+  --request POST \
+  --header 'Content-Type: application/json' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN' \
+  --data '{
+  "kind": "audio",
+  "fileName": "track-main.flac",
+  "contentType": "audio/flac"
+}'
+
+
+Test Request
+(post /releases/{releaseId}/tracks/upload-url)
+Status:200
+Status:401
+Status:422
+{
+  "data": {
+    "uploadUrl": "string",
+    "fileKey": "string",
+    "method": "string",
+    "headers": {
+      "additionalProperty": "string"
+    },
+    "expiresIn": 1
+  }
+}
+
+Validate ISRC​Copy link
+
+Auth Required
+Validates ISRC format and uniqueness across existing tracks. Requires scope: write:releases.
+
+Body
+·ValidateIsrcRequest
+required
+application/json
+isrcCopy link to isrc
+Type:string
+Pattern:^[A-Z0-9]{12}$
+required
+Example
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:object
+required
+Show Child Attributesfor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+422Copy link to 422
+Type:object
+Validation error
+
+errorsCopy link to errors
+Type:object
+required
+A detailed description of each field that failed validation.
+
+Show Child Attributesfor errors
+messageCopy link to message
+Type:string
+required
+Errors overview.
+
+application/json
+Request Example forpost/releases/validate/isrc
+Shell Curl
+curl https://api.toolost.com/v1/releases/validate/isrc \
+  --request POST \
+  --header 'Content-Type: application/json' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN' \
+  --data '{
+  "isrc": "USABC1234567"
+}'
+
+
+Test Request
+(post /releases/validate/isrc)
+Status:200
+Status:401
+Status:422
+{
+  "data": {
+    "valid": true
+  }
+}
+
+Release tracks​Copy link
+
+Auth Required
+Updates the full tracklist for a draft release using audioFileKey/instrumentalFileKey/dolbyFileKey values from the upload-url endpoint. Response includes these keys plus temporary signed audioUrl/instrumentalUrl/dolbyUrl fields. Requires scope: write:releases.
+
+Path Parameters
+releaseIdCopy link to releaseId
+Type:integer
+required
+Example
+Release ID.
+
+Body
+·ReplaceReleaseTracksRequest
+required
+application/json
+tracksCopy link to tracks
+Type:array object[]
+1…
+required
+Example
+Show Child Attributesfor tracks
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:object · ReleaseResource
+required
+Show ReleaseResourcefor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+422Copy link to 422
+Type:object
+Validation error
+
+errorsCopy link to errors
+Type:object
+required
+A detailed description of each field that failed validation.
+
+Show Child Attributesfor errors
+messageCopy link to message
+Type:string
+required
+Errors overview.
+
+application/json
+Request Example forput/releases/{releaseId}/tracks
+Shell Curl
+curl https://api.toolost.com/v1/releases/73518/tracks \
+  --request PUT \
+  --header 'Content-Type: application/json' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN' \
+  --data '{
+  "tracks": [
+    {
+      "title": "Track One",
+      "language": "en",
+      "audioFileKey": "external/tracks/v1/releases/73518/audio/2f7f1147-d5b0-4cd9-818b-236d05bd8263.flac",
+      "instrumentalFileKey": "external/tracks/v1/releases/73518/instrumental/a818d714-547a-43f9-b5aa-b64af03917eb.flac",
+      "dolbyFileKey": "external/tracks/v1/releases/73518/dolby/63e99108-950d-4dc2-bf0d-f8ad32fcd883.flac",
+      "artists": [
+        {
+          "name": "Nova Waves",
+          "role": [
+            "primary"
+          ]
+        }
+      ],
+      "writers": [
+        {
+          "name": "John Doe",
+          "role": [
+            "composer"
+          ]
+        }
+      ]
+    }
+  ]
+}'
+
+
+Test Request
+(put /releases/{releaseId}/tracks)
+Status:200
+Status:401
+Status:422
+{
+  "data": {
+    "id": 73518,
+    "type": "Album",
+    "status": "draft",
+    "title": "API Validation Test Release",
+    "upc": null,
+    "catalogNumber": "TOOLOST3000073518",
+    "version": null,
+    "remixTitle": null,
+    "coverSongs": [],
+    "label": "Bela",
+    "primaryGenre": "Alternative/Gothic",
+    "secondaryGenre": "Alternative/Grunge",
+    "language": "en",
+    "releaseDate": "2026-04-04",
+    "originalReleaseDate": null,
+    "applePreorder": false,
+    "applePreorderDate": null,
+    "licenseType": "Copyright",
+    "licenseInfo": null,
+    "cYear": "2026",
+    "cLine": "Bela cline",
+    "pYear": "2026",
+    "pLine": "Bela pline",
+    "coverUrl": "https://s3.amazonaws.com/bucket/artwork.jpg",
+    "compressedArtwork": "https://s3.amazonaws.com/bucket/artwork_small.jpg",
+    "isAiGeneratedArtwork": false,
+    "aiContentApproved": false,
+    "participants": "string",
+    "releaseTime": {
+      "time": null,
+      "timeZone": null
+    },
+    "motionArt": {
+      "motionArt1x1": [],
+      "motionArt3x4": []
+    },
+    "delivery": {
+      "youtube": true,
+      "facebook": true,
+      "soundcloud": true,
+      "soundExchange": true,
+      "beatPort": true,
+      "beatPortHasAccount": true,
+      "beatPortLink": null,
+      "beatPortLabelLogo": null,
+      "junoDownloads": true,
+      "trackLibs": true,
+      "hook": true,
+      "lyricfind": true,
+      "even": true
+    },
+    "platforms": "string",
+    "territories": "string",
+    "review": {
+      "note": null,
+      "fileName": null,
+      "fileUrl": null,
+      "fileType": null
+    },
+    "aiDocumentation": {
+      "fileName": null,
+      "fileUrl": null
+    },
+    "tracks": [
+      {
+        "id": 98341,
+        "title": "Track One",
+        "version": "Extended Mix",
+        "linerNote": "Recorded in New York.",
+        "isrc": "USABC1234567",
+        "iswc": "T0345246801",
+        "language": "en",
+        "audioFileKey": "external/tracks/v1/releases/73518/audio/2f7f1147-d5b0-4cd9-818b-236d05bd8263.flac",
+        "audioUrl": "string",
+        "instrumentalFileKey": "external/tracks/v1/releases/73518/instrumental/a818d714-547a-43f9-b5aa-b64af03917eb.flac",
+        "instrumentalUrl": "string",
+        "dolbyFileKey": "external/tracks/v1/releases/73518/dolby/63e99108-950d-4dc2-bf0d-f8ad32fcd883.flac",
+        "dolbyUrl": "string",
+        "tiktokStartTime": "00:30",
+        "lyrics": {
+          "content": null,
+          "explicit": true,
+          "cleanVersion": true
+        },
+        "aiAssisted": true,
+        "aiAssistedFileUrl": null,
+        "aiAssistedFileName": null,
+        "artists": "string",
+        "writers": "string",
+        "credits": "string",
+        "createdAt": null,
+        "updatedAt": null
+      }
+    ],
+    "video": {
+      "videoUrl": null,
+      "md5hash": null,
+      "videoType": "string",
+      "ageRestriction": "string",
+      "isCoverVersion": true,
+      "referenceUpc": null,
+      "referenceIsrc": null,
+      "metadata": [],
+      "delivery": {
+        "appleMusic": true,
+        "vevo": true
+      },
+      "participants": "string",
+      "writers": "string",
+      "credits": "string"
+    },
+    "submittedAt": null,
+    "createdAt": null,
+    "updatedAt": null
+  }
+}
+
+Preferences ​Copy link
+Endpoints for managing artist and label preferences. Requires a valid OAuth 2.0 Bearer token with appropriate preference scopes.
+
+PreferencesOperations
+get
+/preferences/artist
+get
+/preferences/artists
+get
+/preferences/label
+get
+/preferences/label/artist/{id}
+get
+/preferences/search-spotify
+get
+/preferences/search-yt-channel
+get
+/preferences/search-apple
+get
+/preferences/get-spotify-artist
+get
+/preferences/get-yt-channel
+get
+/preferences/get-apple-artist
+get
+/preferences/artist-via-link
+post
+/preferences/search/artist-platform
+post
+/preferences/artist/get-artist-via-url
+post
+/preferences/artist/submit
+post
+/preferences/label/submit
+post
+/preferences/label/artist/remove
+Get artist preferences​Copy link
+
+Auth Required
+Returns the artist preferences for the authenticated user including release count. Requires scope: read:preferences.
+
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:object
+required
+Show Child Attributesfor data
+messageCopy link to message
+Type:string
+required
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+Request Example forget/preferences/artist
+Shell Curl
+curl https://api.toolost.com/v1/preferences/artist \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /preferences/artist)
+Status:200
+Status:401
+{
+  "data": {
+    "artist": {
+      "id": 1,
+      "artistName": "Nova Waves",
+      "primaryGenre": "Electronic",
+      "secondaryGenre": "Pop",
+      "language": "English",
+      "about": "Electronic music producer from Los Angeles.",
+      "profileImg": "https://cdn.example.com/preferences/artists/abc123.jpg",
+      "social": {
+        "facebook": "https://facebook.com/novawaves",
+        "instagram": "https://instagram.com/novawaves",
+        "twitter": null,
+        "youtube": null
+      },
+      "platforms": {
+        "spotify": "https://open.spotify.com/artist/1a2b3c",
+        "soundcloud": null,
+        "appleMusic": "https://music.apple.com/artist/nova-waves/123456",
+        "youtube": null,
+        "website": "https://novawaves.com"
+      },
+      "additional": {
+        "wikipedia": null,
+        "ddex": null,
+        "musicbrainz": null,
+        "allmusic": null,
+        "isni": null
+      },
+      "deliveries": {
+        "beatport": false,
+        "delivery_beatport_link": null,
+        "delivery_youtube": true,
+        "delivery_soundcloud": false,
+        "delivery_soundexchange": true,
+        "delivery_junodownload": false,
+        "delivery_tracklib": false,
+        "delivery_facebook": true,
+        "delivery_hook": false,
+        "delivery_lyricfind": false,
+        "delivery_even": false
+      },
+      "releaseTime": "00:00",
+      "timeZone": "America/New_York",
+      "label": "Indie Records",
+      "cLine": "2024 Indie Records",
+      "pLine": "2024 Indie Records",
+      "audiomack": {
+        "status": false,
+        "link": null
+      },
+      "stores": {},
+      "territories": "string",
+      "defaultRoles": "string",
+      "collaborators": "string"
+    },
+    "releaseCount": 1
+  },
+  "message": "string"
+}
+
+Get preference artists​Copy link
+
+Auth Required
+Returns artists with Spotify links for the authenticated user. Requires scope: read:preferences.
+
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:array object[]
+required
+Show Child Attributesfor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+Request Example forget/preferences/artists
+Shell Curl
+curl https://api.toolost.com/v1/preferences/artists \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /preferences/artists)
+Status:200
+Status:401
+{
+  "data": [
+    {
+      "id": 1,
+      "artist_name": "string",
+      "default_roles": [
+        {
+          "id": 1,
+          "artist_id": 1,
+          "name": "string",
+          "type": "string",
+          "spotify_link": null,
+          "default": true
+        }
+      ]
+    }
+  ]
+}
+
+Get label preferences​Copy link
+
+Auth Required
+Returns the label preferences with paginated artists for the authenticated user. Requires scope: read:preferences.
+
+Query Parameters
+searchCopy link to search
+Type:string | null
+max length:  
+255
+Example
+perPageCopy link to perPage
+Type:number
+min:  
+1
+max:  
+100
+Example
+pageCopy link to page
+Type:integer | null
+min:  
+1
+Example
+Integer numbers.
+
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:object
+required
+Show Child Attributesfor data
+messageCopy link to message
+Type:string
+required
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+422Copy link to 422
+Type:object
+Validation error
+
+errorsCopy link to errors
+Type:object
+required
+A detailed description of each field that failed validation.
+
+Show Child Attributesfor errors
+messageCopy link to message
+Type:string
+required
+Errors overview.
+
+application/json
+Request Example forget/preferences/label
+Shell Curl
+curl 'https://api.toolost.com/v1/preferences/label?search=nova&perPage=10&page=1' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /preferences/label)
+Status:200
+Status:401
+Status:422
+{
+  "data": {
+    "label": {
+      "id": 1,
+      "name": "Indie Records",
+      "about": "Independent record label based in NYC.",
+      "profileImg": "https://cdn.example.com/preferences/labels/xyz789.jpg",
+      "social": {
+        "facebook": "https://facebook.com/indierecords",
+        "instagram": null,
+        "twitter": null,
+        "youtube": null
+      },
+      "platforms": {
+        "website": "https://indierecords.com"
+      }
+    },
+    "artists": [
+      {
+        "id": 1,
+        "artistName": "Nova Waves",
+        "primaryGenre": "Electronic",
+        "secondaryGenre": "Pop",
+        "language": "English",
+        "profileImg": "https://cdn.example.com/preferences/artists/abc123.jpg",
+        "stores": {},
+        "territories": "string",
+        "defaultRoles": "string"
+      }
+    ]
+  },
+  "message": "string"
+}
+
+Get label artist​Copy link
+
+Auth Required
+Returns a single artist by ID for label view. Requires scope: read:preferences.
+
+Path Parameters
+idCopy link to id
+Type:integer
+required
+Example
+The artist ID.
+
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:object · LabelArtistResource
+required
+Show LabelArtistResourcefor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+Request Example forget/preferences/label/artist/{id}
+Shell Curl
+curl https://api.toolost.com/v1/preferences/label/artist/1 \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /preferences/label/artist/{id})
+Status:200
+Status:401
+{
+  "data": {
+    "id": 1,
+    "artistName": "Nova Waves",
+    "primaryGenre": "Electronic",
+    "secondaryGenre": "Pop",
+    "language": "English",
+    "profileImg": "https://cdn.example.com/preferences/artists/abc123.jpg",
+    "stores": {},
+    "territories": "string",
+    "defaultRoles": "string"
+  }
+}
+
+Search Spotify artists​Copy link
+
+Auth Required
+Search for artists on Spotify by name. Requires scope: read:preferences.
+
+Query Parameters
+artistCopy link to artist
+Type:string
+Example
+Artist name to search.
+
+limitCopy link to limit
+Type:integer
+Default
+Example
+Maximum number of results.
+
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:array object[]
+required
+Show Child Attributesfor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+Request Example forget/preferences/search-spotify
+Shell Curl
+curl 'https://api.toolost.com/v1/preferences/search-spotify?artist=Nova%20Waves&limit=5' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /preferences/search-spotify)
+Status:200
+Status:401
+{
+  "data": [
+    {
+      "name": "string",
+      "url": "string",
+      "image": "string",
+      "id": "string",
+      "followers": 1
+    }
+  ]
+}
+
+Search YouTube channels​Copy link
+
+Auth Required
+Search for YouTube channels by name. Requires scope: read:preferences.
+
+Query Parameters
+channelCopy link to channel
+Type:string
+Example
+Channel name to search.
+
+limitCopy link to limit
+Type:integer
+Default
+Example
+Maximum number of results.
+
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:array object[]
+required
+Show Child Attributesfor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+Request Example forget/preferences/search-yt-channel
+Shell Curl
+curl 'https://api.toolost.com/v1/preferences/search-yt-channel?channel=Nova%20Waves&limit=5' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /preferences/search-yt-channel)
+Status:200
+Status:401
+{
+  "data": [
+    {
+      "name": "string",
+      "url": "string",
+      "image": "string",
+      "id": "string"
+    }
+  ]
+}
+
+Search Apple Music artists​Copy link
+
+Auth Required
+Search for artists on Apple Music by name. Requires scope: read:preferences.
+
+Query Parameters
+artistCopy link to artist
+Type:string
+Example
+Artist name to search.
+
+limitCopy link to limit
+Type:integer
+Default
+Example
+Maximum number of results.
+
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:array object[]
+required
+Show Child Attributesfor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+Request Example forget/preferences/search-apple
+Shell Curl
+curl 'https://api.toolost.com/v1/preferences/search-apple?artist=Nova%20Waves&limit=5' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /preferences/search-apple)
+Status:200
+Status:401
+{
+  "data": [
+    {
+      "name": "string",
+      "url": "string",
+      "image": "string",
+      "id": "string"
+    }
+  ]
+}
+
+Get Spotify artist​Copy link
+
+Auth Required
+Retrieve a Spotify artist by their link or ID. Requires scope: read:preferences.
+
+Query Parameters
+linkCopy link to link
+Type:string
+Example
+Spotify artist link or ID.
+
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:object
+required
+Show Child Attributesfor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+Request Example forget/preferences/get-spotify-artist
+Shell Curl
+curl 'https://api.toolost.com/v1/preferences/get-spotify-artist?link=https%3A%2F%2Fopen.spotify.com%2Fartist%2F1a2b3c' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /preferences/get-spotify-artist)
+Status:200
+Status:401
+{
+  "data": {
+    "name": "string",
+    "url": "string",
+    "image": "string",
+    "id": "string",
+    "followers": 1,
+    "type": "string"
+  }
+}
+
+Get YouTube channel​Copy link
+
+Auth Required
+Retrieve a YouTube channel by their link. Requires scope: read:preferences.
+
+Query Parameters
+linkCopy link to link
+Type:string
+Example
+YouTube channel link.
+
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:object
+required
+Show Child Attributesfor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+Request Example forget/preferences/get-yt-channel
+Shell Curl
+curl 'https://api.toolost.com/v1/preferences/get-yt-channel?link=https%3A%2F%2Fwww.youtube.com%2F%40novawaves' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /preferences/get-yt-channel)
+Status:200
+Status:401
+{
+  "data": {
+    "name": "string",
+    "url": "string",
+    "image": "string",
+    "id": "string"
+  }
+}
+
+Get Apple Music artist​Copy link
+
+Auth Required
+Retrieve an Apple Music artist by their link. Requires scope: read:preferences.
+
+Query Parameters
+linkCopy link to link
+Type:string
+Example
+Apple Music artist link.
+
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:object
+required
+Show Child Attributesfor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+Request Example forget/preferences/get-apple-artist
+Shell Curl
+curl 'https://api.toolost.com/v1/preferences/get-apple-artist?link=https%3A%2F%2Fmusic.apple.com%2Fartist%2Fnova-waves%2F123456' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /preferences/get-apple-artist)
+Status:200
+Status:401
+{
+  "data": {
+    "name": "string",
+    "url": "string",
+    "image": "string",
+    "id": "string"
+  }
+}
+
+Get artist via link​Copy link
+
+Auth Required
+Retrieve an artist by platform link (unified across platforms). Requires scope: read:preferences.
+
+Query Parameters
+linkCopy link to link
+Type:string
+required
+Example
+platformCopy link to platform
+Type:string
+enum
+required
+Example
+values
+spotify
+youtube
+apple
+audiomack
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:object
+required
+Show Child Attributesfor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+422Copy link to 422
+Type:object
+Validation error
+
+errorsCopy link to errors
+Type:object
+required
+A detailed description of each field that failed validation.
+
+Show Child Attributesfor errors
+messageCopy link to message
+Type:string
+required
+Errors overview.
+
+application/json
+Request Example forget/preferences/artist-via-link
+Shell Curl
+curl 'https://api.toolost.com/v1/preferences/artist-via-link?link=https%3A%2F%2Fopen.spotify.com%2Fartist%2F1a2b3c&platform=spotify' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /preferences/artist-via-link)
+Status:200
+Status:401
+Status:422
+{
+  "data": {
+    "name": "string",
+    "url": "string",
+    "image": "string",
+    "id": "string"
+  }
+}
+
+Search artist via platform​Copy link
+
+Auth Required
+Unified search across platforms: Spotify, YouTube, Apple Music, Audiomack. Requires scope: read:preferences.
+
+Body
+·SearchPlatformRequest
+required
+application/json
+platformCopy link to platform
+Type:string
+enum
+required
+Example
+values
+spotify
+youtube
+apple
+audiomack
+termCopy link to term
+Type:string
+max length:  
+255
+required
+Example
+limitCopy link to limit
+Type:number
+min:  
+1
+max:  
+50
+Example
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:object
+required
+Show Child Attributesfor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+422Copy link to 422
+Type:object
+Validation error
+
+errorsCopy link to errors
+Type:object
+required
+A detailed description of each field that failed validation.
+
+Show Child Attributesfor errors
+messageCopy link to message
+Type:string
+required
+Errors overview.
+
+application/json
+Request Example forpost/preferences/search/artist-platform
+Shell Curl
+curl https://api.toolost.com/v1/preferences/search/artist-platform \
+  --request POST \
+  --header 'Content-Type: application/json' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN' \
+  --data '{
+  "term": "Nova Waves",
+  "platform": "spotify",
+  "limit": 5
+}'
+
+
+Test Request
+(post /preferences/search/artist-platform)
+Status:200
+Status:401
+Status:422
+{
+  "data": {
+    "platform": "string",
+    "results": [
+      {
+        "name": "string",
+        "url": "string",
+        "image": "string",
+        "id": "string",
+        "followers": 1
+      }
+    ]
+  }
+}
+
+Get artist via URL​Copy link
+
+Auth Required
+Retrieve an artist by URL with name validation. The artist name must match the profile name on Spotify or Apple Music. Requires scope: read:preferences.
+
+Body
+·GetArtistViaUrlRequest
+required
+application/json
+nameCopy link to name
+Type:string
+required
+Example
+platformCopy link to platform
+Type:string
+enum
+required
+Example
+values
+spotify
+apple
+urlCopy link to url
+Type:string
+required
+Example
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:object
+required
+Show Child Attributesfor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+422Copy link to 422
+Type:object
+Validation error
+
+errorsCopy link to errors
+Type:object
+required
+A detailed description of each field that failed validation.
+
+Show Child Attributesfor errors
+messageCopy link to message
+Type:string
+required
+Errors overview.
+
+application/json
+Request Example forpost/preferences/artist/get-artist-via-url
+Shell Curl
+curl https://api.toolost.com/v1/preferences/artist/get-artist-via-url \
+  --request POST \
+  --header 'Content-Type: application/json' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN' \
+  --data '{
+  "url": "https://open.spotify.com/artist/1a2b3c",
+  "name": "Nova Waves",
+  "platform": "spotify"
+}'
+
+
+Test Request
+(post /preferences/artist/get-artist-via-url)
+Status:200
+Status:401
+Status:422
+{
+  "data": {
+    "name": "string",
+    "url": "string",
+    "image": "string",
+    "id": "string",
+    "followers": 1,
+    "type": "string"
+  }
+}
+
+Submit artist preferences​Copy link
+
+Auth Required
+Create or update artist preferences for the authenticated user. Requires scope: write:preferences.
+
+Body
+·SubmitArtistPreferenceRequest
+required
+application/json
+artistNameCopy link to artistName
+Type:string
+max length:  
+255
+required
+Example
+metadataCopy link to metadata
+Type:object
+required
+Show Child Attributesfor metadata
+aboutCopy link to about
+Type:string | null
+Example
+additionalCopy link to additional
+Type:object
+Show Child Attributesfor additional
+audiomackCopy link to audiomack
+Type:object
+Show Child Attributesfor audiomack
+c_lineCopy link to c_line
+Type:string | null
+Example
+collaboratorsCopy link to collaborators
+Type:array object[]
+Show Child Attributesfor collaborators
+deliveriesCopy link to deliveries
+Type:object
+Show Child Attributesfor deliveries
+idCopy link to id
+Type:integer | null
+Example
+Integer numbers.
+
+imgCopy link to img
+Type:string | null
+Example
+labelCopy link to label
+Type:string | null
+Example
+languageCopy link to language
+Type:string | null
+Example
+Show additional propertiesfor Request Body
+Responses
+200Copy link to 200
+Type:object
+messageCopy link to message
+Type:string
+required
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+422Copy link to 422
+Type:object
+Validation error
+
+errorsCopy link to errors
+Type:object
+required
+A detailed description of each field that failed validation.
+
+Show Child Attributesfor errors
+messageCopy link to message
+Type:string
+required
+Errors overview.
+
+application/json
+Request Example forpost/preferences/artist/submit
+Shell Curl
+curl https://api.toolost.com/v1/preferences/artist/submit \
+  --request POST \
+  --header 'Content-Type: application/json' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN' \
+  --data '{
+  "id": null,
+  "artistName": "Nova Waves",
+  "primaryGenre": "Electronic",
+  "secondaryGenre": "Pop",
+  "language": "English",
+  "about": "Electronic music producer from Los Angeles.",
+  "img": null,
+  "removeImg": false,
+  "releaseTime": "00:00",
+  "timeZone": "America/New_York",
+  "label": "Indie Records",
+  "c_line": "2024 Indie Records",
+  "p_line": "2024 Indie Records",
+  "stores": [
+    ""
+  ],
+  "social": {
+    "facebook": "https://facebook.com/novawaves",
+    "instagram": "https://instagram.com/novawaves",
+    "twitter": null,
+    "youtube": null
+  },
+  "platforms": {
+    "spotify": "https://open.spotify.com/artist/1a2b3c",
+    "soundcloud": null,
+    "appleMusic": "https://music.apple.com/artist/nova-waves/123456",
+    "youtube": null,
+    "website": "https://novawaves.com"
+  },
+  "additional": {
+    "wikipedia": null,
+    "ddex": null,
+    "musicbrainz": null,
+    "allmusic": null,
+    "isni": null
+  },
+  "deliveries": {
+    "beatport": false,
+    "delivery_beatport_link": null,
+    "delivery_youtube": true,
+    "delivery_soundcloud": false,
+    "delivery_soundexchange": true,
+    "delivery_junodownload": false,
+    "delivery_tracklib": false,
+    "delivery_facebook": true,
+    "delivery_hook": false,
+    "delivery_lyricfind": false,
+    "delivery_even": false
+  },
+  "audiomack": {
+    "status": false,
+    "link": null
+  },
+  "metadata": {
+    "artists": [
+      {
+        "name": "Nova Waves",
+        "role": "Main Artist"
+      }
+    ],
+    "writers": [
+      {
+        "name": "John Doe",
+        "role": "Composer"
+      }
+    ],
+    "credits": [
+      {
+        "name": "Jane Smith",
+        "role": "Mixing Engineer"
+      }
+    ]
+  },
+  "territories": [
+    {
+      "name": "United States",
+      "code": "US"
+    }
+  ],
+  "collaborators": [
+    {
+      "name": "DJ Echo"
+    }
+  ]
+}'
+
+
+Test Request
+(post /preferences/artist/submit)
+Status:200
+Status:401
+Status:422
+{
+  "message": "string"
+}
+
+Submit label preferences​Copy link
+
+Auth Required
+Create or update label preferences for the authenticated user. Requires scope: write:preferences.
+
+Body
+·SubmitLabelPreferenceRequest
+required
+application/json
+nameCopy link to name
+Type:string
+max length:  
+255
+required
+Example
+aboutCopy link to about
+Type:string | null
+Example
+imgCopy link to img
+Type:string | null
+Example
+platformsCopy link to platforms
+Type:object
+Show Child Attributesfor platforms
+removeImgCopy link to removeImg
+Type:boolean | null
+Example
+socialCopy link to social
+Type:object
+Show Child Attributesfor social
+Responses
+200Copy link to 200
+Type:object
+messageCopy link to message
+Type:string
+required
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+422Copy link to 422
+Type:object
+Validation error
+
+errorsCopy link to errors
+Type:object
+required
+A detailed description of each field that failed validation.
+
+Show Child Attributesfor errors
+messageCopy link to message
+Type:string
+required
+Errors overview.
+
+application/json
+Request Example forpost/preferences/label/submit
+Shell Curl
+curl https://api.toolost.com/v1/preferences/label/submit \
+  --request POST \
+  --header 'Content-Type: application/json' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN' \
+  --data '{
+  "name": "Indie Records",
+  "about": "Independent record label based in NYC.",
+  "img": null,
+  "removeImg": false,
+  "social": {
+    "facebook": "https://facebook.com/indierecords",
+    "instagram": null,
+    "twitter": null,
+    "youtube": null
+  },
+  "platforms": {
+    "website": "https://indierecords.com"
+  }
+}'
+
+
+Test Request
+(post /preferences/label/submit)
+Status:200
+Status:401
+Status:422
+{
+  "message": "string"
+}
+
+Remove artist​Copy link
+
+Auth Required
+Remove an artist from label management. Requires scope: write:preferences.
+
+Responses
+200Copy link to 200
+Type:object
+messageCopy link to message
+Type:string
+required
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+Request Example forpost/preferences/label/artist/remove
+Shell Curl
+curl https://api.toolost.com/v1/preferences/label/artist/remove \
+  --request POST \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(post /preferences/label/artist/remove)
+Status:200
+Status:401
+{
+  "message": "string"
+}
+
+Sales - Overview ​Copy link
+Monthly earnings overview for the authenticated user. Requires scope: read:sales.
+
+Sales - OverviewOperations
+get
+/sales/overview
+List monthly overview​Copy link
+
+Auth Required
+Returns a paginated monthly earnings summary ordered by date descending. Requires scope: read:sales.
+
+Query Parameters
+pageCopy link to page
+Type:integer | null
+min:  
+1
+Example
+Integer numbers.
+
+per_pageCopy link to per_page
+Type:number
+min:  
+1
+max:  
+100
+Example
+Responses
+200Copy link to 200
+Type:object
+currentPageCopy link to currentPage
+Type:integer
+required
+Integer numbers.
+
+dataCopy link to data
+Type:array object[] · MonthlyOverviewCollection
+required
+Show MonthlyOverviewResourcefor data
+perPageCopy link to perPage
+Type:integer
+required
+Integer numbers.
+
+totalItemsCopy link to totalItems
+Type:integer
+required
+Integer numbers.
+
+totalPagesCopy link to totalPages
+Type:integer
+required
+Integer numbers.
+
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+422Copy link to 422
+Type:object
+Validation error
+
+errorsCopy link to errors
+Type:object
+required
+A detailed description of each field that failed validation.
+
+Show Child Attributesfor errors
+messageCopy link to message
+Type:string
+required
+Errors overview.
+
+application/json
+Request Example forget/sales/overview
+Shell Curl
+curl 'https://api.toolost.com/v1/sales/overview?page=1&per_page=20' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /sales/overview)
+Status:200
+Status:401
+Status:422
+{
+  "data": [
+    {
+      "date": "2025-06",
+      "total": 1234.56
+    }
+  ],
+  "currentPage": 1,
+  "perPage": 1,
+  "totalItems": 1,
+  "totalPages": 1
+}
+
+Sales - Tracks ​Copy link
+Track-level earnings data and breakdowns. Requires scope: read:sales.
+
+Sales - TracksOperations
+get
+/sales/tracks
+get
+/sales/tracks/{isrc}/overview
+get
+/sales/tracks/{isrc}/channels
+get
+/sales/tracks/{isrc}/territories
+List track sales​Copy link
+
+Auth Required
+Returns paginated earnings aggregated per track, ordered by dividends descending. Requires scope: read:sales.
+
+Query Parameters
+pageCopy link to page
+Type:integer | null
+min:  
+1
+Example
+Integer numbers.
+
+per_pageCopy link to per_page
+Type:number
+min:  
+1
+max:  
+100
+Example
+Responses
+200Copy link to 200
+Type:object
+currentPageCopy link to currentPage
+Type:integer
+required
+Integer numbers.
+
+dataCopy link to data
+Type:array object[] · TrackSalesCollection
+required
+Show TrackSalesResourcefor data
+perPageCopy link to perPage
+Type:integer
+required
+Integer numbers.
+
+totalItemsCopy link to totalItems
+Type:integer
+required
+Integer numbers.
+
+totalPagesCopy link to totalPages
+Type:integer
+required
+Integer numbers.
+
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+422Copy link to 422
+Type:object
+Validation error
+
+errorsCopy link to errors
+Type:object
+required
+A detailed description of each field that failed validation.
+
+Show Child Attributesfor errors
+messageCopy link to message
+Type:string
+required
+Errors overview.
+
+application/json
+Request Example forget/sales/tracks
+Shell Curl
+curl 'https://api.toolost.com/v1/sales/tracks?page=1&per_page=20' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /sales/tracks)
+Status:200
+Status:401
+Status:422
+{
+  "data": [
+    {
+      "id": "4821",
+      "isrc": "USRC17607839",
+      "title": "Midnight Drive",
+      "dividends": 543.21,
+      "coverUrl": "https://example.com/cover.jpg",
+      "coverUrlMedium": "https://example.com/cover_medium.jpg",
+      "splitShare": 50,
+      "participants": "Artist One, Artist Two"
+    }
+  ],
+  "currentPage": 1,
+  "perPage": 1,
+  "totalItems": 1,
+  "totalPages": 1
+}
+
+Track overview​Copy link
+
+Auth Required
+Returns a time-series of earnings per import date for a single track identified by ISRC. Requires scope: read:sales.
+
+Path Parameters
+isrcCopy link to isrc
+Type:string
+required
+Example
+The ISRC code of the track.
+
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:array object[]
+required
+Show Child Attributesfor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+Request Example forget/sales/tracks/{isrc}/overview
+Shell Curl
+curl https://api.toolost.com/v1/sales/tracks/USRC17607839/overview \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /sales/tracks/{isrc}/overview)
+Status:200
+Status:401
+{
+  "data": [
+    {
+      "date": "string",
+      "total": 1
+    }
+  ]
+}
+
+Track channels​Copy link
+
+Auth Required
+Returns earnings for a single track broken down by channel/platform. Requires scope: read:sales.
+
+Path Parameters
+isrcCopy link to isrc
+Type:string
+required
+Example
+The ISRC code of the track.
+
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:array object[]
+required
+Show Child Attributesfor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+Request Example forget/sales/tracks/{isrc}/channels
+Shell Curl
+curl https://api.toolost.com/v1/sales/tracks/USRC17607839/channels \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /sales/tracks/{isrc}/channels)
+Status:200
+Status:401
+{
+  "data": [
+    {
+      "name": "string",
+      "logo": null,
+      "logoDark": null,
+      "logoDefault": "string",
+      "total": 1
+    }
+  ]
+}
+
+Track territories​Copy link
+
+Auth Required
+Returns earnings for a single track broken down by territory/country. Requires scope: read:sales.
+
+Path Parameters
+isrcCopy link to isrc
+Type:string
+required
+Example
+The ISRC code of the track.
+
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:array object[]
+required
+Show Child Attributesfor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+Request Example forget/sales/tracks/{isrc}/territories
+Shell Curl
+curl https://api.toolost.com/v1/sales/tracks/USRC17607839/territories \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /sales/tracks/{isrc}/territories)
+Status:200
+Status:401
+{
+  "data": [
+    {
+      "name": "string",
+      "code": "string",
+      "flag": "string",
+      "total": 1
+    }
+  ]
+}
+
+Sales - Releases ​Copy link
+Release-level earnings data and breakdowns. Requires scope: read:sales.
+
+Sales - ReleasesOperations
+get
+/sales/releases
+get
+/sales/releases/{releaseId}/overview
+get
+/sales/releases/{releaseId}/channels
+get
+/sales/releases/{releaseId}/territories
+List release sales​Copy link
+
+Auth Required
+Returns paginated earnings aggregated per release, ordered by dividends descending. Requires scope: read:sales.
+
+Query Parameters
+pageCopy link to page
+Type:integer | null
+min:  
+1
+Example
+Integer numbers.
+
+per_pageCopy link to per_page
+Type:number
+min:  
+1
+max:  
+100
+Example
+Responses
+200Copy link to 200
+Type:object
+currentPageCopy link to currentPage
+Type:integer
+required
+Integer numbers.
+
+dataCopy link to data
+Type:array object[] · ReleaseSalesCollection
+required
+Show ReleaseSalesResourcefor data
+perPageCopy link to perPage
+Type:integer
+required
+Integer numbers.
+
+totalItemsCopy link to totalItems
+Type:integer
+required
+Integer numbers.
+
+totalPagesCopy link to totalPages
+Type:integer
+required
+Integer numbers.
+
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+422Copy link to 422
+Type:object
+Validation error
+
+errorsCopy link to errors
+Type:object
+required
+A detailed description of each field that failed validation.
+
+Show Child Attributesfor errors
+messageCopy link to message
+Type:string
+required
+Errors overview.
+
+application/json
+Request Example forget/sales/releases
+Shell Curl
+curl 'https://api.toolost.com/v1/sales/releases?page=1&per_page=20' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /sales/releases)
+Status:200
+Status:401
+Status:422
+{
+  "data": [
+    {
+      "id": "73518",
+      "title": "Neon Horizons",
+      "upc": "198765432109",
+      "dividends": 2345.67,
+      "coverUrl": "https://example.com/cover.jpg",
+      "coverUrlMedium": "https://example.com/cover_medium.jpg",
+      "participants": "Artist One, Artist Two"
+    }
+  ],
+  "currentPage": 1,
+  "perPage": 1,
+  "totalItems": 1,
+  "totalPages": 1
+}
+
+Release overview​Copy link
+
+Auth Required
+Returns a time-series of earnings per import date for a single release. Requires scope: read:sales.
+
+Path Parameters
+releaseIdCopy link to releaseId
+Type:integer
+required
+Example
+The release ID.
+
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:array object[]
+required
+Show Child Attributesfor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+Request Example forget/sales/releases/{releaseId}/overview
+Shell Curl
+curl https://api.toolost.com/v1/sales/releases/73518/overview \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /sales/releases/{releaseId}/overview)
+Status:200
+Status:401
+{
+  "data": [
+    {
+      "date": "string",
+      "total": 1
+    }
+  ]
+}
+
+Release channels​Copy link
+
+Auth Required
+Returns earnings for a single release broken down by channel/platform. Requires scope: read:sales.
+
+Path Parameters
+releaseIdCopy link to releaseId
+Type:integer
+required
+Example
+The release ID.
+
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:array object[]
+required
+Show Child Attributesfor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+Request Example forget/sales/releases/{releaseId}/channels
+Shell Curl
+curl https://api.toolost.com/v1/sales/releases/73518/channels \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /sales/releases/{releaseId}/channels)
+Status:200
+Status:401
+{
+  "data": [
+    {
+      "name": "string",
+      "logo": null,
+      "logoDark": null,
+      "logoDefault": "string",
+      "total": 1
+    }
+  ]
+}
+
+Release territories​Copy link
+
+Auth Required
+Returns earnings for a single release broken down by territory/country. Requires scope: read:sales.
+
+Path Parameters
+releaseIdCopy link to releaseId
+Type:integer
+required
+Example
+The release ID.
+
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:array object[]
+required
+Show Child Attributesfor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+Request Example forget/sales/releases/{releaseId}/territories
+Shell Curl
+curl https://api.toolost.com/v1/sales/releases/73518/territories \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /sales/releases/{releaseId}/territories)
+Status:200
+Status:401
+{
+  "data": [
+    {
+      "name": "string",
+      "code": "string",
+      "flag": "string",
+      "total": 1
+    }
+  ]
+}
+
+Sales - Artists ​Copy link
+Artist-level earnings data and breakdowns. Requires scope: read:sales.
+
+Sales - ArtistsOperations
+get
+/sales/artists
+get
+/sales/artists/{artist}/overview
+get
+/sales/artists/{artist}/channels
+get
+/sales/artists/{artist}/territories
+List artist sales​Copy link
+
+Auth Required
+Returns paginated earnings aggregated per primary artist, ordered by dividends descending. Requires scope: read:sales.
+
+Query Parameters
+pageCopy link to page
+Type:integer | null
+min:  
+1
+Example
+Integer numbers.
+
+per_pageCopy link to per_page
+Type:number
+min:  
+1
+max:  
+100
+Example
+Responses
+200Copy link to 200
+Type:object
+currentPageCopy link to currentPage
+Type:integer
+required
+Integer numbers.
+
+dataCopy link to data
+Type:array object[] · ArtistSalesCollection
+required
+Show ArtistSalesResourcefor data
+perPageCopy link to perPage
+Type:integer
+required
+Integer numbers.
+
+totalItemsCopy link to totalItems
+Type:integer
+required
+Integer numbers.
+
+totalPagesCopy link to totalPages
+Type:integer
+required
+Integer numbers.
+
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+422Copy link to 422
+Type:object
+Validation error
+
+errorsCopy link to errors
+Type:object
+required
+A detailed description of each field that failed validation.
+
+Show Child Attributesfor errors
+messageCopy link to message
+Type:string
+required
+Errors overview.
+
+application/json
+Request Example forget/sales/artists
+Shell Curl
+curl 'https://api.toolost.com/v1/sales/artists?page=1&per_page=20' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /sales/artists)
+Status:200
+Status:401
+Status:422
+{
+  "data": [
+    {
+      "name": "Nova Waves",
+      "dividends": 8765.43,
+      "coverUrl": "https://example.com/cover.jpg",
+      "coverUrlMedium": "https://example.com/cover_medium.jpg"
+    }
+  ],
+  "currentPage": 1,
+  "perPage": 1,
+  "totalItems": 1,
+  "totalPages": 1
+}
+
+Artist overview​Copy link
+
+Auth Required
+Returns a time-series of earnings per import date for a single artist. Requires scope: read:sales.
+
+Path Parameters
+artistCopy link to artist
+Type:string
+required
+Example
+The artist name (URL-encoded if it contains spaces).
+
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:array object[]
+required
+Show Child Attributesfor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+Request Example forget/sales/artists/{artist}/overview
+Shell Curl
+curl 'https://api.toolost.com/v1/sales/artists/Nova Waves/overview' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /sales/artists/{artist}/overview)
+Status:200
+Status:401
+{
+  "data": [
+    {
+      "date": "string",
+      "total": 1
+    }
+  ]
+}
+
+Artist channels​Copy link
+
+Auth Required
+Returns earnings for a single artist broken down by channel/platform. Requires scope: read:sales.
+
+Path Parameters
+artistCopy link to artist
+Type:string
+required
+Example
+The artist name (URL-encoded if it contains spaces).
+
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:array object[]
+required
+Show Child Attributesfor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+Request Example forget/sales/artists/{artist}/channels
+Shell Curl
+curl 'https://api.toolost.com/v1/sales/artists/Nova Waves/channels' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /sales/artists/{artist}/channels)
+Status:200
+Status:401
+{
+  "data": [
+    {
+      "name": "string",
+      "logo": null,
+      "logoDark": null,
+      "logoDefault": "string",
+      "total": 1
+    }
+  ]
+}
+
+Artist territories​Copy link
+
+Auth Required
+Returns earnings for a single artist broken down by territory/country. Requires scope: read:sales.
+
+Path Parameters
+artistCopy link to artist
+Type:string
+required
+Example
+The artist name (URL-encoded if it contains spaces).
+
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:array object[]
+required
+Show Child Attributesfor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+Request Example forget/sales/artists/{artist}/territories
+Shell Curl
+curl 'https://api.toolost.com/v1/sales/artists/Nova Waves/territories' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /sales/artists/{artist}/territories)
+Status:200
+Status:401
+{
+  "data": [
+    {
+      "name": "string",
+      "code": "string",
+      "flag": "string",
+      "total": 1
+    }
+  ]
+}
+
+Sales - Channels ​Copy link
+Channel/platform-level earnings data and breakdowns. Requires scope: read:sales.
+
+Sales - ChannelsOperations
+get
+/sales/channels
+get
+/sales/channels/{channel}/overview
+get
+/sales/channels/{channel}/releases
+get
+/sales/channels/{channel}/territories
+List channel sales​Copy link
+
+Auth Required
+Returns earnings aggregated per channel/platform with logos. Requires scope: read:sales.
+
+Query Parameters
+pageCopy link to page
+Type:integer | null
+min:  
+1
+Example
+Integer numbers.
+
+per_pageCopy link to per_page
+Type:number
+min:  
+1
+max:  
+100
+Example
+Responses
+200Copy link to 200
+Type:object
+currentPageCopy link to currentPage
+Type:integer
+required
+Integer numbers.
+
+dataCopy link to data
+Type:array object[] · ChannelCollection
+required
+Show ChannelResourcefor data
+perPageCopy link to perPage
+Type:integer
+required
+Integer numbers.
+
+totalItemsCopy link to totalItems
+Type:integer
+required
+Integer numbers.
+
+totalPagesCopy link to totalPages
+Type:integer
+required
+Integer numbers.
+
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+422Copy link to 422
+Type:object
+Validation error
+
+errorsCopy link to errors
+Type:object
+required
+A detailed description of each field that failed validation.
+
+Show Child Attributesfor errors
+messageCopy link to message
+Type:string
+required
+Errors overview.
+
+application/json
+Request Example forget/sales/channels
+Shell Curl
+curl 'https://api.toolost.com/v1/sales/channels?page=1&per_page=20' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /sales/channels)
+Status:200
+Status:401
+Status:422
+{
+  "data": [
+    {
+      "name": "Spotify",
+      "logo": "https://example.com/spotify-light.png",
+      "logoDark": "https://example.com/spotify-dark.png",
+      "logoDefault": "https://toolost.s3.us-east-2.amazonaws.com/assets/sales/Too Lost.png",
+      "total": 5678.9
+    }
+  ],
+  "currentPage": 1,
+  "perPage": 1,
+  "totalItems": 1,
+  "totalPages": 1
+}
+
+Channel overview​Copy link
+
+Auth Required
+Returns a time-series of earnings per import date for a single channel. Requires scope: read:sales.
+
+Path Parameters
+channelCopy link to channel
+Type:string
+required
+Example
+The channel/platform name (e.g. "SpotifyAB").
+
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:array object[]
+required
+Show Child Attributesfor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+Request Example forget/sales/channels/{channel}/overview
+Shell Curl
+curl https://api.toolost.com/v1/sales/channels/SpotifyAB/overview \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /sales/channels/{channel}/overview)
+Status:200
+Status:401
+{
+  "data": [
+    {
+      "date": "string",
+      "total": 1
+    }
+  ]
+}
+
+Channel releases​Copy link
+
+Auth Required
+Returns earnings for a single channel broken down by release. Requires scope: read:sales.
+
+Path Parameters
+channelCopy link to channel
+Type:string
+required
+Example
+The channel/platform name (e.g. "SpotifyAB").
+
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:array object[]
+required
+Show Child Attributesfor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+Request Example forget/sales/channels/{channel}/releases
+Shell Curl
+curl https://api.toolost.com/v1/sales/channels/SpotifyAB/releases \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /sales/channels/{channel}/releases)
+Status:200
+Status:401
+{
+  "data": [
+    {
+      "upc": null,
+      "title": null,
+      "total": 1,
+      "date": null
+    }
+  ]
+}
+
+Channel territories​Copy link
+
+Auth Required
+Returns earnings for a single channel broken down by territory/country. Requires scope: read:sales.
+
+Path Parameters
+channelCopy link to channel
+Type:string
+required
+Example
+The channel/platform name (e.g. "SpotifyAB").
+
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:array object[]
+required
+Show Child Attributesfor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+Request Example forget/sales/channels/{channel}/territories
+Shell Curl
+curl https://api.toolost.com/v1/sales/channels/SpotifyAB/territories \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /sales/channels/{channel}/territories)
+Status:200
+Status:401
+{
+  "data": [
+    {
+      "name": "string",
+      "code": "string",
+      "flag": "string",
+      "total": 1
+    }
+  ]
+}
+
+Sales - Territories ​Copy link
+Aggregated earnings by territory/country. Requires scope: read:sales.
+
+Sales - TerritoriesOperations
+get
+/sales/territories
+List territories​Copy link
+
+Auth Required
+Returns earnings aggregated by territory, ordered by total descending. Requires scope: read:sales.
+
+Query Parameters
+pageCopy link to page
+Type:integer | null
+min:  
+1
+Example
+Integer numbers.
+
+per_pageCopy link to per_page
+Type:number
+min:  
+1
+max:  
+100
+Example
+Responses
+200Copy link to 200
+Type:object
+currentPageCopy link to currentPage
+Type:integer
+required
+Integer numbers.
+
+dataCopy link to data
+Type:array object[] · TerritoryCollection
+required
+Show TerritoryResourcefor data
+perPageCopy link to perPage
+Type:integer
+required
+Integer numbers.
+
+totalItemsCopy link to totalItems
+Type:integer
+required
+Integer numbers.
+
+totalPagesCopy link to totalPages
+Type:integer
+required
+Integer numbers.
+
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+422Copy link to 422
+Type:object
+Validation error
+
+errorsCopy link to errors
+Type:object
+required
+A detailed description of each field that failed validation.
+
+Show Child Attributesfor errors
+messageCopy link to message
+Type:string
+required
+Errors overview.
+
+application/json
+Request Example forget/sales/territories
+Shell Curl
+curl 'https://api.toolost.com/v1/sales/territories?page=1&per_page=20' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /sales/territories)
+Status:200
+Status:401
+Status:422
+{
+  "data": [
+    {
+      "name": "United States",
+      "code": "US",
+      "flag": "us",
+      "total": 9876.54
+    }
+  ],
+  "currentPage": 1,
+  "perPage": 1,
+  "totalItems": 1,
+  "totalPages": 1
+}
+
+Sales - Stream Rates ​Copy link
+Per-platform stream rate data and breakdowns. Requires scope: read:sales.
+
+Sales - Stream RatesOperations
+get
+/sales/stream-rates
+get
+/sales/stream-rates/{service}/overview
+get
+/sales/stream-rates/{service}/territories
+List stream rates​Copy link
+
+Auth Required
+Returns platform stream rate data with logos. Requires scope: read:sales.
+
+Query Parameters
+pageCopy link to page
+Type:integer | null
+min:  
+1
+Example
+Integer numbers.
+
+per_pageCopy link to per_page
+Type:number
+min:  
+1
+max:  
+100
+Example
+Responses
+200Copy link to 200
+Type:object
+currentPageCopy link to currentPage
+Type:integer
+required
+Integer numbers.
+
+dataCopy link to data
+Type:array object[] · StreamRateCollection
+required
+Show StreamRateResourcefor data
+perPageCopy link to perPage
+Type:integer
+required
+Integer numbers.
+
+totalItemsCopy link to totalItems
+Type:integer
+required
+Integer numbers.
+
+totalPagesCopy link to totalPages
+Type:integer
+required
+Integer numbers.
+
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+422Copy link to 422
+Type:object
+Validation error
+
+errorsCopy link to errors
+Type:object
+required
+A detailed description of each field that failed validation.
+
+Show Child Attributesfor errors
+messageCopy link to message
+Type:string
+required
+Errors overview.
+
+application/json
+Request Example forget/sales/stream-rates
+Shell Curl
+curl 'https://api.toolost.com/v1/sales/stream-rates?page=1&per_page=20' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /sales/stream-rates)
+Status:200
+Status:401
+Status:422
+{
+  "data": [
+    {
+      "id": "1",
+      "service": "Spotify",
+      "logo": "https://example.com/spotify-light.png",
+      "logoDark": "https://example.com/spotify-dark.png",
+      "logoDefault": "https://toolost.s3.us-east-2.amazonaws.com/assets/sales/Too Lost.png"
+    }
+  ],
+  "currentPage": 1,
+  "perPage": 1,
+  "totalItems": 1,
+  "totalPages": 1
+}
+
+Stream rate overview​Copy link
+
+Auth Required
+Returns monthly stream rate overview for a specific platform, including total earnings, stream count, and per-stream rate. Requires scope: read:sales.
+
+Path Parameters
+serviceCopy link to service
+Type:string
+required
+Example
+The platform/service name.
+
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:array object[]
+required
+Show Child Attributesfor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+Request Example forget/sales/stream-rates/{service}/overview
+Shell Curl
+curl https://api.toolost.com/v1/sales/stream-rates/SpotifyAB/overview \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /sales/stream-rates/{service}/overview)
+Status:200
+Status:401
+{
+  "data": [
+    {
+      "date": "string",
+      "total": 1,
+      "streams": 1,
+      "rate": null
+    }
+  ]
+}
+
+Stream rate territories​Copy link
+
+Auth Required
+Returns stream rate data for a specific platform broken down by territory/country. Requires scope: read:sales.
+
+Path Parameters
+serviceCopy link to service
+Type:string
+required
+Example
+The platform/service name.
+
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:array object[]
+required
+Show Child Attributesfor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+Request Example forget/sales/stream-rates/{service}/territories
+Shell Curl
+curl https://api.toolost.com/v1/sales/stream-rates/SpotifyAB/territories \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /sales/stream-rates/{service}/territories)
+Status:200
+Status:401
+{
+  "data": [
+    {
+      "name": "string",
+      "code": "string",
+      "flag": "string",
+      "total": 1
+    }
+  ]
+}
+
+Analytics ​Copy link
+Endpoints for managing analytics data. Requires a valid OAuth 2.0 Bearer token with appropriate analytics scopes.
+
+AnalyticsOperations
+get
+/analytics/overview
+get
+/analytics/tracks
+get
+/analytics/tracks/charts
+get
+/analytics/tracks/{isrc}
+get
+/analytics/platforms
+get
+/analytics/platforms/data
+get
+/analytics/platforms/total-streams
+get
+/analytics/platforms/additional
+get
+/analytics/platforms/additional/info
+get
+/analytics/usage-discovery/overview
+get
+/analytics/usage-discovery/top-songs
+get
+/analytics/usage-discovery/track-matches
+get
+/analytics/release-links/top-releases
+Get analytics overview​Copy link
+
+Auth Required
+Returns overall chart and totals for the authenticated user and period. Requires scope: read:analytics.
+
+Query Parameters
+periodCopy link to period
+Type:string
+enum
+required
+Example
+values
+allTime
+lastSevenDays
+lastThirtyDays
+lastMonth
+lastThreeMonths
+lastSixMonths
+lastYear
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:object
+required
+Show Child Attributesfor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+422Copy link to 422
+Type:object
+Validation error
+
+errorsCopy link to errors
+Type:object
+required
+A detailed description of each field that failed validation.
+
+Show Child Attributesfor errors
+messageCopy link to message
+Type:string
+required
+Errors overview.
+
+application/json
+Request Example forget/analytics/overview
+Shell Curl
+curl 'https://api.toolost.com/v1/analytics/overview?period=lastThirtyDays' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /analytics/overview)
+Status:200
+Status:401
+Status:422
+{
+  "data": {
+    "period": "string",
+    "dateRange": {
+      "from": "string",
+      "to": "string"
+    },
+    "totalStreams": 1,
+    "totalSaves": 1,
+    "totalSkips": 1,
+    "engagement": 1,
+    "chart": [
+      {
+        "date": "string",
+        "totalStreams": 1
+      }
+    ]
+  }
+}
+
+List analytics tracks​Copy link
+
+Auth Required
+Returns paginated per-track analytics totals for the authenticated user. Requires scope: read:analytics.
+
+Query Parameters
+periodCopy link to period
+Type:string
+enum
+required
+Example
+values
+allTime
+lastSevenDays
+lastThirtyDays
+lastMonth
+lastThreeMonths
+lastSixMonths
+lastYear
+pageCopy link to page
+Type:integer
+min:  
+1
+required
+Example
+Integer numbers.
+
+perPageCopy link to perPage
+Type:integer
+min:  
+1
+max:  
+100
+required
+Example
+Integer numbers.
+
+Responses
+200Copy link to 200
+Type:object
+currentPageCopy link to currentPage
+Type:integer
+required
+Integer numbers.
+
+dataCopy link to data
+Type:array object[] · AnalyticsTrackCollection
+required
+Show AnalyticsTrackResourcefor data
+perPageCopy link to perPage
+Type:integer
+required
+Integer numbers.
+
+totalItemsCopy link to totalItems
+Type:integer
+required
+Integer numbers.
+
+totalPagesCopy link to totalPages
+Type:integer
+required
+Integer numbers.
+
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+422Copy link to 422
+Type:object
+Validation error
+
+errorsCopy link to errors
+Type:object
+required
+A detailed description of each field that failed validation.
+
+Show Child Attributesfor errors
+messageCopy link to message
+Type:string
+required
+Errors overview.
+
+application/json
+Request Example forget/analytics/tracks
+Shell Curl
+curl 'https://api.toolost.com/v1/analytics/tracks?period=lastThirtyDays&page=1&perPage=20' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /analytics/tracks)
+Status:200
+Status:401
+Status:422
+{
+  "data": [
+    {
+      "isrc": "USUG12400012",
+      "totalStreams": "128991",
+      "totalSaves": "9412",
+      "totalSkips": "3301",
+      "engagement": "97.44",
+      "track": "string",
+      "release": "string"
+    }
+  ],
+  "currentPage": 1,
+  "perPage": 1,
+  "totalItems": 1,
+  "totalPages": 1
+}
+
+Get track charts​Copy link
+
+Auth Required
+Returns date-level stream charts grouped by track ISRC for the authenticated user. Requires scope: read:analytics.
+
+Query Parameters
+periodCopy link to period
+Type:string
+enum
+required
+Example
+values
+allTime
+lastSevenDays
+lastThirtyDays
+lastMonth
+lastThreeMonths
+lastSixMonths
+lastYear
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:array object[]
+required
+Show Child Attributesfor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+422Copy link to 422
+Type:object
+Validation error
+
+errorsCopy link to errors
+Type:object
+required
+A detailed description of each field that failed validation.
+
+Show Child Attributesfor errors
+messageCopy link to message
+Type:string
+required
+Errors overview.
+
+application/json
+Request Example forget/analytics/tracks/charts
+Shell Curl
+curl 'https://api.toolost.com/v1/analytics/tracks/charts?period=lastThirtyDays' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /analytics/tracks/charts)
+Status:200
+Status:401
+Status:422
+{
+  "data": [
+    {
+      "isrc": "string",
+      "track": {
+        "id": 1,
+        "title": "string",
+        "isrc": "string",
+        "order": 1
+      },
+      "release": {
+        "id": 1,
+        "title": "string",
+        "type": "string",
+        "status": "string",
+        "releaseDate": null,
+        "coverUrl": null
+      },
+      "chart": [
+        {
+          "date": "string",
+          "totalStreams": 1
+        }
+      ]
+    }
+  ]
+}
+
+Get track analytics​Copy link
+
+Auth Required
+Returns chart and totals for a single track ISRC owned by the authenticated user. Requires scope: read:analytics.
+
+Path Parameters
+isrcCopy link to isrc
+Type:string
+required
+Example
+Track ISRC.
+
+Query Parameters
+periodCopy link to period
+Type:string
+enum
+required
+Example
+values
+allTime
+lastSevenDays
+lastThirtyDays
+lastMonth
+lastThreeMonths
+lastSixMonths
+lastYear
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:object
+required
+Show Child Attributesfor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+422Copy link to 422
+Type:object
+Validation error
+
+errorsCopy link to errors
+Type:object
+required
+A detailed description of each field that failed validation.
+
+Show Child Attributesfor errors
+messageCopy link to message
+Type:string
+required
+Errors overview.
+
+application/json
+Request Example forget/analytics/tracks/{isrc}
+Shell Curl
+curl 'https://api.toolost.com/v1/analytics/tracks/USUG12400012?period=lastThirtyDays' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /analytics/tracks/{isrc})
+Status:200
+Status:401
+Status:422
+{
+  "data": {
+    "period": "string",
+    "dateRange": {
+      "from": "string",
+      "to": "string"
+    },
+    "isrc": "string",
+    "totalStreams": 1,
+    "totalSaves": 1,
+    "totalSkips": 1,
+    "engagement": 1,
+    "track": {
+      "id": 1,
+      "title": "string",
+      "isrc": "string",
+      "order": 1
+    },
+    "release": {
+      "id": 1,
+      "title": "string",
+      "type": "string",
+      "status": "string",
+      "releaseDate": null,
+      "coverUrl": null
+    },
+    "chart": [
+      {
+        "date": "string",
+        "totalStreams": 1
+      }
+    ]
+  }
+}
+
+List analytics platforms​Copy link
+
+Auth Required
+Returns supported analytics platforms and available period/release filter options. Requires scope: read:analytics.
+
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:object
+required
+Show Child Attributesfor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+Request Example forget/analytics/platforms
+Shell Curl
+curl https://api.toolost.com/v1/analytics/platforms \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /analytics/platforms)
+Status:200
+Status:401
+{
+  "data": {
+    "platforms": [
+      {
+        "platform": "string",
+        "supportsOverview": true,
+        "supportsTotalStreams": true,
+        "additionalTypes": [
+          "string"
+        ]
+      }
+    ],
+    "filters": {
+      "period": [
+        "string"
+      ],
+      "release": [
+        "string"
+      ]
+    }
+  }
+}
+
+Get platform overview analytics​Copy link
+
+Auth Required
+Returns total streams timeline, top tracks, and country totals for the selected platform. Supports period and release filters. Requires scope: read:analytics.
+
+Query Parameters
+periodCopy link to period
+Type:string
+enum
+required
+Example
+values
+allTime
+lastSevenDays
+lastThirtyDays
+lastMonth
+lastThreeMonths
+lastSixMonths
+lastYear
+releaseCopy link to release
+Type:integer | null
+min:  
+1
+Integer numbers.
+
+platformCopy link to platform
+Type:string
+required
+Example
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:object
+required
+Show Child Attributesfor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+422Copy link to 422
+Type:object
+Validation error
+
+errorsCopy link to errors
+Type:object
+required
+A detailed description of each field that failed validation.
+
+Show Child Attributesfor errors
+messageCopy link to message
+Type:string
+required
+Errors overview.
+
+application/json
+Request Example forget/analytics/platforms/data
+Shell Curl
+curl 'https://api.toolost.com/v1/analytics/platforms/data?period=lastThirtyDays&release=null&platform=vevo' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /analytics/platforms/data)
+Status:200
+Status:401
+Status:422
+{
+  "data": {
+    "totalStreams": null,
+    "tracksTotal": null,
+    "countryTotal": null,
+    "streamsTotal": 1
+  }
+}
+
+Get platform total streams​Copy link
+
+Auth Required
+Returns platform total streams timeline and top tracks without country breakdown. Supports period and release filters. Requires scope: read:analytics.
+
+Query Parameters
+periodCopy link to period
+Type:string
+enum
+required
+Example
+values
+allTime
+lastSevenDays
+lastThirtyDays
+lastMonth
+lastThreeMonths
+lastSixMonths
+lastYear
+releaseCopy link to release
+Type:integer | null
+min:  
+1
+Integer numbers.
+
+platformCopy link to platform
+Type:string
+required
+Example
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:object
+required
+Show Child Attributesfor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+422Copy link to 422
+Type:object
+Validation error
+
+errorsCopy link to errors
+Type:object
+required
+A detailed description of each field that failed validation.
+
+Show Child Attributesfor errors
+messageCopy link to message
+Type:string
+required
+Errors overview.
+
+application/json
+Request Example forget/analytics/platforms/total-streams
+Shell Curl
+curl 'https://api.toolost.com/v1/analytics/platforms/total-streams?period=lastThirtyDays&release=null&platform=vevo' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /analytics/platforms/total-streams)
+Status:200
+Status:401
+Status:422
+{
+  "data": {
+    "totalStreams": null,
+    "tracksTotal": null,
+    "streamsTotal": 1
+  }
+}
+
+Get platform additional analytics​Copy link
+
+Auth Required
+Returns grouped platform analytics by a selected type (for example service tier, device, gender). Supports period and release filters. Requires scope: read:analytics.
+
+Query Parameters
+periodCopy link to period
+Type:string
+enum
+required
+Example
+values
+allTime
+lastSevenDays
+lastThirtyDays
+lastMonth
+lastThreeMonths
+lastSixMonths
+lastYear
+releaseCopy link to release
+Type:integer | null
+min:  
+1
+Integer numbers.
+
+platformCopy link to platform
+Type:string
+required
+Example
+typeCopy link to type
+Type:string
+required
+Example
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+required
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+422Copy link to 422
+Type:object
+Validation error
+
+errorsCopy link to errors
+Type:object
+required
+A detailed description of each field that failed validation.
+
+Show Child Attributesfor errors
+messageCopy link to message
+Type:string
+required
+Errors overview.
+
+application/json
+Request Example forget/analytics/platforms/additional
+Shell Curl
+curl 'https://api.toolost.com/v1/analytics/platforms/additional?period=lastThirtyDays&release=null&platform=vevo&type=service_tier' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /analytics/platforms/additional)
+Status:200
+Status:401
+Status:422
+{
+  "data": null
+}
+
+Get platform additional info totals​Copy link
+
+Auth Required
+Returns summed additional metrics for a selected platform type that supports info totals. Supports period and release filters. Requires scope: read:analytics.
+
+Query Parameters
+periodCopy link to period
+Type:string
+enum
+required
+Example
+values
+allTime
+lastSevenDays
+lastThirtyDays
+lastMonth
+lastThreeMonths
+lastSixMonths
+lastYear
+releaseCopy link to release
+Type:integer | null
+min:  
+1
+Integer numbers.
+
+platformCopy link to platform
+Type:string
+required
+Example
+typeCopy link to type
+Type:string
+required
+Example
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+required
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+422Copy link to 422
+Type:object
+Validation error
+
+errorsCopy link to errors
+Type:object
+required
+A detailed description of each field that failed validation.
+
+Show Child Attributesfor errors
+messageCopy link to message
+Type:string
+required
+Errors overview.
+
+application/json
+Request Example forget/analytics/platforms/additional/info
+Shell Curl
+curl 'https://api.toolost.com/v1/analytics/platforms/additional/info?period=lastThirtyDays&release=null&platform=vevo&type=service_tier' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /analytics/platforms/additional/info)
+Status:200
+Status:401
+Status:422
+{
+  "data": null
+}
+
+Get usage discovery overview​Copy link
+
+Auth Required
+Returns usage discovery totals, platform breakdown, and aggregated engagement metrics. Supports period and release filters. Requires scope: read:analytics.
+
+Query Parameters
+periodCopy link to period
+Type:string
+enum
+required
+Example
+values
+allTime
+lastSevenDays
+lastThirtyDays
+lastMonth
+lastThreeMonths
+lastSixMonths
+lastYear
+releaseCopy link to release
+Type:integer | null
+min:  
+1
+Integer numbers.
+
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:object
+required
+Show Child Attributesfor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+422Copy link to 422
+Type:object
+Validation error
+
+errorsCopy link to errors
+Type:object
+required
+A detailed description of each field that failed validation.
+
+Show Child Attributesfor errors
+messageCopy link to message
+Type:string
+required
+Errors overview.
+
+application/json
+Request Example forget/analytics/usage-discovery/overview
+Shell Curl
+curl 'https://api.toolost.com/v1/analytics/usage-discovery/overview?period=lastThirtyDays&release=null' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /analytics/usage-discovery/overview)
+Status:200
+Status:401
+Status:422
+{
+  "data": {
+    "period": "string",
+    "release": null,
+    "total": [
+      {
+        "date": "string",
+        "matches": 1
+      }
+    ],
+    "platforms": [
+      {
+        "platform": "string",
+        "matches": 1
+      }
+    ],
+    "additional": {
+      "views": 1,
+      "shares": 1,
+      "comments": 1,
+      "likes": 1
+    }
+  }
+}
+
+List usage discovery top songs​Copy link
+
+Auth Required
+Returns paginated top songs from usage discovery analytics. Supports period, release, and search filters. Requires scope: read:analytics.
+
+Query Parameters
+periodCopy link to period
+Type:string
+enum
+required
+Example
+values
+allTime
+lastSevenDays
+lastThirtyDays
+lastMonth
+lastThreeMonths
+lastSixMonths
+lastYear
+releaseCopy link to release
+Type:integer | null
+min:  
+1
+Integer numbers.
+
+searchCopy link to search
+Type:string | null
+max length:  
+120
+Example
+pageCopy link to page
+Type:integer
+min:  
+1
+required
+Example
+Integer numbers.
+
+perPageCopy link to perPage
+Type:integer
+min:  
+1
+max:  
+100
+required
+Example
+Integer numbers.
+
+Responses
+200Copy link to 200
+Type:object
+currentPageCopy link to currentPage
+Type:integer
+required
+Integer numbers.
+
+dataCopy link to data
+Type:array object[] · UsageDiscoveryTopSongCollection
+required
+Show UsageDiscoveryTopSongResourcefor data
+perPageCopy link to perPage
+Type:integer
+required
+Integer numbers.
+
+totalItemsCopy link to totalItems
+Type:integer
+required
+Integer numbers.
+
+totalPagesCopy link to totalPages
+Type:integer
+required
+Integer numbers.
+
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+422Copy link to 422
+Type:object
+Validation error
+
+errorsCopy link to errors
+Type:object
+required
+A detailed description of each field that failed validation.
+
+Show Child Attributesfor errors
+messageCopy link to message
+Type:string
+required
+Errors overview.
+
+application/json
+Request Example forget/analytics/usage-discovery/top-songs
+Shell Curl
+curl 'https://api.toolost.com/v1/analytics/usage-discovery/top-songs?period=lastThirtyDays&release=null&search=nova&page=1&perPage=10' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /analytics/usage-discovery/top-songs)
+Status:200
+Status:401
+Status:422
+{
+  "data": [
+    {
+      "isrc": "string",
+      "assetTitle": "string",
+      "assetId": "string",
+      "assetDuration": "string",
+      "matches": "string",
+      "averagePercentOfSongUsed": "string",
+      "track": "string",
+      "release": "string",
+      "coverUrl": "string"
+    }
+  ],
+  "currentPage": 1,
+  "perPage": 1,
+  "totalItems": 1,
+  "totalPages": 1
+}
+
+List usage discovery track matches​Copy link
+
+Auth Required
+Returns paginated track match rows from usage discovery analytics. Supports period, release, and search filters. Requires scope: read:analytics.
+
+Query Parameters
+periodCopy link to period
+Type:string
+enum
+required
+Example
+values
+allTime
+lastSevenDays
+lastThirtyDays
+lastMonth
+lastThreeMonths
+lastSixMonths
+lastYear
+releaseCopy link to release
+Type:integer | null
+min:  
+1
+Integer numbers.
+
+searchCopy link to search
+Type:string | null
+max length:  
+120
+Example
+pageCopy link to page
+Type:integer
+min:  
+1
+required
+Example
+Integer numbers.
+
+perPageCopy link to perPage
+Type:integer
+min:  
+1
+max:  
+100
+required
+Example
+Integer numbers.
+
+Responses
+200Copy link to 200
+Type:object
+currentPageCopy link to currentPage
+Type:integer
+required
+Integer numbers.
+
+dataCopy link to data
+Type:array object[] · UsageDiscoveryTrackMatchCollection
+required
+Show UsageDiscoveryTrackMatchResourcefor data
+perPageCopy link to perPage
+Type:integer
+required
+Integer numbers.
+
+totalItemsCopy link to totalItems
+Type:integer
+required
+Integer numbers.
+
+totalPagesCopy link to totalPages
+Type:integer
+required
+Integer numbers.
+
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+422Copy link to 422
+Type:object
+Validation error
+
+errorsCopy link to errors
+Type:object
+required
+A detailed description of each field that failed validation.
+
+Show Child Attributesfor errors
+messageCopy link to message
+Type:string
+required
+Errors overview.
+
+application/json
+Request Example forget/analytics/usage-discovery/track-matches
+Shell Curl
+curl 'https://api.toolost.com/v1/analytics/usage-discovery/track-matches?period=lastThirtyDays&release=null&search=nova&page=1&perPage=10' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /analytics/usage-discovery/track-matches)
+Status:200
+Status:401
+Status:422
+{
+  "data": [
+    {
+      "isrc": "string",
+      "assetTitle": "string",
+      "assetId": "string",
+      "videoTitle": "string",
+      "channelName": "string",
+      "creatorName": "string",
+      "url": "string",
+      "views": "string",
+      "shares": "string",
+      "comments": "string",
+      "likes": "string",
+      "dataDate": "string",
+      "track": "string",
+      "release": "string",
+      "coverUrl": "string"
+    }
+  ],
+  "currentPage": 1,
+  "perPage": 1,
+  "totalItems": 1,
+  "totalPages": 1
+}
+
+List top release links​Copy link
+
+Auth Required
+Returns paginated release link analytics ordered by clicks. Supports optional search and release filters. Requires scope: read:analytics.
+
+Query Parameters
+searchCopy link to search
+Type:string | null
+max length:  
+120
+Example
+releaseCopy link to release
+Type:integer | null
+min:  
+1
+Example
+Integer numbers.
+
+pageCopy link to page
+Type:integer
+min:  
+1
+required
+Example
+Integer numbers.
+
+perPageCopy link to perPage
+Type:integer
+min:  
+1
+max:  
+100
+required
+Example
+Integer numbers.
+
+Responses
+200Copy link to 200
+Type:object
+currentPageCopy link to currentPage
+Type:integer
+required
+Integer numbers.
+
+dataCopy link to data
+Type:array object[] · ReleaseLinkAnalyticsCollection
+required
+Show ReleaseLinkAnalyticsResourcefor data
+perPageCopy link to perPage
+Type:integer
+required
+Integer numbers.
+
+totalItemsCopy link to totalItems
+Type:integer
+required
+Integer numbers.
+
+totalPagesCopy link to totalPages
+Type:integer
+required
+Integer numbers.
+
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+422Copy link to 422
+Type:object
+Validation error
+
+errorsCopy link to errors
+Type:object
+required
+A detailed description of each field that failed validation.
+
+Show Child Attributesfor errors
+messageCopy link to message
+Type:string
+required
+Errors overview.
+
+application/json
+Request Example forget/analytics/release-links/top-releases
+Shell Curl
+curl 'https://api.toolost.com/v1/analytics/release-links/top-releases?search=Nova&release=73518&page=1&perPage=10' \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /analytics/release-links/top-releases)
+Status:200
+Status:401
+Status:422
+{
+  "data": [
+    {
+      "releaseId": "73518",
+      "title": "Sunrise EP",
+      "coverUrl": "https://cdn.example.com/cover.jpg",
+      "clicks": "12345",
+      "songPreviews": "1100",
+      "clicksToService": "870",
+      "uniqueUsers": "980",
+      "link": "https://too.fm/abc123",
+      "shortId": "abc123"
+    }
+  ],
+  "currentPage": 1,
+  "perPage": 1,
+  "totalItems": 1,
+  "totalPages": 1
+}
+
+Countries ​Copy link
+Endpoints for retrieving country data. No specific scope required.
+
+CountriesOperations
+get
+/lookup/countries
+List countries​Copy link
+
+Auth Required
+Returns all available countries as code/name pairs.
+
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:array object[]
+required
+Show Child Attributesfor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+Request Example forget/lookup/countries
+Shell Curl
+curl https://api.toolost.com/v1/lookup/countries \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /lookup/countries)
+Status:200
+Status:401
+{
+  "data": [
+    {
+      "code": "string",
+      "name": "string"
+    }
+  ]
+}
+
+Platforms ​Copy link
+Endpoints for retrieving available music platforms (stores). No specific scope required.
+
+PlatformsOperations
+get
+/lookup/platforms
+List platforms​Copy link
+
+Auth Required
+Returns available music platforms for the authenticated user, filtered by any user-specific platform restrictions.
+
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:object
+required
+Show Child Attributesfor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+Request Example forget/lookup/platforms
+Shell Curl
+curl https://api.toolost.com/v1/lookup/platforms \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /lookup/platforms)
+Status:200
+Status:401
+{
+  "data": {
+    "platforms": [
+      "string"
+    ],
+    "aiExcludedPlatforms": [
+      "string"
+    ],
+    "additionalDelivery": {
+      "excluded": [
+        "string"
+      ]
+    }
+  }
+}
+
+Genres ​Copy link
+Endpoints for retrieving available genres. No specific scope required.
+
+GenresOperations
+get
+/lookup/genres
+List genres​Copy link
+
+Auth Required
+Returns all available genre names.
+
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:array string[]
+required
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+Request Example forget/lookup/genres
+Shell Curl
+curl https://api.toolost.com/v1/lookup/genres \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /lookup/genres)
+Status:200
+Status:401
+{
+  "data": [
+    "string"
+  ]
+}
+
+Languages ​Copy link
+Endpoints for retrieving supported release languages. No specific scope required.
+
+LanguagesOperations
+get
+/lookup/languages
+List languages for Lyrics​Copy link
+
+Auth Required
+Returns supported language code/name pairs for release metadata. Includes the special value for instrumental content.
+
+Responses
+200Copy link to 200
+Type:object
+dataCopy link to data
+Type:array object[]
+required
+Show Child Attributesfor data
+application/json
+401Copy link to 401
+Type:object
+Unauthenticated
+
+messageCopy link to message
+Type:string
+required
+Error overview.
+
+application/json
+Request Example forget/lookup/languages
+Shell Curl
+curl https://api.toolost.com/v1/lookup/languages \
+  --header 'Authorization: Bearer YOUR_SECRET_TOKEN'
+
+
+Test Request
+(get /lookup/languages)
+Status:200
+Status:401
+{
+  "data": [
+    {
+      "code": "string",
+      "name": "string"
+    }
+  ]
+}

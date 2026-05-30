@@ -1,28 +1,20 @@
 import { createRelease } from "../../actions";
 import { AppShell, PageHeader } from "../../components";
 import { requireUser } from "../../lib/auth";
-import { platformLabel } from "../../lib/format";
+import { getAvailableDistributionPlatforms } from "../../lib/distribution-platform-options";
 
 export const dynamic = "force-dynamic";
-
-const platforms = [
-  "SPOTIFY",
-  "DEEZER",
-  "APPLE_MUSIC",
-  "YOUTUBE_MUSIC",
-  "TIKTOK",
-  "INSTAGRAM_FACEBOOK",
-  "AMAZON_MUSIC",
-  "TIDAL",
-];
 
 export default async function NewReleasePage({
   searchParams,
 }: {
   searchParams: Promise<{ erro?: string }>;
 }) {
-  await requireUser();
-  const params = await searchParams;
+  const [, params, platforms] = await Promise.all([
+    requireUser(),
+    searchParams,
+    getAvailableDistributionPlatforms(),
+  ]);
 
   return (
     <AppShell>
@@ -168,9 +160,9 @@ export default async function NewReleasePage({
           <h2>Plataformas de destino</h2>
           <div className="platformChecklist">
             {platforms.map((platform) => (
-              <label key={platform}>
-                <input name="platforms" type="checkbox" value={platform} defaultChecked />
-                {platformLabel(platform)}
+              <label key={platform.value}>
+                <input name="platforms" type="checkbox" value={platform.value} defaultChecked />
+                {platform.label}
               </label>
             ))}
           </div>

@@ -1,3 +1,5 @@
+import { platformDisplayName } from "./platforms";
+
 export function statusLabel(status: string) {
   const labels: Record<string, string> = {
     DRAFT: "Rascunho",
@@ -58,18 +60,7 @@ export function releaseStatusLabel(status: string) {
 }
 
 export function platformLabel(platform: string) {
-  const labels: Record<string, string> = {
-    SPOTIFY: "Spotify",
-    DEEZER: "Deezer",
-    APPLE_MUSIC: "Apple Music",
-    YOUTUBE_MUSIC: "YouTube Music",
-    TIKTOK: "TikTok",
-    INSTAGRAM_FACEBOOK: "Instagram/Facebook",
-    AMAZON_MUSIC: "Amazon Music",
-    TIDAL: "Tidal",
-  };
-
-  return labels[platform] ?? platform;
+  return platformDisplayName(platform);
 }
 
 export function platformStatusLabel(status: string) {

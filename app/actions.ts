@@ -20,6 +20,7 @@ import { validateReleasePackage } from "./lib/release-validator";
 import { parseRoyaltyImportCsv } from "./lib/royalty-import";
 import { COMPOSITION_AUTHORSHIP_ASSERTIONS, LEGAL_VERSIONS, RELEASE_RIGHTS_ASSERTIONS } from "./lib/legal";
 import { checkRateLimit } from "./lib/rate-limit";
+import { normalizePlatformValue } from "./lib/platforms";
 
 function formString(formData: FormData, key: string) {
   return String(formData.get(key) ?? "").trim();
@@ -714,7 +715,7 @@ export async function createRelease(formData: FormData) {
   const notes = formString(formData, "notes");
   const masterFile = formData.get("master");
   const coverFile = formData.get("cover");
-  const platforms = formData.getAll("platforms").map(String).filter(Boolean);
+  const platforms = formData.getAll("platforms").map(String).filter(Boolean).map(normalizePlatformValue);
   const contributorNames = formData.getAll("contributorName").map(String);
   const contributorRoles = formData.getAll("contributorRole").map(String);
   const contributorShares = formData.getAll("contributorShare").map(String);
@@ -911,7 +912,7 @@ export async function updateRelease(formData: FormData) {
   const notes = formString(formData, "notes");
   const masterFile = formData.get("master");
   const coverFile = formData.get("cover");
-  const platforms = formData.getAll("platforms").map(String).filter(Boolean);
+  const platforms = formData.getAll("platforms").map(String).filter(Boolean).map(normalizePlatformValue);
   const contributorNames = formData.getAll("contributorName").map(String);
   const contributorRoles = formData.getAll("contributorRole").map(String);
   const contributorShares = formData.getAll("contributorShare").map(String);
@@ -2286,7 +2287,7 @@ export async function testDistributionIntegration(formData: FormData) {
   let message = "";
 
   try {
-    const isTooLost = integration.provider.toLowerCase().replace(/\s+/g, "").includes("toolost");
+    const isTooLost = integration.endpoint.startsWith("https://api.toolost.com/v1");
     const response = await fetch(isTooLost ? "https://api.toolost.com/v1/me" : endpoint, isTooLost
       ? {
           method: "GET",

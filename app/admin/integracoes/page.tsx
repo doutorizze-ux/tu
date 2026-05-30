@@ -3,7 +3,7 @@ import { AppShell, PageHeader } from "../../components";
 import { requireUser } from "../../lib/auth";
 import { decryptSecret, maskSecret } from "../../lib/crypto-secrets";
 import { prisma } from "../../lib/prisma";
-import { isTooLostOAuthConfigured, tooLostRedirectUri, tooLostScopes } from "../../lib/toolost";
+import { isTooLostOAuthConfigured, tooLostScopes } from "../../lib/toolost";
 
 export const dynamic = "force-dynamic";
 
@@ -69,9 +69,9 @@ export default async function DistributionIntegrationsPage({
           {params.erro ? (
             <p className="formError">
               {params.erro === "toolost_env"
-                ? "Configure TOOLOST_CLIENT_ID e TOOLOST_CLIENT_SECRET no Coolify antes de conectar."
+                ? "Configure as credenciais OAuth da distribuidora no Coolify antes de conectar."
                 : params.erro === "toolost_oauth"
-                  ? `OAuth Too Lost nao foi concluido: ${params.status ?? "verifique o callback"}`
+                  ? `OAuth da distribuidora nao foi concluido: ${params.status ?? "verifique o callback"}`
                   : "Confira provider, endpoint, API key e webhook secret."}
             </p>
           ) : null}
@@ -80,7 +80,7 @@ export default async function DistributionIntegrationsPage({
               {params.sucesso === "salvo"
                 ? "Configuracao salva."
                 : params.sucesso === "toolost_conectado"
-                  ? "Too Lost conectado com OAuth. Token salvo de forma criptografada."
+                  ? "Distribuidora conectada com OAuth. Token salvo de forma criptografada."
                   : `Teste de conexao finalizado: ${params.status ?? "verifique logs"}.`}
             </p>
           ) : null}
@@ -88,7 +88,7 @@ export default async function DistributionIntegrationsPage({
           <div className="oauthProviderCard">
             <div>
               <p className="eyebrow">OAuth oficial</p>
-              <h2>Conectar Too Lost</h2>
+              <h2>Conectar distribuidora</h2>
               <p>
                 Use o fluxo Authorization Code da documentacao oficial. O client secret fica somente no servidor.
               </p>
@@ -96,7 +96,7 @@ export default async function DistributionIntegrationsPage({
             <dl className="accessList">
               <div>
                 <dt>Callback</dt>
-                <dd>{tooLostRedirectUri()}</dd>
+                <dd>Configurado no painel da distribuidora</dd>
               </div>
               <div>
                 <dt>Scopes</dt>
@@ -105,12 +105,12 @@ export default async function DistributionIntegrationsPage({
             </dl>
             <form action={startTooLostOAuth}>
               <button className="primaryButton" type="submit" disabled={!tooLostConfigured}>
-                Conectar Too Lost
+                Conectar distribuidora
               </button>
             </form>
             {!tooLostConfigured ? (
               <p className="mutedText">
-                Falta configurar TOOLOST_CLIENT_ID e TOOLOST_CLIENT_SECRET no Coolify.
+                Falta configurar as credenciais OAuth da distribuidora no Coolify.
               </p>
             ) : null}
           </div>
@@ -185,7 +185,7 @@ export default async function DistributionIntegrationsPage({
             </div>
             <div>
               <dt>API</dt>
-              <dd>https://api.toolost.com/v1</dd>
+              <dd>API oficial da distribuidora</dd>
             </div>
             <div>
               <dt>Teste</dt>
@@ -193,11 +193,11 @@ export default async function DistributionIntegrationsPage({
             </div>
             <div>
               <dt>Callback</dt>
-              <dd>/api/toolost/oauth/callback</dd>
+              <dd>Callback OAuth configurado</dd>
             </div>
           </dl>
           <p className="mutedText">
-            A conexao oficial usa Bearer token criptografado. O envio automatico de releases depende do endpoint exato da API Reference da Too Lost.
+            A conexao oficial usa Bearer token criptografado. O envio automatico de releases depende dos endpoints aprovados na API da distribuidora.
           </p>
         </aside>
       </section>

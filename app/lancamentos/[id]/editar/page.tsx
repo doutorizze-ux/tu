@@ -3,21 +3,12 @@ import { notFound } from "next/navigation";
 import { updateRelease } from "../../../actions";
 import { AppShell, PageHeader } from "../../../components";
 import { requireUser } from "../../../lib/auth";
-import { platformLabel, releaseStatusLabel } from "../../../lib/format";
+import { getAvailableDistributionPlatforms } from "../../../lib/distribution-platform-options";
+import { releaseStatusLabel } from "../../../lib/format";
+import { normalizePlatformValue } from "../../../lib/platforms";
 import { prisma } from "../../../lib/prisma";
 
 export const dynamic = "force-dynamic";
-
-const platforms = [
-  "SPOTIFY",
-  "DEEZER",
-  "APPLE_MUSIC",
-  "YOUTUBE_MUSIC",
-  "TIKTOK",
-  "INSTAGRAM_FACEBOOK",
-  "AMAZON_MUSIC",
-  "TIDAL",
-];
 
 function inputDate(date: Date | null) {
   if (!date) {
@@ -34,8 +25,12 @@ export default async function EditReleasePage({
   params: Promise<{ id: string }>;
   searchParams: Promise<{ erro?: string }>;
 }) {
-  const user = await requireUser();
-  const [{ id }, query] = await Promise.all([params, searchParams]);
+  const [user, { id }, query, platforms] = await Promise.all([
+    requireUser(),
+    params,
+    searchParams,
+    getAvailableDistributionPlatforms(),
+  ]);
   const release = await prisma.release.findFirst({
     where: { id, ownerId: user.id },
     include: {
@@ -57,7 +52,13 @@ export default async function EditReleasePage({
   }
 
   const canEdit = ["DRAFT", "REVIEW", "REJECTED"].includes(release.status);
-  const selectedPlatforms = new Set(release.platforms.map((platform) => platform.platform));
+  const selectedPlatforms = new Set(release.platforms.map((platform) => normalizePlatformValue(platform.platform)));
+  const platformOptions = [
+    ...platforms,
+    ...[...selectedPlatforms]
+      .filter((platform) => !platforms.some((option) => option.value === platform))
+      .map((platform) => ({ value: platform, label: platform })),
+  ];
   const masterAsset = release.assets.find((asset) => asset.type === "MASTER");
   const coverAsset = release.assets.find((asset) => asset.type === "COVER");
   const contributorRows = [...release.contributors];
@@ -257,10 +258,10 @@ export default async function EditReleasePage({
           <section className="formSection">
             <h2>Plataformas de destino</h2>
             <div className="platformChecklist">
-              {platforms.map((platform) => (
-                <label key={platform}>
-                  <input name="platforms" type="checkbox" value={platform} defaultChecked={selectedPlatforms.has(platform)} />
-                  {platformLabel(platform)}
+              {platformOptions.map((platform) => (
+                <label key={platform.value}>
+                  <input name="platforms" type="checkbox" value={platform.value} defaultChecked={selectedPlatforms.has(platform.value)} />
+                  {platform.label}
                 </label>
               ))}
             </div>

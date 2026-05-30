@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
 
     const integration = await prisma.distributionIntegration.create({
       data: {
-        provider: "Too Lost",
+        provider: "Distribuidora parceira",
         environment: "PRODUCTION",
         endpoint: TOOLOST_API_BASE_URL,
         testEndpoint: `${TOOLOST_API_BASE_URL}/me`,
@@ -85,7 +85,7 @@ export async function GET(request: NextRequest) {
         isActive: true,
         status: "ACTIVE",
         lastTestStatus: 200,
-        lastTestMessage: profile ? `Conectado: ${profile.email ?? profile.name ?? "perfil Too Lost"}` : "Token recebido.",
+        lastTestMessage: profile ? `Conectado: ${profile.email ?? profile.name ?? "perfil da distribuidora"}` : "Token recebido.",
         lastTestedAt: new Date(),
       },
     });
@@ -96,7 +96,7 @@ export async function GET(request: NextRequest) {
         action: "OAUTH_CONNECT",
         status: "OK",
         responseStatus: 200,
-        message: `Too Lost conectado. Token expira em ${tokens.expires_in} segundos.`,
+        message: `Distribuidora conectada. Token expira em ${tokens.expires_in} segundos.`,
       },
     });
 
@@ -116,7 +116,7 @@ export async function GET(request: NextRequest) {
 
     return adminRedirect(request, { sucesso: "toolost_conectado", status: "OK" });
   } catch (tokenError) {
-    const message = tokenError instanceof Error ? tokenError.message : "Erro desconhecido no OAuth Too Lost.";
+    const message = tokenError instanceof Error ? tokenError.message : "Erro desconhecido no OAuth da distribuidora.";
 
     await prisma.auditLog.create({
       data: {

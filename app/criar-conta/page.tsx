@@ -12,7 +12,10 @@ export default async function RegisterPage({
   return (
     <main className="authShell">
       <section className="authPanel">
-        <Brand />
+        <div className="authTopline">
+          <Brand />
+          <Link className="authBackLink" href="/">← Voltar para a home</Link>
+        </div>
         <div>
           <p className="eyebrow">Nova conta</p>
           <h1>Criar conta profissional</h1>

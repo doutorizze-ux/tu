@@ -18,6 +18,7 @@
     "@aws-sdk/client-s3": "^3.1055.0",
     "@prisma/client": "^6.19.3",
     "next": "latest",
+    "pdfkit": "^0.18.0",
     "react": "latest",
     "react-dom": "latest",
     "server-only": "^0.0.1"

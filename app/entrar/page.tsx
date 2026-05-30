@@ -12,7 +12,10 @@ export default async function LoginPage({
   return (
     <main className="authShell">
       <section className="authPanel">
-        <Brand />
+        <div className="authTopline">
+          <Brand />
+          <Link className="authBackLink" href="/">← Voltar para a home</Link>
+        </div>
         <div>
           <p className="eyebrow">Acesso</p>
           <h1>Entrar na Tunix</h1>

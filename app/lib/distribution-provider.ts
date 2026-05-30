@@ -2,7 +2,9 @@ import "server-only";
 
 import type { Release, ReleaseAsset, ReleaseContributor, ReleasePlatform } from "@prisma/client";
 import { decryptSecret } from "./crypto-secrets";
+import { normalizePlatformValue } from "./platforms";
 import { prisma } from "./prisma";
+import { submitTooLostDistribution, TOOLOST_API_BASE_URL } from "./toolost";
 
 type ReleaseWithRelations = Release & {
   assets?: ReleaseAsset[];
@@ -53,7 +55,7 @@ export function buildDistributionPayload(release: ReleaseWithRelations) {
       legacyMasterFileName: release.masterFileName,
       legacyCoverFileName: release.coverFileName,
     },
-    platforms: release.platforms.map((item) => item.platform),
+    platforms: release.platforms.map((item) => normalizePlatformValue(item.platform)),
     contributors: release.contributors.map((item) => ({
       name: item.name,
       role: item.role,
@@ -99,6 +101,17 @@ export async function submitToDistributionPartner(payload: unknown): Promise<Par
   }
 
   try {
+    if (config.endpoint.startsWith(TOOLOST_API_BASE_URL)) {
+      const result = await submitTooLostDistribution(config.apiKey, payload as ReturnType<typeof buildDistributionPayload>);
+
+      return {
+        ok: true,
+        status: "SENT",
+        responseStatus: result.status,
+        responseBody: result.responseBody,
+      };
+    }
+
     const response = await fetch(config.endpoint, {
       method: "POST",
       headers: {
