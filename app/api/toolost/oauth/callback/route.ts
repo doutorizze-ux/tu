@@ -6,7 +6,8 @@ import { exchangeTooLostCode, getTooLostProfile, TOOLOST_API_BASE_URL } from "..
 export const dynamic = "force-dynamic";
 
 function adminRedirect(request: NextRequest, params: Record<string, string>) {
-  const redirectUrl = new URL("/admin/integracoes", request.url);
+  const baseUrl = process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || request.url;
+  const redirectUrl = new URL("/admin/integracoes", baseUrl);
 
   for (const [key, value] of Object.entries(params)) {
     redirectUrl.searchParams.set(key, value);
