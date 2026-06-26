@@ -265,7 +265,7 @@ export default async function AdminUsersPage({
                 <strong style={{ fontSize: "0.85rem", color: "#ffffff" }}>Papéis no Sistema</strong>
                 <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", marginTop: "0.5rem" }}>
                   {["COMPOSER", "ARTIST", "PRODUCER", "ADMIN"].map((role) => (
-                    <label key={role} style={{ display: "flex", alignItems: "center", gap: "0.5rem", cursor: "pointer", fontSize: "0.9rem", color: "#ffffff" }}>
+                    <label key={role} className="inlineCheck" style={{ color: "#ffffff", fontWeight: "normal", fontSize: "0.9rem", cursor: "pointer" }}>
                       <input 
                         type="checkbox" 
                         name="roles" 
