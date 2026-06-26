@@ -86,6 +86,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
           <Link href="/admin/auditoria">Auditoria</Link>
           <Link href="/admin/integracoes">Admin integrações</Link>
           <Link href="/admin/creditos">Admin créditos</Link>
+          <Link href="/admin/usuarios">Usuários e Créditos</Link>
         </div>
       ) : null}
     </>

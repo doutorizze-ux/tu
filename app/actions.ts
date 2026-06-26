@@ -7,7 +7,7 @@ import { createAsaasCreditPayment, ensureAsaasCustomerWithDocument, isAsaasConfi
 import { createSession, destroySession, hashPassword, requireUser, verifyPassword } from "./lib/auth";
 import { saveAudioGuide } from "./lib/audio-storage";
 import { decryptSecret, encryptSecret } from "./lib/crypto-secrets";
-import { debitCredits, getCompositionCreationCost, getCreditActionCost, getCreditPackage } from "./lib/credits";
+import { debitCredits, getCompositionCreationCost, getCreditActionCost, getCreditPackage, getCreditBalance } from "./lib/credits";
 import {
   buildDistributionPayload,
   getDistributionProviderConfig,
@@ -2414,3 +2414,102 @@ export async function testDistributionIntegration(formData: FormData) {
   revalidatePath("/admin/integracoes");
   redirect(`/admin/integracoes?sucesso=teste&status=${status}`);
 }
+
+export async function adminUpdateUser(formData: FormData) {
+  const adminUser = await requireAdmin();
+  const userId = formString(formData, "userId");
+  const name = formString(formData, "name");
+  const email = formString(formData, "email").toLowerCase();
+  const roles = formData.getAll("roles").map(String);
+
+  if (!userId || !name || !email) {
+    redirect("/admin/usuarios?erro=dados");
+  }
+
+  const existingUser = await prisma.user.findFirst({
+    where: { email, NOT: { id: userId } },
+  });
+
+  if (existingUser) {
+    redirect("/admin/usuarios?erro=email_existente");
+  }
+
+  await prisma.$transaction(async (tx) => {
+    await tx.user.update({
+      where: { id: userId },
+      data: { name, email },
+    });
+
+    await tx.userRole.deleteMany({ where: { userId } });
+    if (roles.length > 0) {
+      await tx.userRole.createMany({
+        data: roles.map((role) => ({ userId, role })),
+      });
+    }
+
+    await tx.auditLog.create({
+      data: {
+        userId: adminUser.id,
+        action: "ADMIN_USER_UPDATED",
+        entity: "User",
+        entityId: userId,
+        metadata: { name, email, roles },
+      },
+    });
+  });
+
+  revalidatePath("/admin/usuarios");
+  redirect("/admin/usuarios?sucesso=usuario_atualizado");
+}
+
+export async function adminAdjustCredits(formData: FormData) {
+  const adminUser = await requireAdmin();
+  const userId = formString(formData, "userId");
+  const amountVal = Number(formString(formData, "amount"));
+  const reason = formString(formData, "reason") || "Ajuste manual do administrador";
+
+  if (!userId || Number.isNaN(amountVal) || amountVal === 0) {
+    redirect("/admin/usuarios?erro=creditos_invalidos");
+  }
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      const balance = await getCreditBalance(userId, tx);
+      const balanceAfter = balance + amountVal;
+
+      if (balanceAfter < 0) {
+        throw new Error("saldo_negativo");
+      }
+
+      await tx.creditLedgerEntry.create({
+        data: {
+          userId,
+          type: "ADMIN_ADJUSTMENT",
+          amount: amountVal,
+          balanceAfter,
+          reason,
+        },
+      });
+
+      await tx.auditLog.create({
+        data: {
+          userId: adminUser.id,
+          action: "ADMIN_CREDITS_ADJUSTED",
+          entity: "User",
+          entityId: userId,
+          metadata: { amount: amountVal, reason, balanceAfter },
+        },
+      });
+    });
+  } catch (error) {
+    if (error instanceof Error && error.message === "saldo_negativo") {
+      redirect("/admin/usuarios?erro=saldo_negativo");
+    }
+    redirect("/admin/usuarios?erro=db");
+  }
+
+  revalidatePath("/admin/usuarios");
+  revalidatePath("/admin/creditos");
+  redirect("/admin/usuarios?sucesso=creditos_ajustados");
+}
+
