@@ -287,6 +287,18 @@ async function ensureCreditCatalog() {
 async function main() {
   await ensureCreditCatalog();
 
+  await upsertUser({
+    name: "Admin Tunix",
+    email: "admin@tunix.com.br",
+    role: "ADMIN",
+    password: "tunix080782",
+  });
+
+  if (process.env.NODE_ENV === "production" || process.env.DISABLE_MOCK_SEED === "true") {
+    console.log("Production/Clean environment detected. Seeding only admin and credit catalog.");
+    return;
+  }
+
   await renameLegacyUserEmail("admin@musicaponte.local", "admin@tunix.com.br", "Admin Tunix");
   await renameLegacyUserEmail("admin@tunix.local", "admin@tunix.com.br", "Admin Tunix");
   await renameLegacyUserEmail("luan@musicaponte.local", "luan@tunix.local");
@@ -304,13 +316,6 @@ async function main() {
       userId: composer.id,
       role: "ADMIN",
     },
-  });
-
-  await upsertUser({
-    name: "Admin Tunix",
-    email: "admin@tunix.com.br",
-    role: "ADMIN",
-    password: "tunix080782",
   });
 
   await ensureDemoCredits(composer, 100);

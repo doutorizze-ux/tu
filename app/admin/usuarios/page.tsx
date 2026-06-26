@@ -1,4 +1,4 @@
-import { adminAdjustCredits, adminUpdateUser } from "../../actions";
+import { adminAdjustCredits, adminUpdateUser, adminResetDatabase } from "../../actions";
 import { AppShell, PageHeader } from "../../components";
 import { requireUser } from "../../lib/auth";
 import { formatCredits } from "../../lib/credits";
@@ -62,6 +62,8 @@ export default async function AdminUsersPage({
             ? "Quantidade de créditos ou motivo inválido."
             : params.erro === "saldo_negativo"
             ? "O saldo de créditos do usuário não pode ficar negativo."
+            : params.erro === "reset_falhou"
+            ? "Falha ao limpar o banco de dados."
             : "Ocorreu um erro ao salvar as alterações."}
         </p>
       ) : null}
@@ -70,7 +72,11 @@ export default async function AdminUsersPage({
         <p className="formSuccess">
           {params.sucesso === "usuario_atualizado"
             ? "Dados do usuário atualizados com sucesso."
-            : "Saldo de créditos ajustado com sucesso."}
+            : params.sucesso === "creditos_ajustados"
+            ? "Saldo de créditos ajustado com sucesso."
+            : params.sucesso === "db_limpo"
+            ? "Banco de dados limpo com sucesso! Pronto para produção."
+            : "Operação realizada com sucesso."}
         </p>
       ) : null}
 
@@ -198,6 +204,38 @@ export default async function AdminUsersPage({
                 </div>
               );
             })}
+          </div>
+        </article>
+
+        <article className="creditAdminPanel wide" style={{ border: "1px solid var(--danger)", borderRadius: "12px", padding: "1.5rem", background: "rgba(239, 68, 68, 0.03)" }}>
+          <div className="panelTitle" style={{ marginBottom: "1.5rem" }}>
+            <h2 style={{ color: "var(--danger)" }}>Zona de Perigo</h2>
+            <p>Ações irreversíveis do sistema de banco de dados.</p>
+          </div>
+          
+          <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+            <p style={{ fontSize: "0.9rem", margin: 0 }}>
+              Use a opção abaixo para **limpar todos os dados fictícios** do banco (todas as músicas de teste, composições, lançamentos de demonstração e usuários falsos). 
+              Apenas o seu usuário Administrador principal (`admin@tunix.com.br`) será mantido no sistema, deixando o aplicativo 100% limpo e pronto para o lançamento oficial.
+            </p>
+            
+            <form action={adminResetDatabase} style={{ marginTop: "0.5rem" }}>
+              <button 
+                type="submit" 
+                className="secondaryButton"
+                style={{ 
+                  backgroundColor: "var(--danger)", 
+                  color: "white", 
+                  borderColor: "var(--danger)",
+                  padding: "0.75rem 1.5rem",
+                  fontSize: "0.9rem",
+                  fontWeight: "bold",
+                  cursor: "pointer"
+                }}
+              >
+                Limpar Banco de Dados (Preparar para Produção)
+              </button>
+            </form>
           </div>
         </article>
       </div>

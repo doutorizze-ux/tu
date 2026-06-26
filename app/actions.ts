@@ -7,7 +7,7 @@ import { createAsaasCreditPayment, ensureAsaasCustomerWithDocument, isAsaasConfi
 import { createSession, destroySession, hashPassword, requireUser, verifyPassword } from "./lib/auth";
 import { saveAudioGuide } from "./lib/audio-storage";
 import { decryptSecret, encryptSecret } from "./lib/crypto-secrets";
-import { debitCredits, getCompositionCreationCost, getCreditActionCost, getCreditPackage, getCreditBalance } from "./lib/credits";
+import { debitCredits, getCompositionCreationCost, getCreditActionCost, getCreditPackage, getCreditBalance, ensureCreditCatalog } from "./lib/credits";
 import {
   buildDistributionPayload,
   getDistributionProviderConfig,
@@ -2512,4 +2512,78 @@ export async function adminAdjustCredits(formData: FormData) {
   revalidatePath("/admin/creditos");
   redirect("/admin/usuarios?sucesso=creditos_ajustados");
 }
+
+export async function adminResetDatabase() {
+  const adminUser = await requireAdmin();
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      // 1. Delete child tables with foreign keys first
+      await tx.royaltyParticipant.deleteMany({});
+      await tx.royaltyStatement.deleteMany({});
+      await tx.distributionDelivery.deleteMany({});
+      await tx.releasePlatform.deleteMany({});
+      await tx.releaseAsset.deleteMany({});
+      await tx.releaseContributor.deleteMany({});
+      await tx.releaseReview.deleteMany({});
+      await tx.releaseDeclaration.deleteMany({});
+      await tx.releaseRequest.deleteMany({});
+
+      await tx.compositionDeclaration.deleteMany({});
+      await tx.audioAsset.deleteMany({});
+      await tx.compositionVersion.deleteMany({});
+      await tx.compositionTag.deleteMany({});
+      await tx.favorite.deleteMany({});
+      await tx.interest.deleteMany({});
+
+      await tx.userSession.deleteMany({});
+      await tx.notification.deleteMany({});
+      await tx.supportTicket.deleteMany({});
+      await tx.creditOrder.deleteMany({});
+      await tx.creditLedgerEntry.deleteMany({});
+
+      // 2. Delete parent tables
+      await tx.composition.deleteMany({});
+      await tx.release.deleteMany({});
+      await tx.tag.deleteMany({});
+
+      // 3. Delete users/profiles except the admin
+      await tx.profile.deleteMany({
+        where: { NOT: { user: { email: "admin@tunix.com.br" } } },
+      });
+      await tx.userRole.deleteMany({
+        where: { NOT: { user: { email: "admin@tunix.com.br" } } },
+      });
+      await tx.user.deleteMany({
+        where: { NOT: { email: "admin@tunix.com.br" } },
+      });
+
+      // 4. Rebuild the credit packages and costs catalog
+      await ensureCreditCatalog(tx);
+
+      // 5. Add audit log of database reset
+      await tx.auditLog.create({
+        data: {
+          userId: adminUser.id,
+          action: "DATABASE_CLEANED_FOR_PRODUCTION",
+          entity: "System",
+          entityId: "reset",
+          metadata: { timestamp: new Date().toISOString() },
+        },
+      });
+    });
+  } catch (error) {
+    console.error("Database reset failed:", error);
+    redirect("/admin/usuarios?erro=reset_falhou");
+  }
+
+  revalidatePath("/admin/usuarios");
+  revalidatePath("/admin/creditos");
+  revalidatePath("/admin/composicoes");
+  revalidatePath("/admin/lancamentos");
+  revalidatePath("/admin/solicitacoes");
+  revalidatePath("/admin/auditoria");
+  redirect("/admin/usuarios?sucesso=db_limpo");
+}
+
 
