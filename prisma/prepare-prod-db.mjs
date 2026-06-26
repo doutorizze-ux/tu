@@ -24,3 +24,16 @@ const result = spawnSync(npxCommand, ["prisma", "db", "push", "--skip-generate"]
 if (result.status !== 0) {
   process.exit(result.status ?? 1);
 }
+
+console.log("Seeding database...");
+const seedResult = spawnSync(process.execPath, ["prisma/seed.mjs"], {
+  stdio: "inherit",
+  shell: false,
+});
+
+if (seedResult.status !== 0) {
+  console.error("Database seeding failed.");
+  process.exit(seedResult.status ?? 1);
+}
+
+console.log("Database successfully prepared and seeded!");
