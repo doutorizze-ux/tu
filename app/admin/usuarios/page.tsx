@@ -150,14 +150,14 @@ export default async function AdminUsersPage({
                           <Link 
                             href={`/admin/usuarios?editUserId=${u.id}`} 
                             className="secondaryButton linkButton" 
-                            style={{ padding: "0.3rem 0.8rem", fontSize: "0.8rem" }}
+                            style={{ padding: "0.3rem 0.8rem", fontSize: "0.8rem", color: "var(--text, #ffffff)", textDecoration: "none" }}
                           >
                             Editar
                           </Link>
                           <Link 
                             href={`/admin/usuarios?adjustUserId=${u.id}`} 
                             className="primaryButton linkButton" 
-                            style={{ padding: "0.3rem 0.8rem", fontSize: "0.8rem" }}
+                            style={{ padding: "0.3rem 0.8rem", fontSize: "0.8rem", color: "#ffffff", textDecoration: "none" }}
                           >
                             Ajustar Créditos
                           </Link>
@@ -229,17 +229,18 @@ export default async function AdminUsersPage({
             padding: "2rem",
             display: "flex",
             flexDirection: "column",
-            gap: "1.5rem"
+            gap: "1.5rem",
+            color: "#ffffff"
           }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <h2 style={{ margin: 0 }}>Editar Usuário</h2>
-              <Link href="/admin/usuarios" style={{ fontSize: "1.5rem", textDecoration: "none", color: "inherit", opacity: 0.7 }}>×</Link>
+              <h2>Editar Usuário</h2>
+              <Link href="/admin/usuarios" style={{ fontSize: "1.5rem", textDecoration: "none", color: "#ffffff", opacity: 0.7 }}>×</Link>
             </div>
             
             <form action={adminUpdateUser} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
               <input type="hidden" name="userId" value={editUser.id} />
               
-              <label style={{ display: "flex", flexDirection: "column", gap: "0.25rem", fontSize: "0.85rem" }}>
+              <label style={{ display: "flex", flexDirection: "column", gap: "0.25rem", fontSize: "0.85rem", color: "#ffffff" }}>
                 Nome Completo
                 <input 
                   name="name" 
@@ -249,7 +250,7 @@ export default async function AdminUsersPage({
                 />
               </label>
 
-              <label style={{ display: "flex", flexDirection: "column", gap: "0.25rem", fontSize: "0.85rem" }}>
+              <label style={{ display: "flex", flexDirection: "column", gap: "0.25rem", fontSize: "0.85rem", color: "#ffffff" }}>
                 E-mail
                 <input 
                   name="email" 
@@ -261,10 +262,10 @@ export default async function AdminUsersPage({
               </label>
 
               <div>
-                <strong style={{ fontSize: "0.85rem" }}>Papéis no Sistema</strong>
+                <strong style={{ fontSize: "0.85rem", color: "#ffffff" }}>Papéis no Sistema</strong>
                 <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", marginTop: "0.5rem" }}>
                   {["COMPOSER", "ARTIST", "PRODUCER", "ADMIN"].map((role) => (
-                    <label key={role} style={{ display: "flex", alignItems: "center", gap: "0.5rem", cursor: "pointer", fontSize: "0.9rem" }}>
+                    <label key={role} style={{ display: "flex", alignItems: "center", gap: "0.5rem", cursor: "pointer", fontSize: "0.9rem", color: "#ffffff" }}>
                       <input 
                         type="checkbox" 
                         name="roles" 
@@ -280,7 +281,7 @@ export default async function AdminUsersPage({
               </div>
 
               <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
-                <Link href="/admin/usuarios" className="secondaryButton linkButton" style={{ flex: 1, textAlign: "center", padding: "0.6rem" }}>
+                <Link href="/admin/usuarios" className="secondaryButton linkButton" style={{ flex: 1, textAlign: "center", padding: "0.6rem", color: "#ffffff", textDecoration: "none" }}>
                   Cancelar
                 </Link>
                 <button className="primaryButton" type="submit" style={{ flex: 1, padding: "0.6rem" }}>
@@ -316,20 +317,21 @@ export default async function AdminUsersPage({
             padding: "2rem",
             display: "flex",
             flexDirection: "column",
-            gap: "1.5rem"
+            gap: "1.5rem",
+            color: "#ffffff"
           }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div>
-                <h2 style={{ margin: 0 }}>Ajustar Créditos</h2>
+                <h2>Ajustar Créditos</h2>
                 <span style={{ fontSize: "0.85rem", opacity: 0.7 }}>Usuário: {adjustUser.name}</span>
               </div>
-              <Link href="/admin/usuarios" style={{ fontSize: "1.5rem", textDecoration: "none", color: "inherit", opacity: 0.7 }}>×</Link>
+              <Link href="/admin/usuarios" style={{ fontSize: "1.5rem", textDecoration: "none", color: "#ffffff", opacity: 0.7 }}>×</Link>
             </div>
             
             <form action={adminAdjustCredits} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
               <input type="hidden" name="userId" value={adjustUser.id} />
               
-              <label style={{ display: "flex", flexDirection: "column", gap: "0.25rem", fontSize: "0.85rem" }}>
+              <label style={{ display: "flex", flexDirection: "column", gap: "0.25rem", fontSize: "0.85rem", color: "#ffffff" }}>
                 Quantidade de Créditos
                 <input 
                   name="amount" 
@@ -340,7 +342,7 @@ export default async function AdminUsersPage({
                 />
               </label>
 
-              <label style={{ display: "flex", flexDirection: "column", gap: "0.25rem", fontSize: "0.85rem" }}>
+              <label style={{ display: "flex", flexDirection: "column", gap: "0.25rem", fontSize: "0.85rem", color: "#ffffff" }}>
                 Motivo do Ajuste
                 <input 
                   name="reason" 
@@ -351,7 +353,7 @@ export default async function AdminUsersPage({
               </label>
 
               <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
-                <Link href="/admin/usuarios" className="secondaryButton linkButton" style={{ flex: 1, textAlign: "center", padding: "0.6rem" }}>
+                <Link href="/admin/usuarios" className="secondaryButton linkButton" style={{ flex: 1, textAlign: "center", padding: "0.6rem", color: "#ffffff", textDecoration: "none" }}>
                   Cancelar
                 </Link>
                 <button className="primaryButton" type="submit" style={{ flex: 1, padding: "0.6rem" }}>
