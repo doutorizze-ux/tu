@@ -1,13 +1,19 @@
 import Link from "next/link";
 import { AppShell, PageHeader, SongMeta } from "../components";
+import { deleteComposition } from "../actions";
 import { requireUser } from "../lib/auth";
 import { statusLabel } from "../lib/format";
 import { prisma } from "../lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-export default async function CompositionsPage() {
+export default async function CompositionsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ erro?: string; sucesso?: string }>;
+}) {
   const user = await requireUser();
+  const params = await searchParams;
   const compositions = await prisma.composition.findMany({
     where: { composerId: user.id },
     orderBy: { createdAt: "desc" },
@@ -32,22 +38,55 @@ export default async function CompositionsPage() {
         }
       />
 
+      {params.erro ? (
+        <p className="formError">
+          {params.erro === "permissao"
+            ? "Você não tem permissão para excluir esta composição."
+            : "Ocorreu um erro ao excluir a composição."}
+        </p>
+      ) : null}
+
+      {params.sucesso ? (
+        <p className="formSuccess">
+          Composição excluída com sucesso.
+        </p>
+      ) : null}
+
       <section className="tablePanel">
         <div className="tableHeader">
           <span>Composição</span>
           <span>Status</span>
           <span>Interesses</span>
           <span>Favoritos</span>
+          <span style={{ textAlign: "right", paddingRight: "1rem" }}>Ações</span>
         </div>
         {compositions.map((song) => (
-          <article className="compositionRow" key={song.title}>
-            <div>
+          <article className="compositionRow" key={song.title} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div style={{ flex: 1 }}>
               <strong>{song.title}</strong>
               <small>{song.genre} · {song.mood ?? "Sem clima"} · {song.voiceType ?? "Voz livre"}</small>
             </div>
-            <span className="songStatus">{statusLabel(song.status)}</span>
-            <span>{song._count.interests}</span>
-            <span>{song._count.favorites}</span>
+            <span className="songStatus" style={{ minWidth: "120px" }}>{statusLabel(song.status)}</span>
+            <span style={{ minWidth: "100px" }}>{song._count.interests}</span>
+            <span style={{ minWidth: "100px" }}>{song._count.favorites}</span>
+            
+            <form action={deleteComposition} style={{ margin: 0, minWidth: "80px", textAlign: "right" }}>
+              <input type="hidden" name="compositionId" value={song.id} />
+              <button 
+                type="submit" 
+                style={{ 
+                  background: "transparent", 
+                  color: "var(--danger, #ef4444)", 
+                  border: "none", 
+                  cursor: "pointer", 
+                  fontSize: "0.85rem",
+                  fontWeight: "bold",
+                  padding: "0.2rem 0.5rem" 
+                }}
+              >
+                Excluir
+              </button>
+            </form>
           </article>
         ))}
       </section>
@@ -64,7 +103,30 @@ export default async function CompositionsPage() {
               voice={song.voiceType ?? "Voz livre"}
               bpm={song.bpm ?? 0}
             />
-            <button>Editar composição</button>
+            
+            <div style={{ display: "flex", gap: "0.5rem", marginTop: "1rem" }}>
+              <button className="secondaryButton" style={{ flex: 1, padding: "0.4rem", fontSize: "0.8rem", cursor: "pointer" }}>
+                Editar
+              </button>
+              
+              <form action={deleteComposition} style={{ flex: 1, margin: 0 }}>
+                <input type="hidden" name="compositionId" value={song.id} />
+                <button 
+                  type="submit" 
+                  className="secondaryButton" 
+                  style={{ 
+                    width: "100%",
+                    color: "var(--danger, #ef4444)", 
+                    borderColor: "var(--danger, #ef4444)", 
+                    padding: "0.4rem", 
+                    fontSize: "0.8rem",
+                    cursor: "pointer"
+                  }}
+                >
+                  Excluir
+                </button>
+              </form>
+            </div>
           </article>
         ))}
       </section>

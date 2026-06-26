@@ -2586,4 +2586,40 @@ export async function adminResetDatabase() {
   redirect("/admin/usuarios?sucesso=db_limpo");
 }
 
+export async function deleteComposition(formData: FormData) {
+  const user = await requireUser();
+  const compositionId = formString(formData, "compositionId");
+
+  if (!compositionId) {
+    redirect("/composicoes?erro=dados");
+  }
+
+  const composition = await prisma.composition.findUnique({
+    where: { id: compositionId },
+  });
+
+  if (!composition || composition.composerId !== user.id) {
+    redirect("/composicoes?erro=permissao");
+  }
+
+  await prisma.composition.delete({
+    where: { id: compositionId },
+  });
+
+  await prisma.auditLog.create({
+    data: {
+      userId: user.id,
+      action: "COMPOSITION_DELETED",
+      entity: "Composition",
+      entityId: compositionId,
+      metadata: { title: composition.title },
+    },
+  });
+
+  revalidatePath("/composicoes");
+  revalidatePath("/catalogo");
+  redirect("/composicoes?sucesso=excluido");
+}
+
+
 
