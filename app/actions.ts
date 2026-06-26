@@ -223,13 +223,25 @@ export async function loginUser(formData: FormData) {
   const email = formString(formData, "email").toLowerCase();
   const password = formString(formData, "password");
 
+  console.log("[LOGIN] Attempting login for email:", email);
+
   if (!checkRateLimit(`login:${email || "unknown"}`, 8, 15 * 60 * 1000)) {
+    console.warn("[LOGIN] Rate limit hit for email:", email);
     redirect("/entrar?erro=limite");
   }
 
   const user = await prisma.user.findUnique({ where: { email } });
 
+  if (!user) {
+    console.warn("[LOGIN] User not found in database for email:", email);
+  } else {
+    console.log("[LOGIN] User found in database. Verifying password...");
+  }
+
   if (!user || !verifyPassword(password, user.password)) {
+    const reason = user ? "INVALID_PASSWORD" : "USER_NOT_FOUND";
+    console.error("[LOGIN] Login failed for email:", email, "Reason:", reason);
+    
     await prisma.auditLog.create({
       data: {
         action: "LOGIN_FAILED",
@@ -237,13 +249,14 @@ export async function loginUser(formData: FormData) {
         entityId: user?.id ?? email,
         metadata: {
           email,
-          reason: user ? "INVALID_PASSWORD" : "USER_NOT_FOUND",
+          reason,
         },
       },
     });
     redirect("/entrar?erro=credenciais");
   }
 
+  console.log("[LOGIN] Login successful! Creating session for userId:", user.id);
   await createSession(user.id);
   redirect("/painel");
 }
