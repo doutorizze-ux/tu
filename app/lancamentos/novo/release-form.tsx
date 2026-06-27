@@ -42,7 +42,8 @@ export function ReleaseForm({
     if (!cLineVal || cLineVal.includes("Artista")) setCLineVal(`${currentYear} ${holder}`);
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     setFormError(null);
 
     const form = formRef.current;
@@ -84,7 +85,6 @@ export function ReleaseForm({
     if (!cLineInput?.value.trim() && !firstMissingEl) firstMissingEl = cLineInput;
 
     if (missingFields.length > 0) {
-      e.preventDefault();
       setFormError(`Por favor, preencha os seguintes campos obrigatórios acima: ${missingFields.join(", ")}.`);
       if (firstMissingEl) {
         firstMissingEl.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -94,7 +94,6 @@ export function ReleaseForm({
     }
 
     if (!rightsDec?.checked || !distAgrem?.checked) {
-      e.preventDefault();
       setFormError("Você precisa marcar as duas caixas de declaração de titularidade e autorização ao final da página.");
       const decBox = !rightsDec?.checked ? rightsDec : distAgrem;
       if (decBox) {
@@ -106,6 +105,17 @@ export function ReleaseForm({
 
     // Form is valid and submitting! Show feedback state
     setIsSubmitting(true);
+
+    try {
+      const formData = new FormData(form);
+      await createRelease(formData);
+    } catch (err: any) {
+      if (err?.message === "NEXT_REDIRECT" || err?.digest?.includes("NEXT_REDIRECT")) {
+        throw err;
+      }
+      setIsSubmitting(false);
+      setFormError(err?.message || "Ocorreu um erro ao enviar os arquivos do lançamento. Tente novamente.");
+    }
   };
 
   return (
