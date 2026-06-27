@@ -150,13 +150,16 @@ async function apiRequest<T>({
   body,
   method,
   path,
+  baseUrl,
 }: {
   accessToken: string;
   body?: unknown;
   method: "GET" | "POST" | "PATCH" | "PUT";
   path: string;
+  baseUrl?: string;
 }) {
-  const response = await fetch(`${TOOLOST_API_BASE_URL}${path}`, {
+  const apiBaseUrl = (baseUrl || TOOLOST_API_BASE_URL).replace(/\/+$/, "");
+  const response = await fetch(`${apiBaseUrl}${path}`, {
     method,
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -269,7 +272,12 @@ function yyyyMmDd(value?: string | null) {
   return value?.slice(0, 10) || undefined;
 }
 
-async function uploadMaster(accessToken: string, releaseId: number, master: NonNullable<TooLostRequestPayload["files"]>["master"]) {
+async function uploadMaster(
+  accessToken: string, 
+  releaseId: number, 
+  master: NonNullable<TooLostRequestPayload["files"]>["master"],
+  baseUrl?: string
+) {
   if (!master) {
     throw new Error("Master FLAC obrigatório para envio à distribuidora.");
   }
@@ -293,6 +301,7 @@ async function uploadMaster(accessToken: string, releaseId: number, master: NonN
       fileName: master.fileName,
       contentType: "audio/flac",
     },
+    baseUrl,
   });
   let bytes: Buffer;
   try {
@@ -328,7 +337,11 @@ function providerIdentifiers(release: TooLostRelease) {
   };
 }
 
-export async function submitTooLostDistribution(accessToken: string, payload: TooLostRequestPayload) {
+export async function submitTooLostDistribution(
+  accessToken: string, 
+  payload: TooLostRequestPayload,
+  baseUrl?: string
+) {
   const existingReleaseId = Number(payload.providerReleaseId);
   const created = Number.isInteger(existingReleaseId) && existingReleaseId > 0
     ? null
@@ -342,88 +355,102 @@ export async function submitTooLostDistribution(accessToken: string, payload: To
         label: payload.labelName || payload.artistName || "Tunix",
         participants: primaryParticipant(payload),
       },
+      baseUrl,
     });
   const releaseId = created?.payload.data.id ?? existingReleaseId;
 
   try {
-    const baseUrl = process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || "https://tunix.com.br";
+    const appBaseUrl = process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || "https://tunix.com.br";
     const coverUrl = payload.externalReleaseId && (payload.files?.cover || payload.files?.master)
-      ? `${baseUrl}/api/releases/${payload.externalReleaseId}/cover`
+      ? `${appBaseUrl}/api/releases/${payload.externalReleaseId}/cover`
       : undefined;
 
     const metadata = await apiRequest({
-    accessToken,
-    method: "PATCH",
-    path: `/releases/${releaseId}/metadata`,
-    body: {
-      type: releaseType(payload.releaseType),
-      title: payload.title,
-      version: payload.versionTitle || undefined,
-      label: payload.labelName || payload.artistName || "Tunix",
-      primaryGenre: payload.genre,
-      language: payload.language,
-      releaseDate: yyyyMmDd(payload.releaseDate),
-      licenseType: "Copyright",
-      cYear: payload.copyright?.year,
-      cLine: payload.copyright?.cLine,
-      pYear: payload.copyright?.year,
-      pLine: payload.copyright?.pLine,
-      upc: payload.identifiers?.requestUpcAssignment ? undefined : payload.identifiers?.upc || undefined,
-      ...(coverUrl ? { coverUrl, compressedArtwork: coverUrl } : {}),
-      participants: primaryParticipant(payload),
-    },
-  });
-    const audioFileKey = await uploadMaster(accessToken, releaseId, payload.files?.master);
+      accessToken,
+      method: "PATCH",
+      path: `/releases/${releaseId}/metadata`,
+      body: {
+        type: releaseType(payload.releaseType),
+        title: payload.title,
+        version: payload.versionTitle || undefined,
+        label: payload.labelName || payload.artistName || "Tunix",
+        primaryGenre: payload.genre,
+        language: payload.language,
+        releaseDate: yyyyMmDd(payload.releaseDate),
+        licenseType: "Copyright",
+        cYear: payload.copyright?.year,
+        cLine: payload.copyright?.cLine,
+        pYear: payload.copyright?.year,
+        pLine: payload.copyright?.pLine,
+        upc: payload.identifiers?.requestUpcAssignment ? undefined : payload.identifiers?.upc || undefined,
+        ...(coverUrl ? { coverUrl, compressedArtwork: coverUrl } : {}),
+        participants: primaryParticipant(payload),
+      },
+      baseUrl,
+    });
+
+    const audioFileKey = await uploadMaster(accessToken, releaseId, payload.files?.master, baseUrl);
+    
+    // Standard DSP rule: For Single releases, track title MUST match release title
+    const isSingle = !payload.releaseType || payload.releaseType.toUpperCase() === "SINGLE";
+    const effectiveTrackTitle = isSingle ? payload.title : (payload.trackTitle || payload.title);
+
     const track = {
-    title: payload.trackTitle || payload.title,
-    version: payload.versionTitle || undefined,
-    language: payload.language,
-    audioFileKey,
-    artists: primaryParticipant(payload),
-    writers: writerParticipants(payload),
-    ...(!payload.identifiers?.requestIsrcAssignment && payload.identifiers?.isrc
-      ? { isrc: payload.identifiers.isrc }
-      : {}),
-  };
+      title: effectiveTrackTitle,
+      version: payload.versionTitle || undefined,
+      language: payload.language,
+      audioFileKey,
+      artists: primaryParticipant(payload),
+      writers: writerParticipants(payload),
+      ...(!payload.identifiers?.requestIsrcAssignment && payload.identifiers?.isrc
+        ? { isrc: payload.identifiers.isrc }
+        : {}),
+    };
+
     const tracks = await apiRequest<{ data: TooLostRelease }>({
-    accessToken,
-    method: "PUT",
-    path: `/releases/${releaseId}/tracks`,
-    body: { tracks: [track] },
-  });
+      accessToken,
+      method: "PUT",
+      path: `/releases/${releaseId}/tracks`,
+      body: { tracks: [track] },
+      baseUrl,
+    });
 
     const delivery = await apiRequest({
-    accessToken,
-    method: "PATCH",
-    path: `/releases/${releaseId}/delivery`,
-    body: {
-      delivery: {
-        platforms: payload.platforms ?? [],
-        territories: deliveryTerritories(payload.territories),
-        additional: {
-          youtube: payload.platforms?.some((platform) => platform.toLowerCase().includes("youtube")) ?? false,
-          facebook: payload.platforms?.some((platform) => platform.toLowerCase().includes("facebook")) ?? false,
+      accessToken,
+      method: "PATCH",
+      path: `/releases/${releaseId}/delivery`,
+      body: {
+        delivery: {
+          platforms: payload.platforms ?? [],
+          territories: deliveryTerritories(payload.territories),
+          additional: {
+            youtube: payload.platforms?.some((platform) => platform.toLowerCase().includes("youtube")) ?? false,
+            facebook: payload.platforms?.some((platform) => platform.toLowerCase().includes("facebook")) ?? false,
+          },
         },
       },
-    },
-  });
+      baseUrl,
+    });
 
     const submitted = await apiRequest({
-    accessToken,
-    method: "POST",
-    path: `/releases/${releaseId}/submit`,
-    body: {
-      acceptTerms: true,
-      confirmRights: true,
-      confirmYoutubeRights: payload.platforms?.some((platform) => platform.toLowerCase().includes("youtube")) ?? false,
-      idempotencyKey: `tunix-${payload.externalReleaseId ?? releaseId}`,
-    },
-  });
+      accessToken,
+      method: "POST",
+      path: `/releases/${releaseId}/submit`,
+      body: {
+        acceptTerms: true,
+        confirmRights: true,
+        confirmYoutubeRights: payload.platforms?.some((platform) => platform.toLowerCase().includes("youtube")) ?? false,
+        idempotencyKey: `tunix-${payload.externalReleaseId ?? releaseId}`,
+      },
+      baseUrl,
+    });
+
     const current = await apiRequest<{ data: TooLostRelease }>({
-    accessToken,
-    method: "GET",
-    path: `/releases/${releaseId}`,
-  });
+      accessToken,
+      method: "GET",
+      path: `/releases/${releaseId}`,
+      baseUrl,
+    });
     const identifiers = providerIdentifiers(current.payload.data);
 
     return {

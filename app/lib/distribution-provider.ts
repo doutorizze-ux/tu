@@ -108,8 +108,13 @@ export async function submitToDistributionPartner(payload: unknown): Promise<Par
   }
 
   try {
-    if (config.endpoint.startsWith(TOOLOST_API_BASE_URL)) {
-      const result = await submitTooLostDistribution(config.apiKey, payload as ReturnType<typeof buildDistributionPayload>);
+    const isTooLost = config.endpoint.includes("toolost.com") || config.provider?.toLowerCase().includes("toolost");
+    if (isTooLost) {
+      const result = await submitTooLostDistribution(
+        config.apiKey,
+        payload as ReturnType<typeof buildDistributionPayload>,
+        config.endpoint
+      );
 
       return {
         ok: true,
