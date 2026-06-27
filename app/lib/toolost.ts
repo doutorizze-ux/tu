@@ -294,7 +294,16 @@ async function uploadMaster(accessToken: string, releaseId: number, master: NonN
       contentType: "audio/flac",
     },
   });
-  const bytes = await getObject(releaseStoragePath(master.storageKey));
+  let bytes: Buffer;
+  try {
+    bytes = await getObject(releaseStoragePath(master.storageKey));
+  } catch (err: any) {
+    if (err?.code === "ENOENT" || err?.message?.includes("ENOENT") || err?.message?.includes("no such file")) {
+      throw new Error(`O arquivo de áudio master (${master.fileName}) não foi encontrado no servidor storage. Por favor, solicite ao cliente o reenvio do arquivo FLAC.`);
+    }
+    throw err;
+  }
+
   const response = await fetch(upload.payload.data.uploadUrl, {
     method: "PUT",
     headers: {
