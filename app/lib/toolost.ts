@@ -310,7 +310,7 @@ async function uploadMaster(accessToken: string, releaseId: number, master: NonN
       ...(upload.payload.data.headers ?? {}),
       "Content-Type": "audio/flac",
     },
-    body: bytes,
+    body: new Uint8Array(bytes),
   });
 
   if (!response.ok) {
