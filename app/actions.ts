@@ -968,8 +968,11 @@ export async function updateRelease(formData: FormData) {
   const contributorShares = formData.getAll("contributorShare").map(String);
   const acceptedRights = formData.get("rightsDeclaration") === "on";
 
+  const roles = await prisma.userRole.findMany({ where: { userId: user.id } });
+  const isAdmin = roles.some((r) => r.role === "ADMIN");
+
   const release = await prisma.release.findFirst({
-    where: { id: releaseId, ownerId: user.id },
+    where: { id: releaseId, ...(isAdmin ? {} : { ownerId: user.id }) },
     include: {
       assets: true,
     },
