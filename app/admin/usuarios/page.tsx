@@ -150,7 +150,7 @@ export default async function AdminUsersPage({
                           <Link 
                             href={`/admin/usuarios?editUserId=${u.id}`} 
                             className="secondaryButton linkButton" 
-                            style={{ padding: "0.3rem 0.8rem", fontSize: "0.8rem", color: "var(--text, #ffffff)", textDecoration: "none" }}
+                            style={{ padding: "0.3rem 0.8rem", fontSize: "0.8rem", color: "var(--ink, #15130f)", textDecoration: "none" }}
                           >
                             Editar
                           </Link>
@@ -221,8 +221,8 @@ export default async function AdminUsersPage({
           zIndex: 1000
         }}>
           <div style={{
-            background: "#121214",
-            border: "1px solid var(--border)",
+            background: "var(--paper, #fffdf8)",
+            border: "1px solid var(--line, #ded6ca)",
             borderRadius: "12px",
             width: "100%",
             maxWidth: "450px",
@@ -230,42 +230,43 @@ export default async function AdminUsersPage({
             display: "flex",
             flexDirection: "column",
             gap: "1.5rem",
-            color: "#ffffff"
+            color: "var(--ink, #15130f)",
+            boxShadow: "0 20px 40px rgba(25, 23, 19, 0.15)"
           }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <h2>Editar Usuário</h2>
-              <Link href="/admin/usuarios" style={{ fontSize: "1.5rem", textDecoration: "none", color: "#ffffff", opacity: 0.7 }}>×</Link>
+              <Link href="/admin/usuarios" style={{ fontSize: "1.5rem", textDecoration: "none", color: "var(--ink, #15130f)", opacity: 0.7 }}>×</Link>
             </div>
             
             <form action={adminUpdateUser} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
               <input type="hidden" name="userId" value={editUser.id} />
               
-              <label style={{ display: "flex", flexDirection: "column", gap: "0.25rem", fontSize: "0.85rem", color: "#ffffff" }}>
+              <label style={{ display: "flex", flexDirection: "column", gap: "0.25rem", fontSize: "0.85rem", color: "var(--ink, #15130f)" }}>
                 Nome Completo
                 <input 
                   name="name" 
                   defaultValue={editUser.name} 
                   required 
-                  style={{ padding: "0.6rem", borderRadius: "6px", border: "1px solid var(--border)", background: "transparent", color: "white" }}
+                  style={{ padding: "0.6rem", borderRadius: "6px", border: "1px solid var(--line, #ded6ca)", background: "var(--bg, #f4efe4)", color: "var(--ink, #15130f)" }}
                 />
               </label>
 
-              <label style={{ display: "flex", flexDirection: "column", gap: "0.25rem", fontSize: "0.85rem", color: "#ffffff" }}>
+              <label style={{ display: "flex", flexDirection: "column", gap: "0.25rem", fontSize: "0.85rem", color: "var(--ink, #15130f)" }}>
                 E-mail
                 <input 
                   name="email" 
                   type="email" 
                   defaultValue={editUser.email} 
                   required 
-                  style={{ padding: "0.6rem", borderRadius: "6px", border: "1px solid var(--border)", background: "transparent", color: "white" }}
+                  style={{ padding: "0.6rem", borderRadius: "6px", border: "1px solid var(--line, #ded6ca)", background: "var(--bg, #f4efe4)", color: "var(--ink, #15130f)" }}
                 />
               </label>
 
               <div>
-                <strong style={{ fontSize: "0.85rem", color: "#ffffff" }}>Papéis no Sistema</strong>
+                <strong style={{ fontSize: "0.85rem", color: "var(--ink, #15130f)" }}>Papéis no Sistema</strong>
                 <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", marginTop: "0.5rem" }}>
                   {["COMPOSER", "ARTIST", "PRODUCER", "ADMIN"].map((role) => (
-                    <label key={role} className="inlineCheck" style={{ color: "#ffffff", fontWeight: "normal", fontSize: "0.9rem", cursor: "pointer" }}>
+                    <label key={role} className="inlineCheck" style={{ color: "var(--ink, #15130f)", fontWeight: "normal", fontSize: "0.9rem", cursor: "pointer" }}>
                       <input 
                         type="checkbox" 
                         name="roles" 
@@ -281,7 +282,7 @@ export default async function AdminUsersPage({
               </div>
 
               <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
-                <Link href="/admin/usuarios" className="secondaryButton linkButton" style={{ flex: 1, textAlign: "center", padding: "0.6rem", color: "#ffffff", textDecoration: "none" }}>
+                <Link href="/admin/usuarios" className="secondaryButton linkButton" style={{ flex: 1, textAlign: "center", padding: "0.6rem", color: "var(--ink, #15130f)", textDecoration: "none" }}>
                   Cancelar
                 </Link>
                 <button className="primaryButton" type="submit" style={{ flex: 1, padding: "0.6rem" }}>
@@ -309,8 +310,8 @@ export default async function AdminUsersPage({
           zIndex: 1000
         }}>
           <div style={{
-            background: "#121214",
-            border: "1px solid var(--border)",
+            background: "var(--paper, #fffdf8)",
+            border: "1px solid var(--line, #ded6ca)",
             borderRadius: "12px",
             width: "100%",
             maxWidth: "450px",
@@ -318,42 +319,43 @@ export default async function AdminUsersPage({
             display: "flex",
             flexDirection: "column",
             gap: "1.5rem",
-            color: "#ffffff"
+            color: "var(--ink, #15130f)",
+            boxShadow: "0 20px 40px rgba(25, 23, 19, 0.15)"
           }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div>
                 <h2>Ajustar Créditos</h2>
                 <span style={{ fontSize: "0.85rem", opacity: 0.7 }}>Usuário: {adjustUser.name}</span>
               </div>
-              <Link href="/admin/usuarios" style={{ fontSize: "1.5rem", textDecoration: "none", color: "#ffffff", opacity: 0.7 }}>×</Link>
+              <Link href="/admin/usuarios" style={{ fontSize: "1.5rem", textDecoration: "none", color: "var(--ink, #15130f)", opacity: 0.7 }}>×</Link>
             </div>
             
             <form action={adminAdjustCredits} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
               <input type="hidden" name="userId" value={adjustUser.id} />
               
-              <label style={{ display: "flex", flexDirection: "column", gap: "0.25rem", fontSize: "0.85rem", color: "#ffffff" }}>
+              <label style={{ display: "flex", flexDirection: "column", gap: "0.25rem", fontSize: "0.85rem", color: "var(--ink, #15130f)" }}>
                 Quantidade de Créditos
                 <input 
                   name="amount" 
                   type="number" 
                   placeholder="Ex: 50 para adicionar, -20 para debitar" 
                   required 
-                  style={{ padding: "0.6rem", borderRadius: "6px", border: "1px solid var(--border)", background: "transparent", color: "white" }}
+                  style={{ padding: "0.6rem", borderRadius: "6px", border: "1px solid var(--line, #ded6ca)", background: "var(--bg, #f4efe4)", color: "var(--ink, #15130f)" }}
                 />
               </label>
 
-              <label style={{ display: "flex", flexDirection: "column", gap: "0.25rem", fontSize: "0.85rem", color: "#ffffff" }}>
+              <label style={{ display: "flex", flexDirection: "column", gap: "0.25rem", fontSize: "0.85rem", color: "var(--ink, #15130f)" }}>
                 Motivo do Ajuste
                 <input 
                   name="reason" 
                   placeholder="Ex: Bônus de boas-vindas" 
                   required 
-                  style={{ padding: "0.6rem", borderRadius: "6px", border: "1px solid var(--border)", background: "transparent", color: "white" }}
+                  style={{ padding: "0.6rem", borderRadius: "6px", border: "1px solid var(--line, #ded6ca)", background: "var(--bg, #f4efe4)", color: "var(--ink, #15130f)" }}
                 />
               </label>
 
               <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
-                <Link href="/admin/usuarios" className="secondaryButton linkButton" style={{ flex: 1, textAlign: "center", padding: "0.6rem", color: "#ffffff", textDecoration: "none" }}>
+                <Link href="/admin/usuarios" className="secondaryButton linkButton" style={{ flex: 1, textAlign: "center", padding: "0.6rem", color: "var(--ink, #15130f)", textDecoration: "none" }}>
                   Cancelar
                 </Link>
                 <button className="primaryButton" type="submit" style={{ flex: 1, padding: "0.6rem" }}>
