@@ -53,6 +53,11 @@ type TooLostRequestPayload = {
       fileName: string;
       mimeType: string;
     } | null;
+    cover?: {
+      storageKey: string;
+      fileName: string;
+      mimeType: string;
+    } | null;
   };
   platforms?: string[];
   contributors?: Array<{
@@ -332,6 +337,11 @@ export async function submitTooLostDistribution(accessToken: string, payload: To
   const releaseId = created?.payload.data.id ?? existingReleaseId;
 
   try {
+    const baseUrl = process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || "https://tunix.com.br";
+    const coverUrl = payload.externalReleaseId && (payload.files?.cover || payload.files?.master)
+      ? `${baseUrl}/api/releases/${payload.externalReleaseId}/cover`
+      : undefined;
+
     const metadata = await apiRequest({
     accessToken,
     method: "PATCH",
@@ -350,6 +360,7 @@ export async function submitTooLostDistribution(accessToken: string, payload: To
       pYear: payload.copyright?.year,
       pLine: payload.copyright?.pLine,
       upc: payload.identifiers?.requestUpcAssignment ? undefined : payload.identifiers?.upc || undefined,
+      ...(coverUrl ? { coverUrl, compressedArtwork: coverUrl } : {}),
       participants: primaryParticipant(payload),
     },
   });
