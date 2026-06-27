@@ -23,8 +23,10 @@ export default async function ReleaseDetailPage({
 }) {
   const user = await requireUser();
   const [{ id }, query] = await Promise.all([params, searchParams]);
+  const roles = await prisma.userRole.findMany({ where: { userId: user.id } });
+  const isAdmin = roles.some((r) => r.role === "ADMIN");
   const release = await prisma.release.findFirst({
-    where: { id, ownerId: user.id },
+    where: { id, ...(isAdmin ? {} : { ownerId: user.id }) },
     include: {
       assets: true,
       platforms: true,

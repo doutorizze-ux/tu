@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AppShell, PageHeader } from "../components";
+import { PlatformListCompact } from "../components/platform-list-compact";
 import { requireUser } from "../lib/auth";
 import { platformLabel, releaseStatusLabel } from "../lib/format";
 import { prisma } from "../lib/prisma";
@@ -62,10 +63,8 @@ export default async function ReleasesPage() {
                   <dd>{release.royaltyStatements.length}</dd>
                 </div>
               </dl>
-              <div className="platformChips">
-                {release.platforms.slice(0, 4).map((item) => (
-                  <span key={item.id}>{platformLabel(item.platform)}</span>
-                ))}
+              <div style={{ marginTop: "12px", marginBottom: "12px" }}>
+                <PlatformListCompact platforms={release.platforms} />
               </div>
               <div className="cardActions releaseActions">
                 <Link className="secondaryButton linkButton" href={`/lancamentos/${release.id}`}>

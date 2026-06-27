@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { adminSubmitReleaseToPartner } from "../../../../actions";
 import { AppShell, PageHeader } from "../../../../components";
+import { PlatformListCompact } from "../../../../components/platform-list-compact";
 import { requireUser } from "../../../../lib/auth";
 import { buildDistributionPayload, getDistributionProviderConfig } from "../../../../lib/distribution-provider";
 import { platformLabel, releaseStatusLabel } from "../../../../lib/format";
@@ -116,7 +117,7 @@ export default async function AdminReleaseSendPage({
             </div>
             <div>
               <dt>Plataformas</dt>
-              <dd>{release.platforms.map((platform) => platformLabel(platform.platform)).join(", ")}</dd>
+              <dd style={{ marginTop: "6px" }}><PlatformListCompact platforms={release.platforms} /></dd>
             </div>
           </dl>
 

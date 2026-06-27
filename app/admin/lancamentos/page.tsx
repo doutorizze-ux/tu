@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { adminApproveRelease, adminRejectRelease } from "../../actions";
 import { AppShell, PageHeader } from "../../components";
+import { PlatformListCompact } from "../../components/platform-list-compact";
 import { requireUser } from "../../lib/auth";
 import { platformLabel, releaseStatusLabel } from "../../lib/format";
 import { prisma } from "../../lib/prisma";
@@ -171,10 +172,8 @@ export default async function AdminReleasesPage({
                     </div>
                   </dl>
 
-                  <div className="platformChips">
-                    {release.platforms.map((platform) => (
-                      <span key={platform.id}>{platformLabel(platform.platform)}</span>
-                    ))}
+                  <div style={{ marginTop: "12px", marginBottom: "12px" }}>
+                    <PlatformListCompact platforms={release.platforms} />
                   </div>
 
                   <div className="validationList compact">

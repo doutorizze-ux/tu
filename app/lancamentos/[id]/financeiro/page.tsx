@@ -27,10 +27,12 @@ export default async function ReleaseFinancePortalPage({
 }) {
   const user = await requireUser();
   const { id } = await params;
+  const roles = await prisma.userRole.findMany({ where: { userId: user.id } });
+  const isAdmin = roles.some((r) => r.role === "ADMIN");
   const release = await prisma.release.findFirst({
     where: {
       id,
-      ownerId: user.id,
+      ...(isAdmin ? {} : { ownerId: user.id }),
     },
     include: {
       contributors: true,
