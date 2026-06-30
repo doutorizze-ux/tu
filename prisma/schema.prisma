@@ -33,6 +33,9 @@ model User {
   creditOrders   CreditOrder[]
   creditLedger   CreditLedgerEntry[]
   asaasCustomerId String?
+  balance         Float                 @default(0)
+  withdrawals     WithdrawalRequest[]
+  contributions   ReleaseContributor[]
 }
 
 model UserRole {
@@ -350,9 +353,12 @@ model ReleaseContributor {
   name         String
   role         String
   royaltyShare Float?
+  email        String?
+  userId       String?
   createdAt    DateTime @default(now())
 
   release Release @relation(fields: [releaseId], references: [id], onDelete: Cascade)
+  user    User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
 }
 
 model ReleaseReview {
@@ -519,4 +525,18 @@ model AuditLog {
   createdAt DateTime @default(now())
 
   user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+model WithdrawalRequest {
+  id        String   @id @default(cuid())
+  userId    String
+  amount    Float
+  pixKey    String
+  pixType   String
+  status    String   @default("PENDING")
+  adminNote String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

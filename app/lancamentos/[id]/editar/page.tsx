@@ -72,6 +72,8 @@ export default async function EditReleasePage({
       name: "",
       role: "",
       royaltyShare: null,
+      email: null,
+      userId: null,
       createdAt: new Date(),
     });
   }

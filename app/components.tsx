@@ -48,6 +48,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
         <span>Central</span>
         <Link href="/painel">Painel inicial</Link>
         {user ? <Link href="/creditos">Créditos</Link> : null}
+        {user ? <Link href="/financeiro">Carteira & Royalties</Link> : null}
         {user ? <Link href="/suporte">Suporte</Link> : null}
         {user ? (
           <Link href="/notificacoes">
@@ -82,6 +83,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
           <span>Operação</span>
           <Link href="/admin/composicoes">Admin composições</Link>
           <Link href="/admin/lancamentos">Admin lançamentos</Link>
+          <Link href="/admin/financeiro">Admin Saques Pix</Link>
           <Link href="/admin/solicitacoes">Solicitações</Link>
           <Link href="/admin/auditoria">Auditoria</Link>
           <Link href="/admin/integracoes">Admin integrações</Link>

@@ -2180,22 +2180,74 @@ export async function adminMarkRoyaltyStatementPaid(formData: FormData) {
   const statementId = formString(formData, "statementId");
   const statement = await prisma.royaltyStatement.findUnique({
     where: { id: statementId },
+    include: { participants: true },
   });
 
   if (!statement) {
     redirect("/admin/lancamentos");
   }
 
-  await prisma.$transaction([
-    prisma.royaltyStatement.update({
+  if (statement.status === "PAID") {
+    redirect(`/admin/lancamentos/${statement.releaseId}/financeiro?erro=ja_pago`);
+  }
+
+  const release = await prisma.release.findUnique({
+    where: { id: statement.releaseId },
+    include: {
+      contributors: true,
+      owner: true,
+    },
+  });
+
+  if (!release) {
+    redirect("/admin/lancamentos");
+  }
+
+  await prisma.$transaction(async (tx) => {
+    // 1. Mark statement and participants as paid
+    await tx.royaltyStatement.update({
       where: { id: statement.id },
       data: { status: "PAID" },
-    }),
-    prisma.royaltyParticipant.updateMany({
+    });
+
+    await tx.royaltyParticipant.updateMany({
       where: { statementId: statement.id },
       data: { status: "PAID" },
-    }),
-    prisma.auditLog.create({
+    });
+
+    // 2. Distribute payout splits to matched users
+    for (const participant of statement.participants) {
+      const contributor = release.contributors.find(
+        (c) => c.name.toLowerCase() === participant.name.toLowerCase() &&
+               c.role.toLowerCase() === participant.role.toLowerCase()
+      );
+
+      let targetUserId = contributor?.userId;
+      if (!targetUserId) {
+        // Fallback: search user by name match
+        const matchedUser = await tx.user.findFirst({
+          where: { name: { equals: participant.name.trim(), mode: "insensitive" } }
+        });
+        if (matchedUser) {
+          targetUserId = matchedUser.id;
+        }
+      }
+
+      // If no coauthor matched, default split credits to release owner
+      if (!targetUserId && participant.name.toLowerCase() === release.artistName.toLowerCase()) {
+        targetUserId = release.ownerId;
+      }
+
+      if (targetUserId) {
+        await tx.user.update({
+          where: { id: targetUserId },
+          data: { balance: { increment: participant.amount } },
+        });
+      }
+    }
+
+    // 3. Log to audit trail
+    await tx.auditLog.create({
       data: {
         userId: user.id,
         action: "ROYALTY_STATEMENT_PAID",
@@ -2207,10 +2259,11 @@ export async function adminMarkRoyaltyStatementPaid(formData: FormData) {
           currency: statement.currency,
         },
       },
-    }),
-  ]);
+    });
+  });
 
   revalidatePath(`/admin/lancamentos/${statement.releaseId}/financeiro`);
+  revalidatePath(`/financeiro`);
   redirect(`/admin/lancamentos/${statement.releaseId}/financeiro?sucesso=pago`);
 }
 
@@ -2680,6 +2733,110 @@ export async function validateChecksum(hash: string) {
   }
 
   return null;
+}
+
+export async function requestWithdrawal(formData: FormData) {
+  const user = await requireUser();
+  const amount = Number(formData.get("amount"));
+  const pixKey = formString(formData, "pixKey");
+  const pixType = formString(formData, "pixType");
+
+  if (!amount || amount <= 0 || !pixKey || !pixType) {
+    redirect("/financeiro?erro=dados");
+  }
+
+  // Retrieve user with fresh balance from database
+  const dbUser = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: { balance: true }
+  });
+
+  if (!dbUser || dbUser.balance < amount) {
+    redirect("/financeiro?erro=saldo");
+  }
+
+  await prisma.$transaction(async (tx) => {
+    // 1. Deduct amount from user balance immediately (prevent double spending)
+    await tx.user.update({
+      where: { id: user.id },
+      data: { balance: { decrement: amount } }
+    });
+
+    // 2. Create the request record
+    await tx.withdrawalRequest.create({
+      data: {
+        userId: user.id,
+        amount,
+        pixKey,
+        pixType,
+        status: "PENDING"
+      }
+    });
+
+    // 3. Log to audit trail
+    await tx.auditLog.create({
+      data: {
+        userId: user.id,
+        action: "WITHDRAWAL_REQUESTED",
+        entity: "User",
+        entityId: user.id,
+        metadata: { amount, pixType }
+      }
+    });
+  });
+
+  revalidatePath("/financeiro");
+  redirect("/financeiro?sucesso=saque");
+}
+
+export async function adminProcessWithdrawal(formData: FormData) {
+  const admin = await requireAdmin();
+  const requestId = formString(formData, "requestId");
+  const decision = formString(formData, "decision"); // "PAID" or "REJECTED"
+  const adminNote = formString(formData, "adminNote") || null;
+
+  const request = await prisma.withdrawalRequest.findUnique({
+    where: { id: requestId },
+    include: { user: true }
+  });
+
+  if (!request || request.status !== "PENDING") {
+    redirect("/admin/financeiro?erro=requisicao");
+  }
+
+  await prisma.$transaction(async (tx) => {
+    if (decision === "REJECTED") {
+      // Refund user's balance
+      await tx.user.update({
+        where: { id: request.userId },
+        data: { balance: { increment: request.amount } }
+      });
+
+      await tx.withdrawalRequest.update({
+        where: { id: requestId },
+        data: { status: "REJECTED", adminNote }
+      });
+    } else {
+      await tx.withdrawalRequest.update({
+        where: { id: requestId },
+        data: { status: "PAID", adminNote }
+      });
+    }
+
+    await tx.auditLog.create({
+      data: {
+        userId: admin.id,
+        action: decision === "REJECTED" ? "WITHDRAWAL_REJECTED" : "WITHDRAWAL_PAID",
+        entity: "WithdrawalRequest",
+        entityId: requestId,
+        metadata: { userId: request.userId, amount: request.amount }
+      }
+    });
+  });
+
+  revalidatePath("/admin/financeiro");
+  revalidatePath("/financeiro");
+  redirect("/admin/financeiro?sucesso=processado");
 }
 
 
