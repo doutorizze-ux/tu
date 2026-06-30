@@ -600,6 +600,7 @@ export async function createComposition(formData: FormData) {
           fileName: storedAudio.fileName,
           mimeType: storedAudio.mimeType,
           sizeBytes: storedAudio.sizeBytes,
+          checksum: storedAudio.checksum,
         },
       });
 
@@ -2622,6 +2623,63 @@ export async function deleteComposition(formData: FormData) {
   revalidatePath("/composicoes");
   revalidatePath("/catalogo");
   redirect("/composicoes?sucesso=excluido");
+}
+
+export async function validateChecksum(hash: string) {
+  if (!hash || typeof hash !== "string") return null;
+  const cleanHash = hash.trim().toLowerCase();
+
+  const audioAsset = await prisma.audioAsset.findFirst({
+    where: { checksum: cleanHash },
+    include: {
+      composition: {
+        include: {
+          composer: {
+            select: { name: true, email: true }
+          }
+        }
+      }
+    }
+  });
+
+  if (audioAsset) {
+    return {
+      type: "COMPOSITION",
+      title: audioAsset.composition.title,
+      owner: audioAsset.composition.composer.name,
+      createdAt: audioAsset.createdAt,
+      fileName: audioAsset.fileName,
+      checksum: audioAsset.checksum,
+      sizeBytes: audioAsset.sizeBytes,
+    };
+  }
+
+  const releaseAsset = await prisma.releaseAsset.findFirst({
+    where: { checksum: cleanHash },
+    include: {
+      release: {
+        include: {
+          owner: {
+            select: { name: true, email: true }
+          }
+        }
+      }
+    }
+  });
+
+  if (releaseAsset) {
+    return {
+      type: "RELEASE",
+      title: releaseAsset.release.title,
+      owner: releaseAsset.release.artistName || releaseAsset.release.owner.name,
+      createdAt: releaseAsset.createdAt,
+      fileName: releaseAsset.fileName,
+      checksum: releaseAsset.checksum,
+      sizeBytes: releaseAsset.sizeBytes,
+    };
+  }
+
+  return null;
 }
 
 

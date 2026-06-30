@@ -70,23 +70,38 @@ export default async function CompositionsPage({
             <span style={{ minWidth: "100px" }}>{song._count.interests}</span>
             <span style={{ minWidth: "100px" }}>{song._count.favorites}</span>
             
-            <form action={deleteComposition} style={{ margin: 0, minWidth: "80px", textAlign: "right" }}>
-              <input type="hidden" name="compositionId" value={song.id} />
-              <button 
-                type="submit" 
+            <div style={{ minWidth: "180px", display: "flex", justifyContent: "flex-end", alignItems: "center", gap: "8px" }}>
+              <Link 
+                href={`/composicoes/${song.id}/certificado`} 
+                className="secondaryButton linkButton" 
                 style={{ 
-                  background: "transparent", 
-                  color: "var(--danger, #ef4444)", 
-                  border: "none", 
-                  cursor: "pointer", 
-                  fontSize: "0.85rem",
-                  fontWeight: "bold",
-                  padding: "0.2rem 0.5rem" 
+                  padding: "0.3rem 0.6rem", 
+                  fontSize: "0.8rem",
+                  textDecoration: "none",
+                  display: "inline-block",
+                  margin: 0
                 }}
               >
-                Excluir
-              </button>
-            </form>
+                Certidão
+              </Link>
+              <form action={deleteComposition} style={{ margin: 0 }}>
+                <input type="hidden" name="compositionId" value={song.id} />
+                <button 
+                  type="submit" 
+                  style={{ 
+                    background: "transparent", 
+                    color: "var(--danger, #ef4444)", 
+                    border: "none", 
+                    cursor: "pointer", 
+                    fontSize: "0.85rem",
+                    fontWeight: "bold",
+                    padding: "0.2rem 0.5rem" 
+                  }}
+                >
+                  Excluir
+                </button>
+              </form>
+            </div>
           </article>
         ))}
       </section>
@@ -105,9 +120,19 @@ export default async function CompositionsPage({
             />
             
             <div style={{ display: "flex", gap: "0.5rem", marginTop: "1rem" }}>
-              <button className="secondaryButton" style={{ flex: 1, padding: "0.4rem", fontSize: "0.8rem", cursor: "pointer" }}>
-                Editar
-              </button>
+              <Link 
+                href={`/composicoes/${song.id}/certificado`} 
+                className="secondaryButton linkButton" 
+                style={{ 
+                  flex: 1, 
+                  padding: "0.4rem", 
+                  fontSize: "0.8rem", 
+                  textAlign: "center",
+                  textDecoration: "none" 
+                }}
+              >
+                Certidão
+              </Link>
               
               <form action={deleteComposition} style={{ flex: 1, margin: 0 }}>
                 <input type="hidden" name="compositionId" value={song.id} />

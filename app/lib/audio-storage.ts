@@ -1,6 +1,6 @@
 import "server-only";
 
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { extname } from "node:path";
 import { putObject } from "./object-storage";
 
@@ -78,6 +78,8 @@ export async function saveAudioGuide(file: File, compositionId: string) {
     throw new Error("Assinatura do arquivo de audio nao corresponde ao formato informado.");
   }
 
+  const checksum = createHash("sha256").update(bytes).digest("hex");
+
   await putObject({
     key: audioStoragePath(storageKey),
     body: bytes,
@@ -89,5 +91,6 @@ export async function saveAudioGuide(file: File, compositionId: string) {
     fileName: originalName,
     mimeType: file.type,
     sizeBytes: file.size,
+    checksum,
   };
 }

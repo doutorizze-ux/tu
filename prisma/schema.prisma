@@ -138,6 +138,7 @@ model AudioAsset {
   mimeType      String
   sizeBytes     Int
   durationSec   Int?
+  checksum      String?
   createdAt     DateTime @default(now())
 
   composition Composition @relation(fields: [compositionId], references: [id], onDelete: Cascade)
