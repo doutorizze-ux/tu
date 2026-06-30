@@ -68,12 +68,37 @@ export default async function SupportPage({
 
         <aside className="adminPanel">
           <h2>Meus chamados</h2>
-          <div className="logList">
+          <div className="reviewQueue">
             {tickets.length ? tickets.map((ticket) => (
-              <div key={ticket.id}>
-                <strong>{ticket.subject} - {ticket.status}</strong>
-                <span>{ticket.category} - {ticket.priority}</span>
-              </div>
+              <article className="reviewCard" key={ticket.id} style={{ borderBottom: "1px solid #f4efe4", paddingBottom: "20px", marginBottom: "20px" }}>
+                <div className="reviewCardHeader">
+                  <div>
+                    <span className={`songStatus ${ticket.status === "OPEN" ? "status-pending" : "status-success"}`} style={{ fontSize: "11px", fontWeight: "600", padding: "2px 8px", borderRadius: "4px", background: ticket.status === "OPEN" ? "#fdf5e6" : "#e6f7f2", color: ticket.status === "OPEN" ? "#b8860b" : "#0f6b5f" }}>
+                      {ticket.status === "OPEN" ? "Aberto" : ticket.status === "IN_REVIEW" ? "Em Análise" : "Resolvido"}
+                    </span>
+                    <h3 style={{ marginTop: "10px", fontSize: "14px", fontWeight: "700" }}>{ticket.subject}</h3>
+                    <p style={{ fontSize: "12px", color: "#8a8174", margin: "4px 0 0 0" }}>
+                      Categoria: {ticket.category} | Prioridade: {ticket.priority}
+                    </p>
+                  </div>
+                </div>
+
+                <div style={{ background: "#fbfaf7", padding: "12px", borderRadius: "6px", margin: "12px 0 0 0", borderLeft: "3px solid #0f6b5f" }}>
+                  <strong style={{ fontSize: "11px", textTransform: "uppercase", color: "#8a8174", display: "block", marginBottom: "4px" }}>Minha Mensagem:</strong>
+                  <p style={{ margin: 0, fontSize: "13px", color: "#15130f", whiteSpace: "pre-wrap", lineHeight: "1.4" }}>
+                    {ticket.message}
+                  </p>
+                </div>
+
+                {ticket.adminNote && (
+                  <div style={{ background: "#e6f7f2", padding: "12px", borderRadius: "6px", margin: "12px 0 0 0", borderLeft: "3px solid #0f6b5f" }}>
+                    <strong style={{ fontSize: "11px", textTransform: "uppercase", color: "#0f6b5f", display: "block", marginBottom: "4px" }}>Resposta da Tunix:</strong>
+                    <p style={{ margin: 0, fontSize: "13px", color: "#15130f", whiteSpace: "pre-wrap", lineHeight: "1.4", fontWeight: "600" }}>
+                      {ticket.adminNote}
+                    </p>
+                  </div>
+                )}
+              </article>
             )) : <p className="mutedText">Nenhum chamado aberto.</p>}
           </div>
         </aside>

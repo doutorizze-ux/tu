@@ -2844,5 +2844,53 @@ export async function adminProcessWithdrawal(formData: FormData) {
   redirect("/admin/financeiro?sucesso=processado");
 }
 
+export async function adminReplySupportTicket(formData: FormData) {
+  const admin = await requireAdmin();
+  const ticketId = formString(formData, "ticketId");
+  const status = formString(formData, "status");
+  const adminNote = formString(formData, "adminNote");
+
+  const ticket = await prisma.supportTicket.findUnique({
+    where: { id: ticketId },
+  });
+
+  if (!ticket) {
+    redirect("/admin/solicitacoes");
+  }
+
+  await prisma.supportTicket.update({
+    where: { id: ticket.id },
+    data: {
+      status,
+      adminNote: adminNote || null,
+    },
+  });
+
+  // Notify the ticket owner
+  await notifyUsers({
+    recipients: [ticket.userId],
+    type: "SUPPORT_TICKET",
+    title: "Suporte respondido",
+    body: `Seu chamado "${ticket.subject}" foi respondido pela equipe.`,
+    href: "/suporte",
+    entity: "SupportTicket",
+    entityId: ticket.id,
+  });
+
+  await prisma.auditLog.create({
+    data: {
+      userId: admin.id,
+      action: "SUPPORT_TICKET_REPLIED",
+      entity: "SupportTicket",
+      entityId: ticket.id,
+      metadata: { status, adminNote },
+    },
+  });
+
+  revalidatePath("/suporte");
+  revalidatePath("/admin/solicitacoes");
+  redirect("/admin/solicitacoes?sucesso=chamado_respondido");
+}
+
 
 
