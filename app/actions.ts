@@ -2231,7 +2231,7 @@ export async function adminMarkRoyaltyStatementPaid(formData: FormData) {
       if (!targetUserId) {
         // Fallback: search user by name match
         const matchedUser = await tx.user.findFirst({
-          where: { name: { equals: participant.name.trim(), mode: "insensitive" } }
+          where: { name: participant.name.trim() }
         });
         if (matchedUser) {
           targetUserId = matchedUser.id;

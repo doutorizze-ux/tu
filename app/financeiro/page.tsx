@@ -32,7 +32,7 @@ export default async function FinanceiroPage({
   // Retrieve royalty earnings details
   const earnings = await prisma.royaltyParticipant.findMany({
     where: {
-      name: { equals: user.name, mode: "insensitive" },
+      name: user.name,
     },
     include: {
       statement: {
