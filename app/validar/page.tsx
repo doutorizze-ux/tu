@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { validateChecksum } from "../actions";
 
 type ValidationResult = {
@@ -14,12 +15,15 @@ type ValidationResult = {
   sizeBytes: number;
 } | null;
 
-export default function ValidatePage() {
+function ValidateContent() {
   const [hashInput, setHashInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [fileLoading, setFileLoading] = useState(false);
   const [result, setResult] = useState<ValidationResult | undefined>(undefined);
   const [errorMsg, setErrorMsg] = useState("");
+
+  const searchParams = useSearchParams();
+  const queryHash = searchParams.get("hash");
 
   // Client-side SHA-256 calculator using Web Crypto API
   const calculateSHA256 = async (file: File): Promise<string> => {
@@ -64,15 +68,12 @@ export default function ValidatePage() {
     }
   };
 
-  const handleHashSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!hashInput.trim()) return;
-
+  const executeValidation = async (hash: string) => {
     setLoading(true);
     setResult(undefined);
     setErrorMsg("");
     try {
-      const res = await validateChecksum(hashInput.trim());
+      const res = await validateChecksum(hash.trim());
       setResult(res);
       if (!res) {
         setErrorMsg("Nenhum registro ou lançamento foi encontrado com este código hash.");
@@ -83,6 +84,20 @@ export default function ValidatePage() {
       setLoading(false);
     }
   };
+
+  const handleHashSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!hashInput.trim()) return;
+    await executeValidation(hashInput);
+  };
+
+  // Trigger validation automatically if hash is passed in the URL
+  useEffect(() => {
+    if (queryHash) {
+      setHashInput(queryHash);
+      executeValidation(queryHash);
+    }
+  }, [queryHash]);
 
   return (
     <div className="validate-container">
@@ -494,5 +509,13 @@ export default function ValidatePage() {
         }
       `}</style>
     </div>
+  );
+}
+
+export default function ValidatePage() {
+  return (
+    <Suspense fallback={<div style={{ padding: "40px", textAlign: "center", fontFamily: "sans-serif" }}>Carregando validador...</div>}>
+      <ValidateContent />
+    </Suspense>
   );
 }
