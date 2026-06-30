@@ -50,8 +50,7 @@ export async function createSession(userId: string) {
   cookieStore.set(SESSION_COOKIE, token, {
     httpOnly: true,
     sameSite: "lax",
-    secure: true, // Force secure since production uses HTTPS
-    expires: expiresAt,
+    secure: false, // Ensures compatibility with HTTP/HTTPS reverse proxies
     maxAge: SESSION_DAYS * 24 * 60 * 60, // 30 days in seconds
     path: "/",
   });
