@@ -13,18 +13,25 @@ export function Brand() {
   );
 }
 
-export function MarketingHeader() {
+export async function MarketingHeader() {
+  const user = await getCurrentUser();
   return (
     <header className="topbar">
       <Brand />
       <nav className="nav">
         <Link href="/catalogo">Catálogo</Link>
-        <Link href="/creditos">Creditos</Link>
+        <Link href="/creditos">Créditos</Link>
         <Link href="/composicoes/nova">Cadastrar música</Link>
       </nav>
-      <Link className="ghostButton linkButton" href="/entrar">
-        Entrar
-      </Link>
+      {user ? (
+        <Link className="primaryButton linkButton" href="/painel" style={{ padding: "8px 16px", textDecoration: "none" }}>
+          Acessar Painel
+        </Link>
+      ) : (
+        <Link className="ghostButton linkButton" href="/entrar">
+          Entrar
+        </Link>
+      )}
     </header>
   );
 }
