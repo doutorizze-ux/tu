@@ -36,7 +36,9 @@ export default async function NewCompositionPage({
                 ? "Obras integralmente geradas por IA não entram no catálogo. Abra suporte se houver titularidade comprovada."
                 : params.erro === "creditos"
                   ? "Saldo insuficiente para cadastrar esta composição. Compre créditos ou fale com o suporte."
-                  : "Informe título, gênero e papel de autoria."}
+                  : params.erro === "tamanho_audio"
+                    ? "O arquivo de áudio guia excede o limite permitido de 5 MB. Por favor, utilize formato MP3 compactado."
+                    : "Informe título, gênero e papel de autoria."}
           </p>
         ) : null}
 
@@ -133,8 +135,8 @@ export default async function NewCompositionPage({
             </label>
           </div>
           <label>
-            Áudio guia
-            <input name="audio" type="file" accept="audio/*" />
+            Áudio guia (Máximo 5MB - Recomenda-se formato MP3)
+            <input name="audio" type="file" accept="audio/mpeg,audio/mp3,audio/x-mpeg,audio/x-mp3,audio/m4a,audio/x-m4a,audio/aac" />
           </label>
           <label>
             Observação de acesso

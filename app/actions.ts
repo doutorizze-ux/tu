@@ -590,6 +590,11 @@ export async function createComposition(formData: FormData) {
   }
 
   if (audioFile instanceof File && audioFile.size > 0) {
+    const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
+    if (audioFile.size > MAX_SIZE) {
+      redirect("/composicoes/nova?erro=tamanho_audio");
+    }
+
     const storedAudio = await saveAudioGuide(audioFile, composition.id);
 
     if (storedAudio) {
