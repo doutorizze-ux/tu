@@ -18,7 +18,7 @@ if (databaseUrl.startsWith("file:")) {
 const npxCommand = process.platform === "win32" ? "npx.cmd" : "npx";
 const result = spawnSync(npxCommand, ["prisma", "db", "push", "--skip-generate"], {
   stdio: "inherit",
-  shell: false,
+  shell: true,
 });
 
 if (result.status !== 0) {
@@ -28,7 +28,7 @@ if (result.status !== 0) {
 console.log("Seeding database...");
 const seedResult = spawnSync(process.execPath, ["prisma/seed.mjs"], {
   stdio: "inherit",
-  shell: false,
+  shell: true,
 });
 
 if (seedResult.status !== 0) {
