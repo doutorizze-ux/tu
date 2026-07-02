@@ -59,12 +59,18 @@ export default async function ReleaseDetailPage({
   const masterAsset = release.assets.find((asset) => asset.type === "MASTER");
   const coverAsset = release.assets.find((asset) => asset.type === "COVER");
   const validation = validateReleasePackage(release);
-  const timeline = buildReleaseTimeline({
+  let timeline = buildReleaseTimeline({
     assets: release.assets,
     auditLogs,
     deliveries: release.deliveries,
     reviews: release.reviews,
   });
+
+  if (!isAdmin) {
+    // Ordinary users should only see high-level progress events, not technical API logs
+    timeline = timeline.filter((item) => item.source !== "DELIVERY" && item.status !== "RELEASE_DELIVERY_BLOCKED");
+  }
+
   const checklist = [
     { label: "Master final enviado", done: Boolean(masterAsset) },
     { label: "Capa enviada", done: Boolean(coverAsset) },
@@ -179,7 +185,7 @@ export default async function ReleaseDetailPage({
 
           <section className="protectedBlock">
             <div className="blockHeader">
-              <h2>Linha do tempo operacional</h2>
+              <h2>{isAdmin ? "Linha do tempo operacional" : "Histórico do Lançamento"}</h2>
               <span>{timeline.length} evento(s)</span>
             </div>
             <div className="timelineList">
@@ -205,23 +211,34 @@ export default async function ReleaseDetailPage({
 
         <aside className="detailSide">
           <section className="sidePanel">
-            <h2>Operação de distribuição</h2>
-            <p>
-              Envio real por provider configurado. O retorno de entrega deve chegar por webhook/API da
-              distribuidora parceira.
-            </p>
-            <Link className="secondaryButton linkButton" href={`/lancamentos/${release.id}/relatorio`}>
-              Ver dossiê
-            </Link>
+            <h2>{isAdmin ? "Operação de distribuição" : "Ações do Lançamento"}</h2>
+            {isAdmin && (
+              <p>
+                Envio real por provider configurado. O retorno de entrega deve chegar por webhook/API da
+                distribuidora parceira.
+              </p>
+            )}
+            
+            {isAdmin && (
+              <Link className="secondaryButton linkButton" href={`/lancamentos/${release.id}/relatorio`}>
+                Ver dossiê
+              </Link>
+            )}
+            
             <Link className="secondaryButton linkButton" href={`/lancamentos/${release.id}/financeiro`}>
               Ver royalties
             </Link>
-            <Link className="secondaryButton linkButton" href={`/api/releases/${release.id}/export`}>
-              Exportar JSON
-            </Link>
+            
+            {isAdmin && (
+              <Link className="secondaryButton linkButton" href={`/api/releases/${release.id}/export`}>
+                Exportar JSON
+              </Link>
+            )}
+            
             <Link className="secondaryButton linkButton" href={`/lancamentos/${release.id}/solicitacoes`}>
               Solicitar alteração
             </Link>
+            
             <form action={submitReleaseForReview}>
               <input name="releaseId" type="hidden" value={release.id} />
               <button
@@ -232,23 +249,29 @@ export default async function ReleaseDetailPage({
                 Enviar para revisão
               </button>
             </form>
+            
             {["DRAFT", "REVIEW", "REJECTED"].includes(release.status) ? (
               <Link className="secondaryButton linkButton" href={`/lancamentos/${release.id}/editar`}>
                 Corrigir pacote
               </Link>
             ) : null}
-            <form action={submitReleaseToPartner}>
-              <input name="releaseId" type="hidden" value={release.id} />
-              <button className="primaryButton" type="submit" disabled={!validation.canSubmit || release.status !== "READY"}>
-                Enviar para distribuidora
-              </button>
-            </form>
-            <form action={markReleaseDelivered}>
-              <input name="releaseId" type="hidden" value={release.id} />
-              <button className="secondaryButton" type="submit" disabled={release.status !== "SUBMITTED"}>
-                Registrar entrega operacional
-              </button>
-            </form>
+            
+            {isAdmin && (
+              <>
+                <form action={submitReleaseToPartner}>
+                  <input name="releaseId" type="hidden" value={release.id} />
+                  <button className="primaryButton" type="submit" disabled={!validation.canSubmit || release.status !== "READY"}>
+                    Enviar para distribuidora
+                  </button>
+                </form>
+                <form action={markReleaseDelivered}>
+                  <input name="releaseId" type="hidden" value={release.id} />
+                  <button className="secondaryButton" type="submit" disabled={release.status !== "SUBMITTED"}>
+                    Registrar entrega operacional
+                  </button>
+                </form>
+              </>
+            )}
           </section>
 
           {release.reviews.length ? (
