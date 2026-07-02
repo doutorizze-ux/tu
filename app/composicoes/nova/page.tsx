@@ -62,7 +62,7 @@ export default async function NewCompositionPage({
           <div className="formGrid">
             <label>
               Título da composição
-              <input name="title" placeholder="Ex: Saudade que não passa" />
+              <input name="title" placeholder="Ex: Saudade que não passa" required />
             </label>
             <label>
               Autores declarados
@@ -70,7 +70,7 @@ export default async function NewCompositionPage({
             </label>
             <label>
               Gênero
-              <select name="genre" defaultValue="">
+              <select name="genre" defaultValue="" required>
                 <option value="" disabled>Selecione</option>
                 {genreOptions.map((option) => (
                   <option key={option}>{option}</option>
@@ -153,7 +153,7 @@ export default async function NewCompositionPage({
           <div className="formGrid">
             <label>
               Seu papel na obra
-              <select name="authorshipRole" defaultValue="">
+              <select name="authorshipRole" defaultValue="" required>
                 <option value="" disabled>Selecione</option>
                 <option value="ORIGINAL_AUTHOR">Autor original</option>
                 <option value="COAUTHOR_AUTHORIZED">Coautor autorizado</option>
@@ -188,19 +188,19 @@ export default async function NewCompositionPage({
               <span>Publicar na vitrine para artistas e produtores</span>
             </label>
             <label>
-              <input name="authorship" type="checkbox" />
+              <input name="authorship" type="checkbox" required />
               <span>Declaro que sou autor, coautor autorizado ou titular autorizado desta composição.</span>
             </label>
             <label>
-              <input name="ownershipDeclaration" type="checkbox" />
+              <input name="ownershipDeclaration" type="checkbox" required />
               <span>Declaro que tenho direito de cadastrar e negociar esta obra na Tunix.</span>
             </label>
             <label>
-              <input name="noPlagiarismDeclaration" type="checkbox" />
+              <input name="noPlagiarismDeclaration" type="checkbox" required />
               <span>Declaro que a obra não plagia nem usa material de terceiros sem autorização.</span>
             </label>
             <label>
-              <input name="aiDeclaration" type="checkbox" />
+              <input name="aiDeclaration" type="checkbox" required />
               <span>Declaro que informei corretamente qualquer uso de inteligência artificial.</span>
             </label>
             <label>

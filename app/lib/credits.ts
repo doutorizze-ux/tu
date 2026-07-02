@@ -83,8 +83,6 @@ export async function ensureCreditCatalog(db: CreditDb = prisma) {
 }
 
 export async function getActiveCreditPackages(db: CreditDb = prisma) {
-  await ensureCreditCatalog(db);
-
   return db.creditPackage.findMany({
     where: { isActive: true },
     orderBy: [{ sortOrder: "asc" }, { amount: "asc" }],
@@ -92,24 +90,18 @@ export async function getActiveCreditPackages(db: CreditDb = prisma) {
 }
 
 export async function getAllCreditPackages(db: CreditDb = prisma) {
-  await ensureCreditCatalog(db);
-
   return db.creditPackage.findMany({
     orderBy: [{ sortOrder: "asc" }, { amount: "asc" }],
   });
 }
 
 export async function getCreditActionCosts(db: CreditDb = prisma) {
-  await ensureCreditCatalog(db);
-
   return db.creditActionCost.findMany({
     orderBy: { label: "asc" },
   });
 }
 
 export async function getCreditPackage(code: string, db: CreditDb = prisma) {
-  await ensureCreditCatalog(db);
-
   return db.creditPackage.findFirst({
     where: {
       code,
@@ -119,8 +111,6 @@ export async function getCreditPackage(code: string, db: CreditDb = prisma) {
 }
 
 export async function getCreditActionCost(code: string, db: CreditDb = prisma) {
-  await ensureCreditCatalog(db);
-
   const cost = await db.creditActionCost.findUnique({
     where: { code },
   });
