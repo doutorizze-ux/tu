@@ -4,6 +4,7 @@ import { AppShell, PageHeader } from "../components";
 import { requireUser } from "../lib/auth";
 import { prisma } from "../lib/prisma";
 import { CopyHashButton, CopyLinkButton } from "./CopyButtons";
+import { getCompositionCreationCost } from "../lib/credits";
 
 export const dynamic = "force-dynamic";
 
@@ -18,6 +19,10 @@ export default async function RegistroPage() {
     },
     orderBy: { createdAt: "desc" },
   });
+
+  // Fetch composition registration credits cost configured by admin
+  const costInfo = await getCompositionCreationCost();
+  const chargedCredits = costInfo?.credits ?? 1;
 
   // Count registered assets
   const registeredCount = compositions.filter((c) => c.audio).length;
@@ -59,12 +64,12 @@ export default async function RegistroPage() {
               <span className="benefit-icon">🪙</span>
               <div>
                 <strong>Custo Acessível</strong>
-                <span>Consome apenas 1 crédito por cadastro com certidão inclusa.</span>
+                <span>Consome apenas {chargedCredits} crédito{chargedCredits !== 1 ? "s" : ""} por cadastro com certidão inclusa.</span>
               </div>
             </div>
           </div>
           <Link href="/composicoes/nova" className="primaryButton hero-cta">
-            Registrar Nova Obra (1 Crédito)
+            Registrar Nova Obra ({chargedCredits} Crédito{chargedCredits !== 1 ? "s" : ""})
           </Link>
         </div>
         <div className="hero-stats">
@@ -74,7 +79,7 @@ export default async function RegistroPage() {
           </div>
           <div className="stat-card highlight-stat">
             <span className="stat-label">Valor por Registro</span>
-            <span className="stat-value">1 <span style={{ fontSize: "14px", fontWeight: "normal" }}>Crédito</span></span>
+            <span className="stat-value">{chargedCredits} <span style={{ fontSize: "14px", fontWeight: "normal" }}>{chargedCredits === 1 ? "Crédito" : "Créditos"}</span></span>
           </div>
         </div>
       </section>
