@@ -75,6 +75,7 @@ type TooLostTrack = {
 type TooLostRelease = {
   id: number;
   upc?: string | null;
+  status?: string | null;
   tracks?: TooLostTrack[];
 };
 
@@ -343,6 +344,32 @@ export async function submitTooLostDistribution(
   baseUrl?: string
 ) {
   const existingReleaseId = Number(payload.providerReleaseId);
+
+  if (Number.isInteger(existingReleaseId) && existingReleaseId > 0) {
+    try {
+      const current = await apiRequest<{ data: TooLostRelease }>({
+        accessToken,
+        method: "GET",
+        path: `/releases/${existingReleaseId}`,
+        baseUrl,
+      });
+      const status = current.payload.data.status?.toLowerCase();
+      if (status && status !== "draft") {
+        console.log(`[TooLost] Release ${existingReleaseId} is already submitted (status: ${status}). Skipping modification.`);
+        return {
+          status: 200,
+          releaseId: existingReleaseId,
+          trackId: current.payload.data.tracks?.[0]?.id ? String(current.payload.data.tracks[0].id) : undefined,
+          isrc: current.payload.data.tracks?.[0]?.isrc || undefined,
+          upc: current.payload.data.upc || undefined,
+          responseBody: JSON.stringify(current.payload.data),
+        };
+      }
+    } catch (err) {
+      console.warn(`[TooLost] Failed to check status of existing release ${existingReleaseId}:`, err);
+    }
+  }
+
   const created = Number.isInteger(existingReleaseId) && existingReleaseId > 0
     ? null
     : await apiRequest<{ data: { id: number } }>({
