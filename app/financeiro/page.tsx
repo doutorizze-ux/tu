@@ -98,6 +98,11 @@ export default async function FinanceiroPage({
         <section className="finance-card withdrawal-form-card">
           <h2>Solicitar Saque (Pix)</h2>
           <form className="compositionForm" action={requestWithdrawal} style={{ margin: 0 }}>
+            {balance < 5.00 && (
+              <div style={{ background: "#fdf2f2", color: "#d32f2f", padding: "12px", borderRadius: "6px", fontSize: "13px", fontWeight: "600", marginBottom: "15px", border: "1px solid #f5c2c2", lineHeight: "1.4" }}>
+                ⚠️ Saldo insuficiente: Você precisa de no mínimo R$ 5,00 de saldo disponível para solicitar saques.
+              </div>
+            )}
             <div className="formGroup">
               <label htmlFor="amount">Valor do Saque (R$)</label>
               <input
@@ -109,13 +114,14 @@ export default async function FinanceiroPage({
                 max={balance}
                 placeholder="0,00"
                 required
+                disabled={balance < 5.00}
               />
             </div>
 
             <div className="formRow" style={{ display: "flex", gap: "15px" }}>
               <div className="formGroup" style={{ flex: 1 }}>
                 <label htmlFor="pixType">Tipo de Chave</label>
-                <select name="pixType" id="pixType" required>
+                <select name="pixType" id="pixType" required disabled={balance < 5.00}>
                   <option value="CPF">CPF</option>
                   <option value="CNPJ">CNPJ</option>
                   <option value="CELULAR">Celular</option>
@@ -132,6 +138,7 @@ export default async function FinanceiroPage({
                   id="pixKey"
                   placeholder="Insira sua chave Pix"
                   required
+                  disabled={balance < 5.00}
                 />
               </div>
             </div>
@@ -278,6 +285,14 @@ export default async function FinanceiroPage({
           font-weight: 700;
           color: #15130f;
           margin: 0 0 20px 0;
+        }
+
+        .primaryButton:disabled {
+          background-color: #c9c3b8 !important;
+          color: #8a8174 !important;
+          cursor: not-allowed !important;
+          opacity: 0.6;
+          box-shadow: none !important;
         }
 
         .badge-pending {
