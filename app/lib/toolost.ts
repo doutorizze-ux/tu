@@ -6,7 +6,7 @@ import { releaseStoragePath } from "./release-storage";
 const TOOLOST_APP_URL = process.env.TOOLOST_APP_URL || "https://toolost.com";
 const TOOLOST_TOKEN_URL = process.env.TOOLOST_TOKEN_URL || "https://toolost.com/oauth/token";
 export const TOOLOST_API_BASE_URL = process.env.TOOLOST_API_BASE_URL || "https://api.toolost.com/v1";
-export const TOOLOST_DEFAULT_SCOPES = "read:profile read:catalog write:releases";
+export const TOOLOST_DEFAULT_SCOPES = "read:profile read:releases write:releases";
 
 type TooLostTokenResponse = {
   token_type: "Bearer";
