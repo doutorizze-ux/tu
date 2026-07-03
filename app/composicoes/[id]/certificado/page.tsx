@@ -161,7 +161,17 @@ export default async function CertificatePage({
                       <tbody>
                         <tr>
                           <th>Nome do Arquivo</th>
-                          <td>{composition.audio.fileName}</td>
+                          <td>
+                            {composition.audio.fileName}{" "}
+                            <a
+                              href={`/api/audio/${composition.id}`}
+                              download={composition.audio.fileName}
+                              className="cert-download-link no-print"
+                              style={{ marginLeft: "10px", color: "#0f6b5f", textDecoration: "underline", fontSize: "0.85rem", fontWeight: "bold" }}
+                            >
+                              (Baixar arquivo original)
+                            </a>
+                          </td>
                         </tr>
                         <tr>
                           <th>Tamanho e Formato</th>
