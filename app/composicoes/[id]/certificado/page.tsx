@@ -521,6 +521,14 @@ export default async function CertificatePage({
       </div>
     );
   } catch (error: any) {
+    if (
+      error.digest?.startsWith("NEXT_REDIRECT") ||
+      error.digest?.startsWith("NEXT_NOT_FOUND") ||
+      error.message === "NEXT_REDIRECT" ||
+      error.message === "NEXT_NOT_FOUND"
+    ) {
+      throw error;
+    }
     console.error("CERTIFICATE PAGE CRASH:", error);
     return (
       <div style={{ padding: "40px", maxWidth: "800px", margin: "40px auto", fontFamily: "sans-serif", background: "#fff0f0", border: "1px solid #ffc0c0", borderRadius: "12px", color: "#c00000", boxShadow: "0 10px 30px rgba(0,0,0,0.05)" }}>

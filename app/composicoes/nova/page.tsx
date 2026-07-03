@@ -2,6 +2,7 @@ import { AppShell, PageHeader } from "../../components";
 import { createComposition } from "../../actions";
 import { requireUser } from "../../lib/auth";
 import { formatCredits, getCreditActionCosts } from "../../lib/credits";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
@@ -14,10 +15,11 @@ export default async function NewCompositionPage({
 }: {
   searchParams: Promise<{ erro?: string }>;
 }) {
-  await requireUser();
-  const params = await searchParams;
-  const categoryCosts = await getCreditActionCosts();
-  const compositionCosts = categoryCosts.filter((cost) => cost.code.startsWith("COMPOSITION_CATEGORY_") && cost.isActive);
+  try {
+    await requireUser();
+    const params = await searchParams;
+    const categoryCosts = await getCreditActionCosts();
+    const compositionCosts = categoryCosts.filter((cost) => cost.code.startsWith("COMPOSITION_CATEGORY_") && cost.isActive);
 
   return (
     <AppShell>
@@ -216,4 +218,29 @@ export default async function NewCompositionPage({
       </form>
     </AppShell>
   );
+} catch (error: any) {
+  if (
+    error.digest?.startsWith("NEXT_REDIRECT") ||
+    error.digest?.startsWith("NEXT_NOT_FOUND") ||
+    error.message === "NEXT_REDIRECT" ||
+    error.message === "NEXT_NOT_FOUND"
+  ) {
+    throw error;
+  }
+  console.error("NEW COMPOSITION PAGE CRASH:", error);
+    return (
+      <AppShell>
+        <div style={{ padding: "40px", maxWidth: "800px", margin: "40px auto", fontFamily: "sans-serif", background: "#fff0f0", border: "1px solid #ffc0c0", borderRadius: "12px", color: "#c00000", boxShadow: "0 10px 30px rgba(0,0,0,0.05)" }}>
+          <h2 style={{ margin: "0 0 10px 0", fontSize: "1.3rem" }}>Erro ao carregar página de nova composição</h2>
+          <p style={{ color: "#555", fontSize: "0.9rem" }}>Por favor, envie este print ao suporte técnico com o erro abaixo:</p>
+          <pre style={{ whiteSpace: "pre-wrap", background: "#ffffff", padding: "15px", borderRadius: "8px", border: "1px solid #e0e0e0", fontSize: "0.85rem", color: "#333", overflowX: "auto" }}>
+            {error.stack || error.message || String(error)}
+          </pre>
+          <Link href="/composicoes" style={{ display: "inline-block", marginTop: "20px", color: "#0f6b5f", fontWeight: "bold", textDecoration: "underline" }}>
+            Voltar para Minhas Composições
+          </Link>
+        </div>
+      </AppShell>
+    );
+  }
 }
