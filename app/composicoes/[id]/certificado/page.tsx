@@ -39,15 +39,33 @@ export default async function CertificatePage({
     );
   }
 
-  const formattedDate = new Intl.DateTimeFormat("pt-BR", {
-    dateStyle: "long",
-    timeStyle: "medium",
-    timeZone: "America/Sao_Paulo",
-  }).format(composition.createdAt);
+  let formattedDate = "";
+  try {
+    formattedDate = new Intl.DateTimeFormat("pt-BR", {
+      dateStyle: "long",
+      timeStyle: "medium",
+      timeZone: "America/Sao_Paulo",
+    }).format(composition.createdAt);
+  } catch (e) {
+    formattedDate = composition.createdAt.toLocaleString("pt-BR");
+  }
 
   const declaration = composition.declarations.find(
     (d) => d.declarationType === "AUTHORSHIP_AND_AI"
   );
+
+  let signatureDate = "";
+  if (declaration) {
+    try {
+      signatureDate = new Intl.DateTimeFormat("pt-BR", {
+        dateStyle: "short",
+        timeStyle: "short",
+        timeZone: "America/Sao_Paulo",
+      }).format(new Date(declaration.acceptedAt));
+    } catch (e) {
+      signatureDate = new Date(declaration.acceptedAt).toLocaleDateString("pt-BR");
+    }
+  }
 
   return (
     <div className="cert-page-container">
@@ -171,7 +189,7 @@ export default async function CertificatePage({
                     "Declaro, sob as penas da lei, ser o criador e detentor exclusivo dos direitos autorais desta composição, assumindo total responsabilidade civil e criminal por sua autoria perante terceiros."
                     <span className="cert-signature-date">
                       Assinado digitalmente por {composition.composer.name} em{" "}
-                      {new Date(declaration.acceptedAt).toLocaleDateString("pt-BR")}
+                      {signatureDate}
                     </span>
                   </blockquote>
                 </section>
