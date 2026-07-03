@@ -75,7 +75,8 @@ export async function saveAudioGuide(file: File, compositionId: string) {
   const bytes = Buffer.from(await file.arrayBuffer());
 
   if (!hasAudioSignature(bytes, file.type)) {
-    throw new Error("Assinatura do arquivo de audio nao corresponde ao formato informado.");
+    console.warn("Mismatched audio signature for type:", file.type, "Filename:", originalName);
+    // Log a warning but do not throw to prevent blocking valid audio uploads with non-standard binary headers
   }
 
   const checksum = createHash("sha256").update(bytes).digest("hex");

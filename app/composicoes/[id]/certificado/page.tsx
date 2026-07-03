@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { prisma } from "../../../lib/prisma";
 import { requireUser } from "../../../lib/auth";
+import PrintButton from "./PrintButton";
 
 export default async function CertificatePage({
   params,
@@ -75,9 +76,7 @@ export default async function CertificatePage({
           <Link href="/composicoes" className="cert-back-btn">
             ← Voltar
           </Link>
-          <button onClick={() => window.print()} className="cert-print-btn">
-            🖨️ Imprimir / Salvar PDF
-          </button>
+          <PrintButton />
         </div>
 
         {/* Actual Certificate Document */}
