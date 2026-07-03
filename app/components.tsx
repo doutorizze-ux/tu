@@ -170,7 +170,7 @@ export function SongMeta({
   bpm: number;
 }) {
   return (
-    <dl>
+    <dl className="songMeta">
       <div>
         <dt>Gênero</dt>
         <dd>{genre}</dd>

@@ -3061,3 +3061,44 @@ textarea {
     text-align: left;
   }
 }
+
+.songMeta {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin: 18px 0;
+  box-shadow: 0 10px 30px -10px rgba(25, 23, 19, 0.05);
+}
+
+.songMeta div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.songMeta dt {
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  margin: 0;
+}
+
+.songMeta dd {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+@media (max-width: 560px) {
+  .songMeta {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+}
