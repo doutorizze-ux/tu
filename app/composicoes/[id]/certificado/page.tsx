@@ -500,6 +500,11 @@ export default async function CertificatePage({
 
           /* Print Media Queries */
           @media print {
+            @page {
+              size: A4;
+              margin: 10mm 15mm;
+            }
+
             body {
               background: #ffffff !important;
               color: #000000 !important;
@@ -522,8 +527,119 @@ export default async function CertificatePage({
               background: #ffffff !important;
             }
 
+            .cert-border-outer {
+              padding: 5px !important;
+              border-width: 3px !important;
+            }
+
             .cert-border-inner {
-              padding: 20px 30px !important;
+              padding: 15px 25px !important;
+            }
+
+            .cert-header {
+              margin-bottom: 12px !important;
+            }
+
+            .cert-logo-text {
+              font-size: 20px !important;
+              margin-bottom: 4px !important;
+            }
+
+            .cert-main-title {
+              font-size: 20px !important;
+              margin: 5px 0 !important;
+            }
+
+            .cert-subtitle {
+              font-size: 9px !important;
+            }
+
+            .cert-divider-gold {
+              margin-top: 8px !important;
+            }
+
+            .cert-intro {
+              font-size: 11px !important;
+              line-height: 1.4 !important;
+              margin-bottom: 12px !important;
+            }
+
+            .cert-section {
+              margin-bottom: 12px !important;
+            }
+
+            .cert-section h2 {
+              font-size: 10px !important;
+              margin-bottom: 6px !important;
+              padding-bottom: 3px !important;
+              letter-spacing: 1px !important;
+            }
+
+            .cert-table {
+              font-size: 11px !important;
+            }
+
+            .cert-table th {
+              padding: 4px 5px 4px 0 !important;
+              width: 25% !important;
+            }
+
+            .cert-table td {
+              padding: 4px 0 4px 5px !important;
+            }
+
+            .cert-code {
+              font-size: 10px !important;
+            }
+
+            .cert-hash-code {
+              font-size: 9px !important;
+              padding: 2px 4px !important;
+            }
+
+            .cert-quote {
+              font-size: 11px !important;
+              margin: 6px 0 !important;
+              padding-left: 10px !important;
+            }
+
+            .cert-signature-date {
+              font-size: 9px !important;
+              margin-top: 4px !important;
+            }
+
+            .cert-footer {
+              margin-top: 15px !important;
+            }
+
+            .cert-seal {
+              width: 55px !important;
+              height: 55px !important;
+              margin-bottom: 6px !important;
+            }
+
+            .seal-gold-star {
+              font-size: 14px !important;
+            }
+
+            .seal-text {
+              font-size: 7px !important;
+            }
+
+            .cert-verification-notice p {
+              font-size: 9px !important;
+              margin: 2px 0 !important;
+            }
+
+            .cert-link {
+              font-size: 11px !important;
+              margin: 2px 0 !important;
+            }
+
+            .cert-disclaimer {
+              font-size: 8px !important;
+              margin-top: 8px !important;
+              line-height: 1.2 !important;
             }
           }
         `}</style>
