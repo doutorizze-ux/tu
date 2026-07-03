@@ -93,12 +93,12 @@ export default async function RegistroPage() {
           </p>
         </div>
 
-        <div className="tableHeader">
-          <span>Título / Obra</span>
-          <span>Gênero</span>
-          <span>Data de Registro</span>
-          <span>Código Hash SHA-256</span>
-          <span style={{ textAlign: "right", paddingRight: "1rem" }}>Ações de Prova</span>
+        <div className="tableHeader" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span style={{ flex: 1.5 }}>Título / Obra</span>
+          <span style={{ flex: 1 }}>Gênero</span>
+          <span style={{ flex: 1.2 }}>Data de Registro</span>
+          <span style={{ flex: 2 }}>Código Hash SHA-256</span>
+          <span style={{ flex: 1.5, textAlign: "right", paddingRight: "1.2rem" }}>Ações de Prova</span>
         </div>
 
         {compositions.length ? (

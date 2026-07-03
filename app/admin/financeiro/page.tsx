@@ -143,12 +143,12 @@ export default async function AdminFinanceiroPage({
           <h2 style={{ fontSize: "1.1rem", fontWeight: "700", color: "var(--ink)" }}>Histórico de Saques Processados</h2>
           <p style={{ fontSize: "0.85rem", color: "#6e675d", margin: "5px 0 0 0" }}>Registro histórico de saques pagos ou recusados no sistema.</p>
         </div>
-        <div className="tableHeader">
-          <span>Usuário / E-mail</span>
-          <span>Chave Pix</span>
-          <span>Processado Em</span>
-          <span>Status</span>
-          <span style={{ textAlign: "right", paddingRight: "1rem" }}>Valor Pago</span>
+        <div className="tableHeader" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span style={{ flex: 1.5 }}>Usuário / E-mail</span>
+          <span style={{ flex: 1.5 }}>Chave Pix</span>
+          <span style={{ flex: 1.2 }}>Processado Em</span>
+          <span style={{ flex: 1 }}>Status</span>
+          <span style={{ flex: 1, textAlign: "right", paddingRight: "1.2rem" }}>Valor Pago</span>
         </div>
         {processedRequests.length ? (
           processedRequests.map((req) => (

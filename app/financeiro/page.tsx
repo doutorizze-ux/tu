@@ -161,12 +161,12 @@ export default async function FinanceiroPage({
           <h2 style={{ fontSize: "1.1rem", fontWeight: "700", color: "var(--ink)" }}>Extrato Detalhado de Royalties</h2>
           <p style={{ fontSize: "0.85rem", color: "#6e675d", margin: "5px 0 0 0" }}>Valores recebidos por música e plataforma.</p>
         </div>
-        <div className="tableHeader">
-          <span>Lançamento / Música</span>
-          <span>Plataforma</span>
-          <span>Período</span>
-          <span>Sua Participação</span>
-          <span style={{ textAlign: "right", paddingRight: "1rem" }}>Valor Creditado</span>
+        <div className="tableHeader" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span style={{ flex: 1.5 }}>Lançamento / Música</span>
+          <span style={{ flex: 1 }}>Plataforma</span>
+          <span style={{ flex: 1.2 }}>Período</span>
+          <span style={{ flex: 1 }}>Sua Participação</span>
+          <span style={{ flex: 1, textAlign: "right", paddingRight: "1.2rem" }}>Valor Creditado</span>
         </div>
         {earnings.length ? (
           earnings.map((earning) => (
@@ -204,12 +204,12 @@ export default async function FinanceiroPage({
           <h2 style={{ fontSize: "1.1rem", fontWeight: "700", color: "var(--ink)" }}>Solicitações de Saque</h2>
           <p style={{ fontSize: "0.85rem", color: "#6e675d", margin: "5px 0 0 0" }}>Acompanhe o status dos seus pedidos de Pix.</p>
         </div>
-        <div className="tableHeader">
-          <span>Data de Solicitação</span>
-          <span>Chave Pix</span>
-          <span>Tipo de Chave</span>
-          <span>Status</span>
-          <span style={{ textAlign: "right", paddingRight: "1rem" }}>Valor do Saque</span>
+        <div className="tableHeader" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span style={{ flex: 1.5 }}>Data de Solicitação</span>
+          <span style={{ flex: 1.5 }}>Chave Pix</span>
+          <span style={{ flex: 1 }}>Tipo de Chave</span>
+          <span style={{ flex: 1 }}>Status</span>
+          <span style={{ flex: 1, textAlign: "right", paddingRight: "1.2rem" }}>Valor do Saque</span>
         </div>
         {withdrawals.length ? (
           withdrawals.map((req) => (

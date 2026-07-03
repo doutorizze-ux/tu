@@ -53,12 +53,12 @@ export default async function CompositionsPage({
       ) : null}
 
       <section className="tablePanel">
-        <div className="tableHeader">
-          <span>Composição</span>
-          <span>Status</span>
-          <span>Interesses</span>
-          <span>Favoritos</span>
-          <span style={{ textAlign: "right", paddingRight: "1rem" }}>Ações</span>
+        <div className="tableHeader" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span style={{ flex: 1 }}>Composição</span>
+          <span style={{ minWidth: "120px" }}>Status</span>
+          <span style={{ minWidth: "100px" }}>Interesses</span>
+          <span style={{ minWidth: "100px" }}>Favoritos</span>
+          <span style={{ minWidth: "180px", textAlign: "right", paddingRight: "1.2rem" }}>Ações</span>
         </div>
         {compositions.map((song) => (
           <article className="compositionRow" key={song.title} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
