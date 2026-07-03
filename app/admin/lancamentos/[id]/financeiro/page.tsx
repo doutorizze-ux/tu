@@ -270,7 +270,7 @@ export default async function AdminReleaseFinancePage({
             Baixar modelo
           </Link>
         </div>
-        <form className="compositionForm" action={adminImportRoyaltyCsv}>
+        <form className="compositionForm" action={adminImportRoyaltyCsv} encType="multipart/form-data">
           <input name="releaseId" type="hidden" value={release.id} />
           <div className="formGrid">
             <label>

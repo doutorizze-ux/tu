@@ -97,7 +97,7 @@ export default async function EditReleasePage({
           <p>Este lancamento ja entrou na etapa operacional de envio. Alteracoes agora precisam virar uma nova solicitacao.</p>
         </section>
       ) : (
-        <form className="compositionForm" action={updateRelease}>
+        <form className="compositionForm" action={updateRelease} encType="multipart/form-data">
           <input name="releaseId" type="hidden" value={release.id} />
           {query.erro ? (
             <p className="formError">

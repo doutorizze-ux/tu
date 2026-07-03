@@ -27,7 +27,7 @@ export default async function NewCompositionPage({
         description="Registre a obra com metadados musicais, autoria e declaração de IA."
       />
 
-      <form className="compositionForm" action={createComposition}>
+      <form className="compositionForm" action={createComposition} encType="multipart/form-data">
         {params.erro ? (
           <p className="formError">
             {params.erro === "declaracao"
