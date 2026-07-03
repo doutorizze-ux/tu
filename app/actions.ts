@@ -2683,6 +2683,109 @@ export async function deleteComposition(formData: FormData) {
   redirect("/composicoes?sucesso=excluido");
 }
 
+export async function updateComposition(formData: FormData) {
+  const user = await requireUser();
+  const compositionId = formString(formData, "compositionId");
+  const title = formString(formData, "title");
+  const authors = formString(formData, "authors");
+  const genre = formString(formData, "genre");
+  const theme = formString(formData, "theme");
+  const mood = formString(formData, "mood");
+  const voiceType = formString(formData, "voice");
+  const language = formString(formData, "language") || "pt-BR";
+  const lyrics = formString(formData, "lyrics");
+  const lyricsVisibility = formString(formData, "lyricsVisibility") || "INTERESTED";
+  const audioVisibility = formString(formData, "audioVisibility") || "INTERESTED";
+  const accessNote = formString(formData, "accessNote");
+  const bpmValue = Number(formData.get("bpm"));
+  const audioFile = formData.get("audio");
+
+  if (!compositionId || !title || !genre) {
+    redirect(`/composicoes/${compositionId}/editar?erro=dados`);
+  }
+
+  const composition = await prisma.composition.findUnique({
+    where: { id: compositionId },
+    include: { audio: true },
+  });
+
+  if (!composition || composition.composerId !== user.id) {
+    redirect("/composicoes?erro=permissao");
+  }
+
+  // Update metadata. Note we do NOT change createdAt!
+  await prisma.composition.update({
+    where: { id: compositionId },
+    data: {
+      title,
+      lyrics: lyrics || null,
+      genre,
+      theme: theme || null,
+      mood: mood || null,
+      bpm: Number.isFinite(bpmValue) ? bpmValue : null,
+      language,
+      voiceType: voiceType || null,
+      lyricsVisibility,
+      audioVisibility,
+      accessNote: accessNote || null,
+    },
+  });
+
+  if (audioFile instanceof File && audioFile.size > 0) {
+    const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
+    if (audioFile.size > MAX_SIZE) {
+      redirect(`/composicoes/${compositionId}/editar?erro=tamanho_audio`);
+    }
+
+    const storedAudio = await saveAudioGuide(audioFile, compositionId);
+
+    if (storedAudio) {
+      if (composition.audio) {
+        await prisma.audioAsset.delete({
+          where: { id: composition.audio.id },
+        });
+      }
+
+      await prisma.audioAsset.create({
+        data: {
+          compositionId: compositionId,
+          storageKey: storedAudio.storageKey,
+          fileName: storedAudio.fileName,
+          mimeType: storedAudio.mimeType,
+          sizeBytes: storedAudio.sizeBytes,
+          checksum: storedAudio.checksum,
+        },
+      });
+
+      await prisma.auditLog.create({
+        data: {
+          userId: user.id,
+          action: "AUDIO_GUIDE_UPDATED",
+          entity: "Composition",
+          entityId: compositionId,
+          metadata: { fileName: storedAudio.fileName },
+        },
+      });
+    }
+  }
+
+  await prisma.auditLog.create({
+    data: {
+      userId: user.id,
+      action: "COMPOSITION_UPDATED",
+      entity: "Composition",
+      entityId: compositionId,
+      metadata: { title },
+    },
+  });
+
+  revalidatePath("/composicoes");
+  revalidatePath(`/composicoes/${compositionId}/certificado`);
+  revalidatePath("/catalogo");
+  revalidatePath(`/catalogo/${compositionId}`);
+  redirect("/composicoes?sucesso=editado");
+}
+
 export async function validateChecksum(hash: string) {
   if (!hash || typeof hash !== "string") return null;
   const cleanHash = hash.trim().toLowerCase();

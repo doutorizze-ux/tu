@@ -48,7 +48,9 @@ export default async function CompositionsPage({
 
       {params.sucesso ? (
         <p className="formSuccess">
-          Composição excluída com sucesso.
+          {params.sucesso === "editado"
+            ? "Composição editada e salva com sucesso."
+            : "Composição excluída com sucesso."}
         </p>
       ) : null}
 
@@ -70,7 +72,20 @@ export default async function CompositionsPage({
             <span style={{ minWidth: "100px" }}>{song._count.interests}</span>
             <span style={{ minWidth: "100px" }}>{song._count.favorites}</span>
             
-            <div style={{ minWidth: "180px", display: "flex", justifyContent: "flex-end", alignItems: "center", gap: "8px" }}>
+            <div style={{ minWidth: "220px", display: "flex", justifyContent: "flex-end", alignItems: "center", gap: "8px" }}>
+              <Link 
+                href={`/composicoes/${song.id}/editar`} 
+                className="secondaryButton linkButton" 
+                style={{ 
+                  padding: "0.3rem 0.6rem", 
+                  fontSize: "0.8rem",
+                  textDecoration: "none",
+                  display: "inline-block",
+                  margin: 0
+                }}
+              >
+                Editar
+              </Link>
               <Link 
                 href={`/composicoes/${song.id}/certificado`} 
                 className="secondaryButton linkButton" 
@@ -120,6 +135,19 @@ export default async function CompositionsPage({
             />
             
             <div style={{ display: "flex", gap: "0.5rem", marginTop: "1rem" }}>
+              <Link 
+                href={`/composicoes/${song.id}/editar`} 
+                className="secondaryButton linkButton" 
+                style={{ 
+                  flex: 1, 
+                  padding: "0.4rem", 
+                  fontSize: "0.8rem", 
+                  textAlign: "center",
+                  textDecoration: "none" 
+                }}
+              >
+                Editar
+              </Link>
               <Link 
                 href={`/composicoes/${song.id}/certificado`} 
                 className="secondaryButton linkButton" 
