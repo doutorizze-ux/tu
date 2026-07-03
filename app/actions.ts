@@ -2329,6 +2329,7 @@ export async function saveDistributionIntegration(formData: FormData) {
 
   if (isActive) {
     await prisma.distributionIntegration.updateMany({
+      where: { provider: { not: "PUBLIC_DISTRIBUTION_ENABLED" } },
       data: { isActive: false },
     });
   }
@@ -2368,6 +2369,47 @@ export async function saveDistributionIntegration(formData: FormData) {
 
   revalidatePath("/admin/integracoes");
   redirect("/admin/integracoes?sucesso=salvo");
+}
+
+export async function togglePublicDistribution(formData: FormData) {
+  const user = await requireAdmin();
+  const isActive = formData.get("isActive") === "on";
+
+  const existing = await prisma.distributionIntegration.findFirst({
+    where: { provider: "PUBLIC_DISTRIBUTION_ENABLED" },
+  });
+
+  if (existing) {
+    await prisma.distributionIntegration.update({
+      where: { id: existing.id },
+      data: { isActive },
+    });
+  } else {
+    await prisma.distributionIntegration.create({
+      data: {
+        provider: "PUBLIC_DISTRIBUTION_ENABLED",
+        isActive,
+        endpoint: "SYSTEM",
+        apiKeyEncrypted: "SYSTEM",
+        webhookSecretEncrypted: "SYSTEM",
+      },
+    });
+  }
+
+  await prisma.auditLog.create({
+    data: {
+      userId: user.id,
+      action: "TOGGLE_PUBLIC_DISTRIBUTION",
+      entity: "SystemSetting",
+      entityId: "PUBLIC_DISTRIBUTION",
+      metadata: { isActive },
+    },
+  });
+
+  revalidatePath("/admin/integracoes");
+  revalidatePath("/painel");
+  revalidatePath("/components");
+  redirect("/admin/integracoes?sucesso=config_salva");
 }
 
 export async function startTooLostOAuth() {

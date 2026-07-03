@@ -1,4 +1,4 @@
-import { saveDistributionIntegration, startTooLostOAuth, testDistributionIntegration } from "../../actions";
+import { saveDistributionIntegration, startTooLostOAuth, testDistributionIntegration, togglePublicDistribution } from "../../actions";
 import { AppShell, PageHeader } from "../../components";
 import { requireUser } from "../../lib/auth";
 import { decryptSecret, maskSecret } from "../../lib/crypto-secrets";
@@ -37,6 +37,7 @@ export default async function DistributionIntegrationsPage({
   }
 
   const integration = await prisma.distributionIntegration.findFirst({
+    where: { provider: { not: "PUBLIC_DISTRIBUTION_ENABLED" } },
     orderBy: { updatedAt: "desc" },
     include: {
       logs: {
@@ -45,6 +46,12 @@ export default async function DistributionIntegrationsPage({
       },
     },
   });
+
+  const publicDistConfig = await prisma.distributionIntegration.findFirst({
+    where: { provider: "PUBLIC_DISTRIBUTION_ENABLED" },
+  });
+  const isPublicDistActive = publicDistConfig?.isActive ?? false;
+
   const deliveries = await prisma.distributionDelivery.findMany({
     orderBy: { createdAt: "desc" },
     take: 8,
@@ -81,9 +88,35 @@ export default async function DistributionIntegrationsPage({
                 ? "Configuracao salva."
                 : params.sucesso === "toolost_conectado"
                   ? "Distribuidora conectada com OAuth. Token salvo de forma criptografada."
-                  : `Teste de conexao finalizado: ${params.status ?? "verifique logs"}.`}
+                  : params.sucesso === "config_salva"
+                    ? "Configuração de visibilidade da vitrine de lançamentos salva com sucesso!"
+                    : `Teste de conexao finalizado: ${params.status ?? "verifique logs"}.`}
             </p>
           ) : null}
+
+          <div className="oauthProviderCard" style={{ marginBottom: "30px", border: "1px solid #d4af37", background: "#fffdf8" }}>
+            <div>
+              <p className="eyebrow" style={{ color: "#d4af37", fontWeight: "bold" }}>Vitrine de Lançamentos</p>
+              <h2>Disponibilidade da Distribuição</h2>
+              <p>
+                Ative ou desative se a ferramenta de lançamentos e distribuição deve estar liberada para os artistas no painel. Quando desativado, o público verá uma tela de "Em breve".
+              </p>
+            </div>
+            <form action={togglePublicDistribution} style={{ display: "flex", alignItems: "center", gap: "12px", marginTop: "15px" }}>
+              <label style={{ display: "flex", alignItems: "center", gap: "10px", fontWeight: "bold", cursor: "pointer" }}>
+                <input
+                  type="checkbox"
+                  name="isActive"
+                  defaultChecked={isPublicDistActive}
+                  style={{ width: "20px", height: "20px", cursor: "pointer" }}
+                />
+                Liberar Distribuição para o Público (Artistas)
+              </label>
+              <button className="primaryButton" type="submit" style={{ marginLeft: "auto", fontSize: "0.85rem", padding: "8px 16px" }}>
+                Salvar Configuração
+              </button>
+            </form>
+          </div>
 
           <div className="oauthProviderCard">
             <div>

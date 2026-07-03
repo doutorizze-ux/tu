@@ -41,6 +41,15 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
   const isAdmin = user?.roles.some((role) => role.role === "ADMIN") ?? false;
   const isComposer = user?.roles.some((role) => role.role === "COMPOSER") ?? false;
   const isArtist = user?.roles.some((role) => ["ARTIST", "PRODUCER"].includes(role.role)) ?? false;
+
+  const isPublicDistActive = isAdmin
+    ? true
+    : (
+        await prisma.distributionIntegration.findFirst({
+          where: { provider: "PUBLIC_DISTRIBUTION_ENABLED" },
+        })
+      )?.isActive ?? false;
+
   const unreadNotifications = user
     ? await prisma.notification.count({
         where: {
@@ -77,7 +86,28 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
           <span>Artista</span>
           <Link href="/catalogo">Catálogo de obras</Link>
           <Link href="/interesses">Interesses enviados</Link>
-          <Link href="/lancamentos">Distribuição</Link>
+          <Link href="/lancamentos">
+            Distribuição
+            {!isPublicDistActive && (
+              <span
+                style={{
+                  background: "#d4af37",
+                  color: "#ffffff",
+                  padding: "1px 6px",
+                  borderRadius: "4px",
+                  fontSize: "0.68rem",
+                  fontWeight: "bold",
+                  marginLeft: "8px",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.5px",
+                  display: "inline-block",
+                  verticalAlign: "middle"
+                }}
+              >
+                Em breve
+              </span>
+            )}
+          </Link>
         </div>
       ) : null}
       {isComposer && !isArtist ? (
