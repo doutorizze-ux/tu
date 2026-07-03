@@ -69,6 +69,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
           <Link href="/registro">Registrar Obra (Certidões)</Link>
           <Link href="/composicoes">Minhas obras</Link>
           <Link href="/interesses">Interesses recebidos</Link>
+          <Link href="/validar">Validar Certidão</Link>
         </div>
       ) : null}
       {isArtist ? (
