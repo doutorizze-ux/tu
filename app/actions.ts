@@ -3037,5 +3037,112 @@ export async function adminReplySupportTicket(formData: FormData) {
   redirect("/admin/solicitacoes?sucesso=chamado_respondido");
 }
 
+function validateCPF(cpf: string): boolean {
+  const cleanCPF = cpf.replace(/\D/g, "");
+  if (cleanCPF.length !== 11) return false;
+  if (/^(\d)\1{10}$/.test(cleanCPF)) return false;
+
+  let sum = 0;
+  let remainder;
+
+  for (let i = 1; i <= 9; i++) {
+    sum += parseInt(cleanCPF.substring(i - 1, i)) * (11 - i);
+  }
+  remainder = (sum * 10) % 11;
+  if (remainder === 10 || remainder === 11) remainder = 0;
+  if (remainder !== parseInt(cleanCPF.substring(9, 10))) return false;
+
+  sum = 0;
+  for (let i = 1; i <= 10; i++) {
+    sum += parseInt(cleanCPF.substring(i - 1, i)) * (12 - i);
+  }
+  remainder = (sum * 10) % 11;
+  if (remainder === 10 || remainder === 11) remainder = 0;
+  if (remainder !== parseInt(cleanCPF.substring(10, 11))) return false;
+
+  return true;
+}
+
+export async function updateProfile(formData: FormData) {
+  const user = await requireUser();
+  const displayName = formString(formData, "displayName");
+  const fullName = formString(formData, "fullName");
+  const cpf = formString(formData, "cpf");
+  const motherName = formString(formData, "motherName");
+  const city = formString(formData, "city");
+  const state = formString(formData, "state");
+  const bio = formString(formData, "bio");
+  const website = formString(formData, "website");
+
+  if (!displayName) {
+    redirect("/perfil?erro=dados");
+  }
+
+  // Load user roles
+  const roles = await prisma.userRole.findMany({ where: { userId: user.id } });
+  const isComposer = roles.some((r) => r.role === "COMPOSER");
+
+  // Composers MUST fill in full name, mother name, and valid CPF before registering songs
+  if (isComposer) {
+    if (!fullName || !cpf || !motherName) {
+      redirect("/perfil?erro=dados_compositor");
+    }
+    if (!validateCPF(cpf)) {
+      redirect("/perfil?erro=cpf_invalido");
+    }
+  }
+
+  // Format CPF as 000.000.000-00
+  const cleanCPF = cpf.replace(/\D/g, "");
+  const formattedCPF = cleanCPF.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+
+  // Update profile
+  await prisma.profile.upsert({
+    where: { userId: user.id },
+    create: {
+      userId: user.id,
+      displayName,
+      fullName: fullName || null,
+      cpf: formattedCPF || null,
+      motherName: motherName || null,
+      city: city || null,
+      state: state || null,
+      bio: bio || null,
+      website: website || null,
+    },
+    update: {
+      displayName,
+      fullName: fullName || null,
+      cpf: formattedCPF || null,
+      motherName: motherName || null,
+      city: city || null,
+      state: state || null,
+      bio: bio || null,
+      website: website || null,
+    },
+  });
+
+  // Sync user name
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { name: displayName },
+  });
+
+  await prisma.auditLog.create({
+    data: {
+      userId: user.id,
+      action: "PROFILE_UPDATED",
+      entity: "Profile",
+      entityId: user.id,
+      metadata: { displayName, hasCPF: !!cpf },
+    },
+  });
+
+  revalidatePath("/perfil");
+  revalidatePath("/painel");
+  revalidatePath("/components");
+  redirect("/perfil?sucesso=salvo");
+}
+
 
 

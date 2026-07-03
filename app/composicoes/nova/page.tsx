@@ -2,6 +2,8 @@ import { AppShell, PageHeader } from "../../components";
 import { createComposition } from "../../actions";
 import { requireUser } from "../../lib/auth";
 import { formatCredits, getCreditActionCosts } from "../../lib/credits";
+import { prisma } from "../../lib/prisma";
+import { redirect } from "next/navigation";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -16,7 +18,21 @@ export default async function NewCompositionPage({
   searchParams: Promise<{ erro?: string }>;
 }) {
   try {
-    await requireUser();
+    const user = await requireUser();
+    
+    // Check if the user is a composer and check their profile status
+    const roles = await prisma.userRole.findMany({ where: { userId: user.id } });
+    const isComposer = roles.some((role) => role.role === "COMPOSER");
+    
+    if (isComposer) {
+      const profile = await prisma.profile.findUnique({
+        where: { userId: user.id },
+      });
+      if (!profile || !profile.fullName || !profile.cpf || !profile.motherName) {
+        redirect("/perfil?alerta=registro_pendente");
+      }
+    }
+
     const params = await searchParams;
     const categoryCosts = await getCreditActionCosts();
     const compositionCosts = categoryCosts.filter((cost) => cost.code.startsWith("COMPOSITION_CATEGORY_") && cost.isActive);

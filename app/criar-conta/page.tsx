@@ -47,9 +47,7 @@ export default async function RegisterPage({
             Perfil principal
             <select name="role" defaultValue="COMPOSER">
               <option value="COMPOSER">Compositor</option>
-              <option value="ARTIST">Artista</option>
-              <option value="PRODUCER">Produtor</option>
-              <option value="MANAGER">Empresário</option>
+              <option value="ARTIST">Artista / Produtor</option>
             </select>
           </label>
           <div className="checkList legalChecks">

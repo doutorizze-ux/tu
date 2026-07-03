@@ -50,6 +50,9 @@ db.exec(`
     id TEXT PRIMARY KEY NOT NULL,
     userId TEXT NOT NULL UNIQUE,
     displayName TEXT NOT NULL,
+    fullName TEXT,
+    cpf TEXT,
+    motherName TEXT,
     city TEXT,
     state TEXT,
     bio TEXT,
@@ -463,6 +466,9 @@ addColumnIfMissing("Release", "requestIsrcAssignment", "BOOLEAN NOT NULL DEFAULT
 addColumnIfMissing("Release", "requestUpcAssignment", "BOOLEAN NOT NULL DEFAULT true");
 addColumnIfMissing("Release", "providerReleaseId", "TEXT");
 addColumnIfMissing("Release", "providerTrackId", "TEXT");
+addColumnIfMissing("Profile", "fullName", "TEXT");
+addColumnIfMissing("Profile", "cpf", "TEXT");
+addColumnIfMissing("Profile", "motherName", "TEXT");
 
 db.close();
 console.log(`Created development database at ${dbPath}`);

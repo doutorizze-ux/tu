@@ -63,6 +63,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
       <div>
         <span>Central</span>
         <Link href="/painel">Painel inicial</Link>
+        {user ? <Link href="/perfil">Meu Perfil</Link> : null}
         {user ? <Link href="/creditos">Créditos</Link> : null}
         {user ? <Link href="/financeiro">Carteira & Royalties</Link> : null}
         {user ? <Link href="/suporte">Suporte</Link> : null}

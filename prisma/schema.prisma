@@ -63,6 +63,9 @@ model Profile {
   id          String   @id @default(cuid())
   userId      String   @unique
   displayName String
+  fullName    String?
+  cpf         String?
+  motherName  String?
   city        String?
   state       String?
   bio         String?
