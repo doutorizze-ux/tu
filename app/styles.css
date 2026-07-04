@@ -582,6 +582,33 @@ button {
   border-right: 1px solid var(--line);
   background: rgba(255, 253, 248, 0.78);
   padding: 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.desktopNav {
+  flex: 1;
+  overflow-y: auto;
+  margin-top: 24px !important;
+  margin-bottom: 12px;
+  padding-right: 4px;
+}
+
+.desktopNav::-webkit-scrollbar {
+  width: 4px;
+}
+
+.desktopNav::-webkit-scrollbar-thumb {
+  background: rgba(15, 107, 95, 0.15);
+  border-radius: 4px;
+}
+
+.desktopAccount {
+  margin-top: auto;
+}
+
+.desktopAccount .accountBox {
+  margin-top: 0;
 }
 
 .sidebarTop {
