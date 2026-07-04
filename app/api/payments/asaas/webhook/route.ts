@@ -27,14 +27,28 @@ export async function POST(request: Request) {
   const receivedToken = request.headers.get("asaas-access-token") ?? "";
 
   if (token && receivedToken !== token) {
-    return NextResponse.json({ ok: false }, { status: 401 });
+    console.error("ASAAS WEBHOOK ERROR: Token mismatch. Received:", receivedToken, "Expected:", token);
+    return NextResponse.json({ ok: false, error: "UNAUTHORIZED_TOKEN" }, { status: 401 });
   }
 
   if (process.env.NODE_ENV === "production" && !token) {
+    console.error("ASAAS WEBHOOK ERROR: ASAAS_WEBHOOK_TOKEN env variable is missing or empty in production.");
     return NextResponse.json({ ok: false, error: "ASAAS_WEBHOOK_TOKEN_REQUIRED" }, { status: 500 });
   }
 
-  const payload = (await request.json()) as AsaasWebhookPayload;
+  let payload: AsaasWebhookPayload;
+  try {
+    const text = await request.text();
+    if (!text || text.trim() === "") {
+      console.log("ASAAS WEBHOOK: Empty request body received (likely a verification ping). Returning 200 OK.");
+      return NextResponse.json({ ok: true, message: "Ping received successfully" });
+    }
+    payload = JSON.parse(text) as AsaasWebhookPayload;
+  } catch (error: any) {
+    console.error("ASAAS WEBHOOK ERROR: Failed to parse request body as JSON:", error);
+    return NextResponse.json({ ok: true, error: "INVALID_JSON" });
+  }
+
   const eventType = payload.event ?? "UNKNOWN";
   const payment = payload.payment;
   const eventId = payload.id ?? `${eventType}:${payment?.id ?? crypto.randomUUID()}`;
@@ -48,7 +62,8 @@ export async function POST(request: Request) {
         payload: payload as object,
       },
     });
-  } catch {
+  } catch (dbError: any) {
+    console.log("ASAAS WEBHOOK: Duplicate event ID or DB insert warning:", eventId, dbError.message);
     return NextResponse.json({ ok: true, duplicate: true });
   }
 
