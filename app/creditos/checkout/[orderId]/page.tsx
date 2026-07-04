@@ -5,6 +5,7 @@ import { getAsaasPixQrCode, isAsaasConfigured } from "../../../lib/asaas";
 import { requireUser } from "../../../lib/auth";
 import { formatCredits } from "../../../lib/credits";
 import { prisma } from "../../../lib/prisma";
+import AutoRefresh from "./AutoRefresh";
 
 export const dynamic = "force-dynamic";
 
@@ -62,6 +63,7 @@ export default async function CreditCheckoutPage({
 
   return (
     <AppShell>
+      {order.status !== "PAID" && <AutoRefresh />}
       <PageHeader
         eyebrow="Pagamento seguro"
         title="Checkout Tunix"
