@@ -26,14 +26,13 @@ export async function POST(request: Request) {
   const token = expectedWebhookToken();
   const receivedToken = request.headers.get("asaas-access-token") ?? "";
 
-  if (token && receivedToken !== token) {
-    console.error("ASAAS WEBHOOK ERROR: Token mismatch. Received:", receivedToken, "Expected:", token);
-    return NextResponse.json({ ok: false, error: "UNAUTHORIZED_TOKEN" }, { status: 401 });
-  }
-
-  if (process.env.NODE_ENV === "production" && !token) {
-    console.error("ASAAS WEBHOOK ERROR: ASAAS_WEBHOOK_TOKEN env variable is missing or empty in production.");
-    return NextResponse.json({ ok: false, error: "ASAAS_WEBHOOK_TOKEN_REQUIRED" }, { status: 500 });
+  if (token) {
+    if (receivedToken !== token) {
+      console.error("ASAAS WEBHOOK ERROR: Token mismatch. Received:", receivedToken, "Expected:", token);
+      return NextResponse.json({ ok: false, error: "UNAUTHORIZED_TOKEN" }, { status: 401 });
+    }
+  } else {
+    console.warn("ASAAS WEBHOOK WARNING: ASAAS_WEBHOOK_TOKEN environment variable is not configured. Signature validation is bypassed for now.");
   }
 
   let payload: AsaasWebhookPayload;
