@@ -72,7 +72,7 @@ export default async function CompositionsPage({
             <span style={{ minWidth: "100px" }}>{song._count.interests}</span>
             <span style={{ minWidth: "100px" }}>{song._count.favorites}</span>
             
-            <div style={{ minWidth: "220px", display: "flex", justifyContent: "flex-end", alignItems: "center", gap: "8px" }}>
+            <div style={{ minWidth: "290px", display: "flex", justifyContent: "flex-end", alignItems: "center", gap: "8px" }}>
               <Link 
                 href={`/composicoes/${song.id}/editar`} 
                 className="secondaryButton linkButton" 
@@ -98,6 +98,19 @@ export default async function CompositionsPage({
                 }}
               >
                 Certidão
+              </Link>
+              <Link 
+                href={`/composicoes/${song.id}/contrato`} 
+                className="secondaryButton linkButton" 
+                style={{ 
+                  padding: "0.3rem 0.6rem", 
+                  fontSize: "0.8rem",
+                  textDecoration: "none",
+                  display: "inline-block",
+                  margin: 0
+                }}
+              >
+                Contrato
               </Link>
               <form action={deleteComposition} style={{ margin: 0 }}>
                 <input type="hidden" name="compositionId" value={song.id} />
@@ -133,13 +146,11 @@ export default async function CompositionsPage({
               voice={song.voiceType ?? "Voz livre"}
               bpm={song.bpm ?? 0}
             />
-            
-            <div style={{ display: "flex", gap: "0.5rem", marginTop: "1rem" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem", marginTop: "1rem" }}>
               <Link 
                 href={`/composicoes/${song.id}/editar`} 
                 className="secondaryButton linkButton" 
                 style={{ 
-                  flex: 1, 
                   padding: "0.4rem", 
                   fontSize: "0.8rem", 
                   textAlign: "center",
@@ -152,7 +163,6 @@ export default async function CompositionsPage({
                 href={`/composicoes/${song.id}/certificado`} 
                 className="secondaryButton linkButton" 
                 style={{ 
-                  flex: 1, 
                   padding: "0.4rem", 
                   fontSize: "0.8rem", 
                   textAlign: "center",
@@ -161,8 +171,20 @@ export default async function CompositionsPage({
               >
                 Certidão
               </Link>
+              <Link 
+                href={`/composicoes/${song.id}/contrato`} 
+                className="secondaryButton linkButton" 
+                style={{ 
+                  padding: "0.4rem", 
+                  fontSize: "0.8rem", 
+                  textAlign: "center",
+                  textDecoration: "none" 
+                }}
+              >
+                Contrato
+              </Link>
               
-              <form action={deleteComposition} style={{ flex: 1, margin: 0 }}>
+              <form action={deleteComposition} style={{ margin: 0 }}>
                 <input type="hidden" name="compositionId" value={song.id} />
                 <button 
                   type="submit" 
