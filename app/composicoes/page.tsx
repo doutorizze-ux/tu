@@ -4,6 +4,7 @@ import { deleteComposition } from "../actions";
 import { requireUser } from "../lib/auth";
 import { statusLabel } from "../lib/format";
 import { prisma } from "../lib/prisma";
+import ShareShowcaseButton from "./ShareShowcaseButton";
 
 export const dynamic = "force-dynamic";
 
@@ -32,9 +33,12 @@ export default async function CompositionsPage({
         title="Minhas composições"
         description="Organize obras, acompanhe status e veja quais músicas estão chamando atenção."
         action={
-          <Link className="primaryButton linkButton" href="/composicoes/nova">
-            Cadastrar música
-          </Link>
+          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center" }}>
+            <ShareShowcaseButton composerId={user.id} />
+            <Link className="primaryButton linkButton" href="/composicoes/nova" style={{ margin: 0 }}>
+              Cadastrar música
+            </Link>
+          </div>
         }
       />
 

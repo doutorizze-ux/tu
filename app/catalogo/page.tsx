@@ -98,12 +98,27 @@ export default async function CatalogPage({
     .map((c) => c.composer)
     .sort((a, b) => a.name.localeCompare(b.name));
 
+  let pageTitle = "Catálogo de repertório";
+  let pageDescription = "Filtre e descubra composições por palavra-chave, gênero ou compositor favorito.";
+
+  if (filterComposerId) {
+    const selectedComposer = await prisma.user.findUnique({
+      where: { id: filterComposerId },
+      include: { profile: true },
+    });
+    if (selectedComposer) {
+      const displayName = selectedComposer.profile?.displayName || selectedComposer.name;
+      pageTitle = `Vitrine de ${displayName}`;
+      pageDescription = `Confira todas as obras e composições disponíveis no catálogo de ${displayName}.`;
+    }
+  }
+
   return (
     <AppShell>
       <PageHeader
         eyebrow="Descoberta"
-        title="Catálogo de repertório"
-        description="Filtre e descubra composições por palavra-chave, gênero ou compositor favorito."
+        title={pageTitle}
+        description={pageDescription}
       />
 
       <section className="searchPanelContainer">
