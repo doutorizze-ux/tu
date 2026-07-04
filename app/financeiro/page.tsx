@@ -4,6 +4,7 @@ import { AppShell, PageHeader } from "../components";
 import { requireUser } from "../lib/auth";
 import { prisma } from "../lib/prisma";
 import { requestWithdrawal } from "../actions";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
@@ -13,6 +14,14 @@ export default async function FinanceiroPage({
   searchParams: Promise<{ erro?: string; sucesso?: string }>;
 }) {
   const user = await requireUser();
+  
+  // Check if the user is an artist/producer or admin
+  const roles = await prisma.userRole.findMany({ where: { userId: user.id } });
+  const isArtistOrAdmin = roles.some((role) => ["ARTIST", "PRODUCER", "ADMIN"].includes(role.role));
+  
+  if (!isArtistOrAdmin) {
+    redirect("/painel");
+  }
   const params = await searchParams;
 
   // Retrieve current user balance
