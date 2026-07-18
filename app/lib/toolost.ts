@@ -116,10 +116,13 @@ export function tooLostClientSecret() {
 }
 
 export function tooLostRedirectUri() {
-  return (
-    process.env.TOOLOST_REDIRECT_URI?.trim()
-    || `${process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || "https://tunix.com.br"}/callback`
-  );
+  const envUri = process.env.TOOLOST_REDIRECT_URI?.trim();
+  if (envUri && !envUri.includes("localhost")) {
+    return envUri;
+  }
+  const appUrl = process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || "https://tunix.com.br";
+  const base = appUrl.includes("localhost") ? "https://tunix.com.br" : appUrl;
+  return `${base}/callback`;
 }
 
 export function tooLostScopes() {
