@@ -14,7 +14,7 @@ import {
   submitToDistributionPartner,
 } from "./lib/distribution-provider";
 import type { PartnerDeliveryResult } from "./lib/distribution-provider";
-import { createTooLostAuthorizeUrl, isTooLostOAuthConfigured } from "./lib/toolost";
+import { createTooLostAuthorizeUrl, deleteTooLostRelease, isTooLostOAuthConfigured } from "./lib/toolost";
 import { prisma } from "./lib/prisma";
 import { saveReleaseAsset } from "./lib/release-storage";
 import { validateReleasePackage } from "./lib/release-validator";
@@ -1737,6 +1737,55 @@ export async function adminSubmitReleaseToPartner(formData: FormData) {
   revalidatePath(`/admin/lancamentos/${release.id}/envio`);
   revalidatePath(`/lancamentos/${release.id}`);
   redirect(`/admin/lancamentos/${release.id}/envio?sucesso=envio`);
+}
+
+export async function adminDeleteRelease(formData: FormData) {
+  const user = await requireAdmin();
+  const releaseId = formString(formData, "releaseId");
+  const release = await prisma.release.findUnique({
+    where: { id: releaseId },
+  });
+
+  if (!release) {
+    redirect("/admin/lancamentos");
+  }
+
+  if (release.providerReleaseId) {
+    try {
+      const config = await getDistributionProviderConfig();
+      if (config.apiKey) {
+        await deleteTooLostRelease(config.apiKey, Number(release.providerReleaseId), config.endpoint);
+      }
+    } catch (err) {
+      console.warn("[TooLost] Failed to delete release from provider:", err);
+    }
+  }
+
+  await prisma.$transaction([
+    prisma.releaseAsset.deleteMany({ where: { releaseId: release.id } }),
+    prisma.releasePlatform.deleteMany({ where: { releaseId: release.id } }),
+    prisma.releaseContributor.deleteMany({ where: { releaseId: release.id } }),
+    prisma.distributionDelivery.deleteMany({ where: { releaseId: release.id } }),
+    prisma.royaltyStatement.deleteMany({ where: { releaseId: release.id } }),
+    prisma.release.delete({ where: { id: release.id } }),
+  ]);
+
+  await prisma.auditLog.create({
+    data: {
+      userId: user.id,
+      action: "ADMIN_RELEASE_DELETED",
+      entity: "Release",
+      entityId: release.id,
+      metadata: {
+        title: release.title,
+        providerReleaseId: release.providerReleaseId,
+      },
+    },
+  });
+
+  revalidatePath("/admin/lancamentos");
+  revalidatePath("/lancamentos");
+  redirect("/admin/lancamentos?sucesso=excluido");
 }
 
 export async function adminRetryReleaseDelivery(formData: FormData) {

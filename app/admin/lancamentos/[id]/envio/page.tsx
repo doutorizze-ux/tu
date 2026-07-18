@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { adminSubmitReleaseToPartner } from "../../../../actions";
+import { adminDeleteRelease, adminSubmitReleaseToPartner } from "../../../../actions";
 import { AppShell, PageHeader } from "../../../../components";
 import { PlatformListCompact } from "../../../../components/platform-list-compact";
 import { requireUser } from "../../../../lib/auth";
@@ -143,6 +143,22 @@ export default async function AdminReleaseSendPage({
             </div>
             <button className="primaryButton" disabled={!canSend} type="submit">
               Enviar para distribuidora real
+            </button>
+          </form>
+
+          <form action={adminDeleteRelease} style={{ marginTop: "12px" }}>
+            <input name="releaseId" type="hidden" value={release.id} />
+            <button
+              className="secondaryButton"
+              style={{
+                width: "100%",
+                background: "rgba(220, 53, 69, 0.1)",
+                color: "#dc3545",
+                borderColor: "rgba(220, 53, 69, 0.3)",
+              }}
+              type="submit"
+            >
+              🗑️ Excluir / Derrubar Lançamento (Too Lost & Tunix)
             </button>
           </form>
 
