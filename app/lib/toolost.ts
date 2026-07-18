@@ -282,12 +282,24 @@ function primaryParticipant(payload: TooLostRequestPayload) {
 }
 
 function writerParticipants(payload: TooLostRequestPayload) {
-  return (payload.contributors ?? [])
-    .filter((item) => /composer|compositor|writer|autor/i.test(item.role))
+  const writers = (payload.contributors ?? [])
+    .filter((item) => /composer|compositor|writer|autor|lyricist|letrista/i.test(item.role))
     .map((item) => ({
       name: item.name,
       role: ["composer"],
     }));
+
+  if (writers.length > 0) {
+    return writers;
+  }
+
+  const fallbackName = payload.artistName || "Tunix";
+  return [
+    {
+      name: fallbackName,
+      role: ["composer"],
+    },
+  ];
 }
 
 function yyyyMmDd(value?: string | null) {
@@ -301,12 +313,11 @@ async function uploadMaster(
   baseUrl?: string
 ) {
   if (!master) {
-    throw new Error("Master FLAC obrigatório para envio à distribuidora.");
+    throw new Error("Master de audio (FLAC ou WAV) obrigatorio para envio a distribuidora.");
   }
 
-  if (master.mimeType !== "audio/flac" && !master.fileName.toLowerCase().endsWith(".flac")) {
-    throw new Error("A Too Lost exige master final no formato FLAC.");
-  }
+  const isWav = master.mimeType.includes("wav") || master.fileName.toLowerCase().endsWith(".wav");
+  const contentType = isWav ? "audio/wav" : "audio/flac";
 
   const upload = await apiRequest<{
     data: {
@@ -321,10 +332,11 @@ async function uploadMaster(
     body: {
       kind: "audio",
       fileName: master.fileName,
-      contentType: "audio/flac",
+      contentType,
     },
     baseUrl,
   });
+
   let bytes: Buffer;
   try {
     bytes = await getObject(releaseStoragePath(master.storageKey));
