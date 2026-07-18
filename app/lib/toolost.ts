@@ -283,10 +283,10 @@ function primaryParticipant(payload: TooLostRequestPayload) {
 
 function writerParticipants(payload: TooLostRequestPayload) {
   const writers = (payload.contributors ?? [])
-    .filter((item) => /composer|compositor|writer|autor|lyricist|letrista/i.test(item.role))
+    .filter((item) => /composer|compositor|writer|autor|lyricist|letrista|instrumentalist|instrumentista/i.test(item.role))
     .map((item) => ({
       name: item.name,
-      role: ["composer"],
+      role: ["composer", "lyricist"],
     }));
 
   if (writers.length > 0) {
@@ -297,7 +297,7 @@ function writerParticipants(payload: TooLostRequestPayload) {
   return [
     {
       name: fallbackName,
-      role: ["composer"],
+      role: ["composer", "lyricist"],
     },
   ];
 }
@@ -371,60 +371,6 @@ function providerIdentifiers(release: TooLostRelease) {
   };
 }
 
-export async function submitTooLostDistribution(
-  accessToken: string, 
-  payload: TooLostRequestPayload,
-  baseUrl?: string
-) {
-  const existingReleaseId = Number(payload.providerReleaseId);
-
-  if (Number.isInteger(existingReleaseId) && existingReleaseId > 0) {
-    try {
-      const current = await apiRequest<{ data: TooLostRelease }>({
-        accessToken,
-        method: "GET",
-        path: `/releases/${existingReleaseId}`,
-        baseUrl,
-      });
-      const status = current.payload.data.status?.toLowerCase();
-      if (status && status !== "draft") {
-        console.log(`[TooLost] Release ${existingReleaseId} is already submitted (status: ${status}). Skipping modification.`);
-        return {
-          status: 200,
-          releaseId: existingReleaseId,
-          trackId: current.payload.data.tracks?.[0]?.id ? String(current.payload.data.tracks[0].id) : undefined,
-          isrc: current.payload.data.tracks?.[0]?.isrc || undefined,
-          upc: current.payload.data.upc || undefined,
-          responseBody: JSON.stringify(current.payload.data),
-        };
-      }
-    } catch (err) {
-      console.warn(`[TooLost] Failed to check status of existing release ${existingReleaseId}:`, err);
-    }
-  }
-
-  const created = Number.isInteger(existingReleaseId) && existingReleaseId > 0
-    ? null
-    : await apiRequest<{ data: { id: number } }>({
-      accessToken,
-      method: "POST",
-      path: "/releases",
-      body: {
-        type: releaseType(payload.releaseType),
-        title: payload.title,
-        label: payload.labelName || payload.artistName || "Tunix",
-        participants: primaryParticipant(payload),
-      },
-      baseUrl,
-    });
-  const releaseId = created?.payload.data.id ?? existingReleaseId;
-
-  try {
-    const appBaseUrl = process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || "https://tunix.com.br";
-    const coverUrl = payload.externalReleaseId && (payload.files?.cover || payload.files?.master)
-      ? `${appBaseUrl}/api/releases/${payload.externalReleaseId}/cover`
-      : undefined;
-
 function normalizeTooLostGenre(genre?: string): string {
   if (!genre) return "Latin";
   const normalized = genre.trim().toLowerCase();
@@ -470,6 +416,68 @@ function normalizeTooLostGenre(genre?: string): string {
 
   return map[normalized] || "Latin";
 }
+
+async function createFreshReleaseOnTooLost(
+  accessToken: string,
+  payload: TooLostRequestPayload,
+  baseUrl?: string
+): Promise<number> {
+  const created = await apiRequest<{ data: { id: number } }>({
+    accessToken,
+    method: "POST",
+    path: "/releases",
+    body: {
+      type: releaseType(payload.releaseType),
+      title: payload.title,
+      label: payload.labelName || payload.artistName || "Tunix",
+      participants: primaryParticipant(payload),
+    },
+    baseUrl,
+  });
+  return created.payload.data.id;
+}
+
+export async function submitTooLostDistribution(
+  accessToken: string, 
+  payload: TooLostRequestPayload,
+  baseUrl?: string
+) {
+  const existingReleaseId = Number(payload.providerReleaseId);
+
+  if (Number.isInteger(existingReleaseId) && existingReleaseId > 0) {
+    try {
+      const current = await apiRequest<{ data: TooLostRelease }>({
+        accessToken,
+        method: "GET",
+        path: `/releases/${existingReleaseId}`,
+        baseUrl,
+      });
+      const status = current.payload.data.status?.toLowerCase();
+      if (status && status !== "draft") {
+        console.log(`[TooLost] Release ${existingReleaseId} is already submitted (status: ${status}). Skipping modification.`);
+        return {
+          status: 200,
+          releaseId: existingReleaseId,
+          trackId: current.payload.data.tracks?.[0]?.id ? String(current.payload.data.tracks[0].id) : undefined,
+          isrc: current.payload.data.tracks?.[0]?.isrc || undefined,
+          upc: current.payload.data.upc || undefined,
+          responseBody: JSON.stringify(current.payload.data),
+        };
+      }
+    } catch (err) {
+      console.warn(`[TooLost] Failed to check status of existing release ${existingReleaseId}:`, err);
+    }
+  }
+
+  let releaseId = Number.isInteger(existingReleaseId) && existingReleaseId > 0
+    ? existingReleaseId
+    : await createFreshReleaseOnTooLost(accessToken, payload, baseUrl);
+
+  try {
+    const appBaseUrl = process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || "https://tunix.com.br";
+    const coverUrl = payload.externalReleaseId && (payload.files?.cover || payload.files?.master)
+      ? `${appBaseUrl}/api/releases/${payload.externalReleaseId}/cover`
+      : undefined;
 
     const metadata = await apiRequest({
       accessToken,
@@ -586,7 +594,7 @@ function normalizeTooLostGenre(genre?: string): string {
       upc: identifiers.upc,
       status: submitted.status,
       responseBody: JSON.stringify({
-        created: created?.payload ?? null,
+        releaseId,
         metadata: metadata.payload,
         tracks: tracks.payload,
         delivery: delivery.payload,
