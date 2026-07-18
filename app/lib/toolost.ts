@@ -286,7 +286,7 @@ function writerParticipants(payload: TooLostRequestPayload) {
     .filter((item) => /composer|compositor|writer|autor|lyricist|letrista|instrumentalist|instrumentista/i.test(item.role))
     .map((item) => ({
       name: item.name,
-      role: ["composer", "lyricist"],
+      role: ["composer"],
     }));
 
   if (writers.length > 0) {
@@ -297,7 +297,7 @@ function writerParticipants(payload: TooLostRequestPayload) {
   return [
     {
       name: fallbackName,
-      role: ["composer", "lyricist"],
+      role: ["composer"],
     },
   ];
 }
@@ -430,10 +430,7 @@ async function createFreshReleaseOnTooLost(
       type: releaseType(payload.releaseType),
       title: payload.title,
       label: payload.labelName || payload.artistName || "Tunix",
-      participants: [
-        ...primaryParticipant(payload),
-        ...writerParticipants(payload),
-      ],
+      participants: primaryParticipant(payload),
     },
     baseUrl,
   });
@@ -501,10 +498,7 @@ export async function submitTooLostDistribution(
         pLine: payload.copyright?.pLine,
         upc: payload.identifiers?.requestUpcAssignment ? undefined : payload.identifiers?.upc || undefined,
         ...(coverUrl ? { coverUrl, compressedArtwork: coverUrl } : {}),
-        participants: [
-          ...primaryParticipant(payload),
-          ...writerParticipants(payload),
-        ],
+        participants: primaryParticipant(payload),
       },
       baseUrl,
     });
