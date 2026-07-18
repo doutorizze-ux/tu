@@ -3,9 +3,27 @@ import "server-only";
 import { getObject } from "./object-storage";
 import { releaseStoragePath } from "./release-storage";
 
-const TOOLOST_APP_URL = process.env.TOOLOST_APP_URL || "https://toolost.com";
-const TOOLOST_TOKEN_URL = process.env.TOOLOST_TOKEN_URL || "https://toolost.com/oauth/token";
-export const TOOLOST_API_BASE_URL = process.env.TOOLOST_API_BASE_URL || "https://api.toolost.com/v1";
+function getToolostAppUrl() {
+  const envUrl = process.env.TOOLOST_APP_URL?.trim();
+  if (envUrl && !envUrl.includes("sandbox")) return envUrl;
+  return "https://toolost.com";
+}
+
+function getToolostTokenUrl() {
+  const envUrl = process.env.TOOLOST_TOKEN_URL?.trim();
+  if (envUrl && !envUrl.includes("sandbox")) return envUrl;
+  return "https://toolost.com/oauth/token";
+}
+
+function getToolostApiBaseUrl() {
+  const envUrl = process.env.TOOLOST_API_BASE_URL?.trim();
+  if (envUrl && !envUrl.includes("sandbox")) return envUrl;
+  return "https://api.toolost.com/v1";
+}
+
+const TOOLOST_APP_URL = getToolostAppUrl();
+const TOOLOST_TOKEN_URL = getToolostTokenUrl();
+export const TOOLOST_API_BASE_URL = getToolostApiBaseUrl();
 export const TOOLOST_DEFAULT_SCOPES = "read:profile read:releases write:releases";
 
 type TooLostTokenResponse = {
