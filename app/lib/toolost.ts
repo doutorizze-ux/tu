@@ -291,7 +291,7 @@ function writerParticipants(payload: TooLostRequestPayload) {
     .filter((item) => /composer|compositor|writer|autor|lyricist|letrista|instrumentalist|instrumentista/i.test(item.role))
     .map((item) => ({
       name: item.name,
-      role: ["composer"],
+      role: ["composer", "instrumentalist"],
     }));
 
   if (writers.length > 0) {
@@ -302,7 +302,7 @@ function writerParticipants(payload: TooLostRequestPayload) {
   return [
     {
       name: fallbackName,
-      role: ["composer"],
+      role: ["composer", "instrumentalist"],
     },
   ];
 }
@@ -356,13 +356,13 @@ async function uploadMaster(
     method: "PUT",
     headers: {
       ...(upload.payload.data.headers ?? {}),
-      "Content-Type": "audio/flac",
+      "Content-Type": contentType,
     },
     body: new Uint8Array(bytes),
   });
 
   if (!response.ok) {
-    throw new Error(`Falha no upload seguro do master FLAC: HTTP ${response.status}.`);
+    throw new Error(`Falha no upload seguro do master: HTTP ${response.status}.`);
   }
 
   return upload.payload.data.fileKey;
