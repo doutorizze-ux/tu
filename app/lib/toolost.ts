@@ -474,9 +474,7 @@ export async function submitTooLostDistribution(
     }
   }
 
-  let releaseId = Number.isInteger(existingReleaseId) && existingReleaseId > 0
-    ? existingReleaseId
-    : await createFreshReleaseOnTooLost(accessToken, payload, baseUrl);
+  let releaseId = await createFreshReleaseOnTooLost(accessToken, payload, baseUrl);
 
   try {
     const appBaseUrl = process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || "https://tunix.com.br";
