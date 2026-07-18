@@ -181,7 +181,7 @@ async function apiRequest<T>({
 }: {
   accessToken: string;
   body?: unknown;
-  method: "GET" | "POST" | "PATCH" | "PUT";
+  method: "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
   path: string;
   baseUrl?: string;
 }) {
@@ -612,4 +612,17 @@ export async function submitTooLostDistribution(
       releaseId,
     );
   }
+}
+
+export async function deleteTooLostRelease(
+  accessToken: string,
+  releaseId: number,
+  baseUrl?: string
+) {
+  return apiRequest<{ message: string }>({
+    accessToken,
+    method: "DELETE",
+    path: `/releases/${releaseId}`,
+    baseUrl,
+  });
 }
