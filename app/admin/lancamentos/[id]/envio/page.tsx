@@ -109,15 +109,15 @@ export default async function AdminReleaseSendPage({
             </div>
             <div>
               <dt>Endpoint</dt>
-              <dd>{providerConfig.endpoint || "Nao configurado"}</dd>
+              <dd style={{ wordBreak: "break-all" }}>{providerConfig.endpoint || "Nao configurado"}</dd>
             </div>
             <div>
               <dt>Cliente</dt>
               <dd>{release.owner.name}</dd>
             </div>
-            <div>
-              <dt>Plataformas</dt>
-              <dd style={{ marginTop: "6px" }}><PlatformListCompact platforms={release.platforms} /></dd>
+            <div style={{ gridColumn: "1 / -1" }}>
+              <dt>Plataformas ({release.platforms.length})</dt>
+              <dd style={{ marginTop: "8px" }}><PlatformListCompact platforms={release.platforms} /></dd>
             </div>
           </dl>
 

@@ -28,7 +28,7 @@ export function PlatformListCompact({
     return (
       <div className="platformChips" style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
         {normalized.map((p, idx) => (
-          <span key={idx} style={{ padding: "4px 10px", fontSize: "0.78rem" }}>
+          <span key={idx} style={{ padding: "4px 10px", fontSize: "0.78rem", whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", lineHeight: "1.2" }}>
             {platformLabel(p)}
           </span>
         ))}
@@ -43,7 +43,7 @@ export function PlatformListCompact({
     <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
       <div className="platformChips" style={{ display: "flex", flexWrap: "wrap", gap: "6px", alignItems: "center" }}>
         {visible.map((p, idx) => (
-          <span key={idx} style={{ padding: "4px 10px", fontSize: "0.78rem" }}>
+          <span key={idx} style={{ padding: "4px 10px", fontSize: "0.78rem", whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", lineHeight: "1.2" }}>
             {platformLabel(p)}
           </span>
         ))}
