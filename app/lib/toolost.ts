@@ -100,7 +100,7 @@ export function tooLostClientSecret() {
 export function tooLostRedirectUri() {
   return (
     process.env.TOOLOST_REDIRECT_URI?.trim()
-    || `${process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || "https://tunix.com.br"}/api/toolost/oauth/callback`
+    || `${process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || "https://tunix.com.br"}/callback`
   );
 }
 
