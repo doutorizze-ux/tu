@@ -7,7 +7,7 @@ import { getTooLostPlatforms, TOOLOST_API_BASE_URL } from "./toolost";
 
 export async function getAvailableDistributionPlatforms(): Promise<DistributionPlatformOption[]> {
   const integration = await prisma.distributionIntegration.findFirst({
-    where: { isActive: true },
+    where: { isActive: true, provider: { not: "PUBLIC_DISTRIBUTION_ENABLED" } },
     orderBy: { updatedAt: "desc" },
   });
 

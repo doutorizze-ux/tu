@@ -73,7 +73,7 @@ export function buildDistributionPayload(release: ReleaseWithRelations) {
 
 export async function getDistributionProviderConfig() {
   const integration = await prisma.distributionIntegration.findFirst({
-    where: { isActive: true },
+    where: { isActive: true, provider: { not: "PUBLIC_DISTRIBUTION_ENABLED" } },
     orderBy: { updatedAt: "desc" },
   });
 
