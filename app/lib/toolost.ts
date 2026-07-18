@@ -413,6 +413,52 @@ export async function submitTooLostDistribution(
       ? `${appBaseUrl}/api/releases/${payload.externalReleaseId}/cover`
       : undefined;
 
+function normalizeTooLostGenre(genre?: string): string {
+  if (!genre) return "Latin";
+  const normalized = genre.trim().toLowerCase();
+
+  const map: Record<string, string> = {
+    sertanejo: "Latin",
+    piseiro: "Latin",
+    forro: "Latin",
+    forró: "Latin",
+    pagode: "Latin",
+    samba: "Latin",
+    funk: "Latin",
+    mpb: "Latin",
+    axe: "Latin",
+    axé: "Latin",
+    arrocha: "Latin",
+    brega: "Latin",
+    latino: "Latin",
+    latin: "Latin",
+    gospel: "Gospel/Christian",
+    gospel_cristao: "Gospel/Christian",
+    cristao: "Gospel/Christian",
+    evangelico: "Gospel/Christian",
+    pop: "Pop",
+    rock: "Rock",
+    eletronica: "Electronic",
+    electronic: "Electronic",
+    hiphop: "Hip-Hop/Rap",
+    "hip-hop": "Hip-Hop/Rap",
+    rap: "Hip-Hop/Rap",
+    trap: "Hip-Hop/Rap",
+    country: "Country",
+    reggae: "Reggae",
+    folk: "Folk",
+    "r&b": "R&B/Soul",
+    soul: "R&B/Soul",
+    jazz: "Jazz",
+    classica: "Classical",
+    classical: "Classical",
+    inspirational: "Inspirational",
+    alternative: "Alternative",
+  };
+
+  return map[normalized] || "Latin";
+}
+
     const metadata = await apiRequest({
       accessToken,
       method: "PATCH",
@@ -422,7 +468,7 @@ export async function submitTooLostDistribution(
         title: payload.title,
         version: payload.versionTitle || undefined,
         label: payload.labelName || payload.artistName || "Tunix",
-        primaryGenre: payload.genre,
+        primaryGenre: normalizeTooLostGenre(payload.genre),
         language: payload.language,
         releaseDate: yyyyMmDd(payload.releaseDate),
         licenseType: "Copyright",
