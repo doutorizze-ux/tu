@@ -430,7 +430,10 @@ async function createFreshReleaseOnTooLost(
       type: releaseType(payload.releaseType),
       title: payload.title,
       label: payload.labelName || payload.artistName || "Tunix",
-      participants: primaryParticipant(payload),
+      participants: [
+        ...primaryParticipant(payload),
+        ...writerParticipants(payload),
+      ],
     },
     baseUrl,
   });
@@ -498,7 +501,10 @@ export async function submitTooLostDistribution(
         pLine: payload.copyright?.pLine,
         upc: payload.identifiers?.requestUpcAssignment ? undefined : payload.identifiers?.upc || undefined,
         ...(coverUrl ? { coverUrl, compressedArtwork: coverUrl } : {}),
-        participants: primaryParticipant(payload),
+        participants: [
+          ...primaryParticipant(payload),
+          ...writerParticipants(payload),
+        ],
       },
       baseUrl,
     });
