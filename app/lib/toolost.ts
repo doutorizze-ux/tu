@@ -47,6 +47,11 @@ type TooLostRequestPayload = {
   trackTitle?: string;
   versionTitle?: string | null;
   artistName?: string;
+  primaryArtistLegalName?: string | null;
+  rightsholder?: {
+    name?: string | null;
+    document?: string | null;
+  } | null;
   labelName?: string | null;
   genre?: string;
   language?: string;
@@ -293,7 +298,7 @@ function writerParticipants(payload: TooLostRequestPayload) {
     return writers;
   }
 
-  const fallbackName = payload.artistName || "Tunix";
+  const fallbackName = payload.primaryArtistLegalName || payload.artistName || "Tunix";
   return [
     {
       name: fallbackName,
@@ -516,6 +521,7 @@ export async function submitTooLostDistribution(
       audioFileKey,
       artists: primaryParticipant(payload),
       writers: writerParticipants(payload),
+      credits: writerParticipants(payload),
       ...(!payload.identifiers?.requestIsrcAssignment && payload.identifiers?.isrc
         ? { isrc: payload.identifiers.isrc }
         : {}),
