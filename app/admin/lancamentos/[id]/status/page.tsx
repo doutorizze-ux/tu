@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { adminRetryReleaseDelivery, adminUpdatePlatformStatus } from "../../../../actions";
+import { adminDeleteRelease, adminRetryReleaseDelivery, adminUpdatePlatformStatus } from "../../../../actions";
 import { AppShell, PageHeader } from "../../../../components";
 import { requireUser } from "../../../../lib/auth";
 import { platformLabel, platformStatusLabel, releaseStatusLabel } from "../../../../lib/format";
@@ -220,6 +220,22 @@ export default async function AdminReleaseStatusPage({
               <p className="mutedText">Nenhuma tentativa registrada.</p>
             )}
           </section>
+
+          <form action={adminDeleteRelease} style={{ marginTop: "16px" }}>
+            <input name="releaseId" type="hidden" value={release.id} />
+            <button
+              className="secondaryButton"
+              style={{
+                width: "100%",
+                background: "rgba(220, 53, 69, 0.1)",
+                color: "#dc3545",
+                borderColor: "rgba(220, 53, 69, 0.3)",
+              }}
+              type="submit"
+            >
+              🗑️ Excluir / Derrubar Lançamento (Too Lost & Tunix)
+            </button>
+          </form>
         </aside>
       </section>
 
