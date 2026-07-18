@@ -115,9 +115,9 @@ export default async function AdminReleaseSendPage({
               <dt>Cliente</dt>
               <dd>{release.owner.name}</dd>
             </div>
-            <div style={{ gridColumn: "1 / -1" }}>
+            <div className="fullWidth">
               <dt>Plataformas ({release.platforms.length})</dt>
-              <dd style={{ marginTop: "8px" }}><PlatformListCompact platforms={release.platforms} /></dd>
+              <dd><PlatformListCompact platforms={release.platforms} /></dd>
             </div>
           </dl>
 
