@@ -1339,6 +1339,54 @@ textarea {
   padding: 12px;
 }
 
+.platformPicker {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 253, 248, 0.72);
+  overflow: hidden;
+}
+
+.platformPicker summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 52px;
+  padding: 13px 16px;
+  cursor: pointer;
+  list-style: none;
+  font-weight: 800;
+}
+
+.platformPicker summary::-webkit-details-marker {
+  display: none;
+}
+
+.platformPicker summary::after {
+  content: "+";
+  color: var(--accent);
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.platformPicker[open] summary::after {
+  content: "−";
+}
+
+.platformPicker summary strong {
+  margin-left: auto;
+  color: var(--accent);
+  font-size: 0.86rem;
+  white-space: nowrap;
+}
+
+.platformPicker .platformChecklist {
+  max-height: min(52vh, 520px);
+  overflow-y: auto;
+  border-top: 1px solid var(--line);
+  padding: 14px;
+}
+
 .splitRow {
   display: grid;
   grid-template-columns: 1fr 1fr 90px;
@@ -3217,4 +3265,265 @@ textarea {
   font-size: 0.82rem;
   padding: 8px 16px;
   font-weight: 700;
+}
+
+/* Responsive hardening shared by public, customer and admin pages. */
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+  height: auto;
+}
+
+pre,
+code,
+.copyField,
+.payloadPreview {
+  max-width: 100%;
+}
+
+.tableWrap,
+.tablePanel,
+.reportTable {
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 900px) {
+  .shell {
+    padding-top: 12px;
+  }
+
+  .hero {
+    gap: 28px;
+    padding-top: 20px;
+  }
+
+  .section,
+  .businessSection,
+  .workflow {
+    padding-block: 40px;
+  }
+
+  .metricGrid,
+  .reportGrid,
+  .reviewFacts,
+  .platformChecklist {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .releaseGrid,
+  .compositionGrid,
+  .planGrid,
+  .businessGrid,
+  .reconciliationGrid,
+  .financeParticipantGrid,
+  .creditPackages {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .reportTableHeader,
+  .reportTableRow {
+    grid-template-columns: 100px minmax(170px, 1fr) 100px minmax(180px, 1fr);
+  }
+
+  .tableHeader,
+  .compositionRow {
+    min-width: 660px;
+  }
+}
+
+@media (max-width: 640px) {
+  html {
+    font-size: 15px;
+  }
+
+  .shell,
+  .workspace {
+    width: min(100% - 24px, 1180px);
+  }
+
+  .workspace {
+    padding: 20px 0 40px;
+  }
+
+  .topbar {
+    align-items: center;
+  }
+
+  .brandLogo {
+    width: clamp(112px, 36vw, 150px);
+    height: 46px;
+  }
+
+  .topbar > .linkButton {
+    width: auto;
+    flex: 0 1 auto;
+  }
+
+  .hero h1,
+  .pageHeader h1,
+  .commandHero h1 {
+    font-size: clamp(2.25rem, 11vw, 3rem);
+    overflow-wrap: anywhere;
+  }
+
+  .heroCopy > p:not(.eyebrow),
+  .pageHeader p:not(.eyebrow),
+  .commandHero p:not(.eyebrow) {
+    font-size: 1rem;
+  }
+
+  .heroActions,
+  .filterActions,
+  .reportActions {
+    display: grid;
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+
+  .sectionTitle,
+  .pageHeader {
+    gap: 16px;
+  }
+
+  .studioPanel,
+  .panelBlock,
+  .formSection,
+  .authPanel,
+  .interestCard,
+  .emptyState,
+  .reportSheet,
+  .detailMain,
+  .sidePanel,
+  .creditHero > div,
+  .creditPackage,
+  .panelCard,
+  .creditAdminPanel {
+    padding: 16px;
+  }
+
+  .metricGrid,
+  .releaseGrid,
+  .compositionGrid,
+  .planGrid,
+  .businessGrid,
+  .reconciliationGrid,
+  .financeParticipantGrid,
+  .creditPackages,
+  .reportGrid,
+  .reviewFacts,
+  .platformChecklist,
+  .platformDeliveryList,
+  .packageEditorFields {
+    grid-template-columns: 1fr;
+  }
+
+  .metricCard,
+  .businessGrid article,
+  .plans article,
+  .creditPackage {
+    min-height: auto;
+  }
+
+  .songMeta,
+  .releaseFacts,
+  .songCard dl {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .interestTopline,
+  .songCardHeader,
+  .songCardFooter,
+  .checkoutSummary dl div {
+    align-items: stretch;
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .songCardFooter .primaryButton.compact,
+  .notificationCard form,
+  .notificationCard button {
+    width: 100%;
+  }
+
+  .validationItem,
+  .validationList.compact .validationItem,
+  .checkItem {
+    grid-template-columns: 1fr;
+  }
+
+  .validationItem span {
+    grid-row: auto;
+    justify-self: start;
+  }
+
+  .qrCodeBox {
+    min-height: auto;
+    padding: 14px;
+  }
+
+  .reportTableHeader {
+    display: none;
+  }
+
+  .reportTableRow,
+  .reportTableRow.two,
+  .reportTableRow.three,
+  .reportTable:has(.reportTableRow.two) .reportTableHeader,
+  .reportTable:has(.reportTableRow.three) .reportTableHeader {
+    grid-template-columns: 1fr;
+  }
+
+  .reportTableRow span {
+    padding-block: 2px;
+  }
+
+  .platformPicker summary {
+    align-items: flex-start;
+    display: grid;
+    grid-template-columns: 1fr auto;
+  }
+
+  .platformPicker summary strong {
+    grid-column: 1;
+    margin-left: 0;
+  }
+
+  .platformPicker summary::after {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+}
+
+@media (max-width: 380px) {
+  .shell,
+  .workspace {
+    width: min(100% - 20px, 1180px);
+  }
+
+  .sidebar {
+    padding-inline: 10px;
+  }
+
+  .sidebarTop {
+    gap: 8px;
+  }
+
+  .mobileMenu summary {
+    padding-inline: 10px;
+  }
+
+  .topbar > .linkButton {
+    min-height: 40px;
+    padding-inline: 10px;
+  }
+
+  .songMeta,
+  .releaseFacts,
+  .songCard dl {
+    grid-template-columns: 1fr;
+  }
 }

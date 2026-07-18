@@ -294,14 +294,21 @@ export function ReleaseForm({
 
       <section className="formSection">
         <h2>Plataformas de destino</h2>
-        <div className="platformChecklist">
-          {platforms.map((platform) => (
-            <label key={platform.value} className="inlineCheck">
-              <input name="platforms" type="checkbox" value={platform.value} defaultChecked />
-              <span>{platform.label}</span>
-            </label>
-          ))}
-        </div>
+        <p className="mutedText">Seu lançamento será enviado para todas as plataformas disponíveis.</p>
+        <details className="platformPicker">
+          <summary>
+            <span>Revisar plataformas</span>
+            <strong>{platforms.length} selecionadas</strong>
+          </summary>
+          <div className="platformChecklist">
+            {platforms.map((platform) => (
+              <label key={platform.value} className="inlineCheck">
+                <input name="platforms" type="checkbox" value={platform.value} defaultChecked />
+                <span>{platform.label}</span>
+              </label>
+            ))}
+          </div>
+        </details>
       </section>
 
       <section className="formSection">

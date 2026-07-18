@@ -272,14 +272,21 @@ export default async function EditReleasePage({
 
           <section className="formSection">
             <h2>Plataformas de destino</h2>
-            <div className="platformChecklist">
-              {platformOptions.map((platform) => (
-                <label key={platform.value}>
-                  <input name="platforms" type="checkbox" value={platform.value} defaultChecked={selectedPlatforms.has(platform.value)} />
-                  {platform.label}
-                </label>
-              ))}
-            </div>
+            <p className="mutedText">Abra a lista somente se quiser revisar ou alterar os destinos.</p>
+            <details className="platformPicker">
+              <summary>
+                <span>Revisar plataformas</span>
+                <strong>{selectedPlatforms.size} selecionadas</strong>
+              </summary>
+              <div className="platformChecklist">
+                {platformOptions.map((platform) => (
+                  <label key={platform.value}>
+                    <input name="platforms" type="checkbox" value={platform.value} defaultChecked={selectedPlatforms.has(platform.value)} />
+                    {platform.label}
+                  </label>
+                ))}
+              </div>
+            </details>
           </section>
 
           <section className="formSection">
