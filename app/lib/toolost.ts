@@ -509,17 +509,37 @@ function normalizeTooLostGenre(genre?: string): string {
       baseUrl,
     });
 
+    let validPlatforms: string[] = [];
+    try {
+      const platformData = await getTooLostPlatforms(accessToken);
+      const excluded = new Set([
+        ...(platformData.aiExcludedPlatforms ?? []),
+        ...(platformData.additionalDelivery?.excluded ?? []),
+      ]);
+      const available = (platformData.platforms ?? []).filter((p) => p && !excluded.has(p));
+      const availableSet = new Set(available);
+
+      if (payload.platforms && payload.platforms.length > 0) {
+        validPlatforms = payload.platforms.filter((p) => availableSet.has(p));
+      }
+      if (validPlatforms.length === 0) {
+        validPlatforms = available;
+      }
+    } catch {
+      validPlatforms = payload.platforms ?? [];
+    }
+
     const delivery = await apiRequest({
       accessToken,
       method: "PATCH",
       path: `/releases/${releaseId}/delivery`,
       body: {
         delivery: {
-          platforms: payload.platforms ?? [],
+          platforms: validPlatforms,
           territories: deliveryTerritories(payload.territories),
           additional: {
-            youtube: payload.platforms?.some((platform) => platform.toLowerCase().includes("youtube")) ?? false,
-            facebook: payload.platforms?.some((platform) => platform.toLowerCase().includes("facebook")) ?? false,
+            youtube: validPlatforms.some((platform) => platform.toLowerCase().includes("youtube")),
+            facebook: validPlatforms.some((platform) => platform.toLowerCase().includes("facebook")),
           },
         },
       },
