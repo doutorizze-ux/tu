@@ -19,9 +19,10 @@ export async function MarketingHeader() {
     <header className="topbar">
       <Brand />
       <nav className="nav">
+        <Link href="/#distribuicao">Como funciona</Link>
         <Link href="/catalogo">Catálogo</Link>
         <Link href="/creditos">Créditos</Link>
-        <Link href="/composicoes/nova">Cadastrar música</Link>
+        <Link href="/lancamentos/novo">Distribuir música</Link>
       </nav>
       {user ? (
         <Link className="primaryButton linkButton" href="/painel" style={{ padding: "8px 16px", textDecoration: "none" }}>

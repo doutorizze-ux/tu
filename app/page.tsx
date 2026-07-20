@@ -2,195 +2,230 @@ import Link from "next/link";
 import { MarketingHeader, SongMeta } from "./components";
 import { compositions, filters } from "./data";
 
-const metrics = [
-  { label: "Obras no catalogo", value: "128" },
-  { label: "Interesses qualificados", value: "43" },
-  { label: "Lancamentos em preparo", value: "19" },
-];
-
-const operatingStack = [
+const distributionSteps = [
   {
-    label: "Catalogo",
-    title: "Repertorio organizado para decisao comercial.",
-    text: "Composicoes com audio, metadados, filtros profissionais e historico de interesse em um fluxo unico.",
+    number: "01",
+    title: "Prepare seu lançamento",
+    text: "Envie áudio, capa, créditos, compositores e todos os metadados em um único fluxo guiado.",
   },
   {
-    label: "Creditos",
-    title: "Uso por saldo, sem plano mensal.",
-    text: "O cliente compra creditos e usa em acoes da plataforma, como cadastrar composicoes e preparar lancamentos.",
+    number: "02",
+    title: "Revise com segurança",
+    text: "A Tunix organiza pendências, splits, códigos e direitos antes de o pacote seguir para distribuição.",
   },
   {
-    label: "Distribuicao",
-    title: "Pacotes prontos para sair do painel.",
-    text: "Master, capa, ISRC, UPC, splits, plataformas e revisao operacional antes do envio.",
+    number: "03",
+    title: "Alcance o seu público",
+    text: "Distribua para centenas de plataformas e acompanhe cada etapa do lançamento pelo painel.",
   },
 ];
 
-const creditPacks = [
+const advantages = [
   {
-    name: "Inicial",
-    amount: "20 creditos",
-    price: "R$ 49,90",
-    note: "Para validar repertorio e iniciar os primeiros cadastros.",
+    tag: "Distribuição",
+    title: "Um lançamento, centenas de destinos.",
+    text: "Spotify, Apple Music, Deezer, Amazon Music, TikTok, YouTube Music e muitas outras plataformas em um só envio.",
   },
   {
-    name: "Profissional",
-    amount: "80 creditos",
-    price: "R$ 169,90",
-    note: "Para artistas, compositores e selos com operacao constante.",
+    tag: "Controle",
+    title: "Você sabe exatamente o que está acontecendo.",
+    text: "Acompanhe revisão, pendências, entregas e status sem depender de planilhas ou conversas espalhadas.",
   },
   {
-    name: "Gravadora",
-    amount: "220 creditos",
-    price: "R$ 399,90",
-    note: "Para catalogos maiores e equipes que trabalham em volume.",
+    tag: "Direitos",
+    title: "Créditos e splits organizados desde o início.",
+    text: "Registre participantes, percentuais e informações essenciais para uma operação musical profissional.",
   },
+];
+
+const platformNames = [
+  "Spotify",
+  "Apple Music",
+  "Deezer",
+  "YouTube Music",
+  "Amazon Music",
+  "TikTok",
+  "Instagram",
+  "Tidal",
 ];
 
 export default function Home() {
   return (
-    <main className="shell">
+    <main className="shell homeShell">
       <MarketingHeader />
 
-      <section className="hero">
+      <section className="hero homeHero">
         <div className="heroCopy">
-          <p className="eyebrow">Infraestrutura musical brasileira</p>
-          <h1>A plataforma para transformar repertorio em operacao.</h1>
+          <div className="heroBadge">
+            <span aria-hidden="true" />
+            Distribuição musical com operação brasileira
+          </div>
+          <h1>
+            Sua música pronta para <em>chegar ao mundo.</em>
+          </h1>
           <p>
-            A Tunix organiza composicoes, interesses, creditos e lancamentos em
-            um ambiente de trabalho serio para compositores, artistas, selos e produtores.
+            Distribua seus lançamentos para as principais plataformas digitais,
+            organize créditos e acompanhe tudo em um painel simples, seguro e profissional.
           </p>
           <div className="heroActions">
-            <Link className="primaryButton linkButton" href="/composicoes/nova">
-              Cadastrar composicao
+            <Link className="primaryButton linkButton heroPrimary" href="/lancamentos/novo">
+              Distribuir minha música
+              <span aria-hidden="true">→</span>
             </Link>
-            <Link className="secondaryButton linkButton" href="/catalogo">
-              Buscar repertorio
+            <Link className="secondaryButton linkButton" href="/criar-conta">
+              Criar conta
             </Link>
           </div>
-          <div className="trustStrip" aria-label="Modulos principais">
-            <span>Catalogo auditavel</span>
-            <span>Compra de creditos</span>
-            <span>Distribuicao musical</span>
+          <div className="heroProof" aria-label="Benefícios da Tunix">
+            <span>✓ Sem mensalidade obrigatória</span>
+            <span>✓ Processo acompanhado</span>
+            <span>✓ Catálogo organizado</span>
           </div>
         </div>
 
-        <section className="studioPanel" aria-label="Painel demonstrativo">
-          <div className="panelHeader">
-            <span>Centro operacional</span>
-            <strong>Ativo</strong>
-          </div>
-          <div className="dealBoard" aria-hidden="true">
-            <div>
-              <span>Saldo em creditos</span>
-              <strong>220</strong>
-            </div>
-            <div>
-              <span>Fila de revisao</span>
-              <strong>12</strong>
-            </div>
-            <div>
-              <span>Pacotes enviados</span>
-              <strong>7</strong>
-            </div>
-          </div>
-          <div className="soundWave compactWave" aria-hidden="true">
-            {Array.from({ length: 24 }).map((_, index) => (
-              <span key={index} style={{ height: `${24 + ((index * 17) % 58)}px` }} />
-            ))}
-          </div>
-          <div className="panelGrid">
-            {metrics.map((metric) => (
-              <div key={metric.label}>
-                <strong>{metric.value}</strong>
-                <span>{metric.label}</span>
+        <section className="distributionPreview" aria-label="Prévia do acompanhamento de um lançamento">
+          <div className="previewGlow" aria-hidden="true" />
+          <div className="releasePreviewCard">
+            <header>
+              <div className="coverArtwork" aria-hidden="true">
+                <span />
+                <span />
+                <span />
               </div>
-            ))}
+              <div>
+                <small>PRÓXIMO LANÇAMENTO</small>
+                <strong>Meu novo single</strong>
+                <span>Artista independente</span>
+              </div>
+              <b>Em revisão</b>
+            </header>
+            <div className="releaseProgress" aria-label="Progresso do lançamento: 75%">
+              <div><span>Progresso do envio</span><strong>75%</strong></div>
+              <i><span /></i>
+            </div>
+            <div className="previewChecklist">
+              <div className="done"><span>✓</span><p><strong>Áudio e capa</strong><small>Arquivos recebidos</small></p></div>
+              <div className="done"><span>✓</span><p><strong>Créditos e metadados</strong><small>Informações completas</small></p></div>
+              <div className="active"><span>3</span><p><strong>Revisão operacional</strong><small>Em análise pela Tunix</small></p></div>
+              <div><span>4</span><p><strong>Entrega nas plataformas</strong><small>Próxima etapa</small></p></div>
+            </div>
+          </div>
+          <div className="floatingStat floatingStatTop">
+            <span>↗</span><div><strong>400+</strong><small>plataformas disponíveis</small></div>
+          </div>
+          <div className="floatingStat floatingStatBottom">
+            <span>✓</span><div><strong>Pacote completo</strong><small>pronto para distribuição</small></div>
           </div>
         </section>
       </section>
 
-      <section className="businessSection" id="operacao">
-        <div className="sectionTitle">
-          <p className="eyebrow">Produto de verdade</p>
-          <h2>Uma base corporativa para operar catalogo, saldo e distribuicao.</h2>
+      <section className="platformRibbon" aria-label="Principais plataformas atendidas">
+        <p>Leve seu som para onde o seu público está</p>
+        <div>
+          {platformNames.map((platform) => <strong key={platform}>{platform}</strong>)}
         </div>
-        <div className="businessGrid">
-          {operatingStack.map((item) => (
-            <article key={item.label}>
-              <span>{item.label}</span>
+      </section>
+
+      <section className="distributionSection" id="distribuicao">
+        <div className="homeSectionHeading">
+          <div>
+            <p className="eyebrow">Do upload ao streaming</p>
+            <h2>Distribuir música não precisa ser complicado.</h2>
+          </div>
+          <p>
+            A Tunix transforma um processo cheio de detalhes em etapas claras.
+            Você prepara o lançamento; nós ajudamos a manter tudo no caminho certo.
+          </p>
+        </div>
+        <div className="distributionFlow">
+          {distributionSteps.map((step) => (
+            <article key={step.number}>
+              <span>{step.number}</span>
+              <div className="flowIcon" aria-hidden="true">{step.number === "01" ? "♫" : step.number === "02" ? "✓" : "↗"}</div>
+              <h3>{step.title}</h3>
+              <p>{step.text}</p>
+            </article>
+          ))}
+        </div>
+        <div className="distributionCallout">
+          <div>
+            <span className="calloutIcon" aria-hidden="true">◎</span>
+            <p><strong>Você mantém o foco na música.</strong><small>A Tunix organiza os detalhes do lançamento.</small></p>
+          </div>
+          <Link className="primaryButton linkButton" href="/lancamentos/novo">Começar distribuição →</Link>
+        </div>
+      </section>
+
+      <section className="advantagesSection" id="recursos">
+        <div className="homeSectionHeading compactHeading">
+          <div>
+            <p className="eyebrow">Estrutura para crescer</p>
+            <h2>Mais que enviar arquivos. Uma operação musical completa.</h2>
+          </div>
+        </div>
+        <div className="advantageGrid">
+          {advantages.map((item, index) => (
+            <article key={item.tag} className={index === 0 ? "featuredAdvantage" : ""}>
+              <span>{item.tag}</span>
               <h3>{item.title}</h3>
               <p>{item.text}</p>
+              <div className="advantageDecoration" aria-hidden="true">{index === 0 ? "400+" : index === 1 ? "● ● ●" : "100%"}</div>
             </article>
           ))}
         </div>
       </section>
 
-      <section className="section" id="catalogo">
-        <div className="sectionTitle">
-          <p className="eyebrow">Catalogo profissional</p>
-          <h2>Composicoes filtradas por decisao musical, nao por sorte.</h2>
+      <section className="catalogShowcase" id="catalogo">
+        <div className="homeSectionHeading">
+          <div>
+            <p className="eyebrow">Catálogo de oportunidades</p>
+            <h2>Encontre a próxima música do seu repertório.</h2>
+          </div>
+          <p>
+            Artistas e produtores também encontram composições organizadas por gênero,
+            clima, voz e BPM — prontas para uma decisão musical mais inteligente.
+          </p>
         </div>
-
-        <div className="filters" aria-label="Filtros de busca">
-          {filters.map((filter) => (
-            <button key={filter}>{filter}</button>
-          ))}
+        <div className="filters homeFilters" aria-label="Filtros de busca">
+          {filters.map((filter) => <button key={filter}>{filter}</button>)}
         </div>
-
-        <div className="compositionGrid">
+        <div className="compositionGrid homeCompositionGrid">
           {compositions.map((song) => (
-            <article className="songCard" key={song.title}>
+            <article className="songCard homeSongCard" key={song.title}>
               <div className="songStatus">{song.status}</div>
               <h3>{song.title}</h3>
               <p>por {song.author}</p>
               <SongMeta genre={song.genre} mood={song.mood} voice={song.voice} bpm={song.bpm} />
-              <button>Manifestar interesse</button>
+              <button>Conhecer composição →</button>
             </article>
           ))}
         </div>
+        <div className="centeredAction">
+          <Link className="secondaryButton linkButton" href="/catalogo">Explorar catálogo completo</Link>
+        </div>
       </section>
 
-      <section className="workflow" id="fluxo">
+      <section className="finalCta">
         <div>
-          <p className="eyebrow">Fluxo operacional</p>
-          <h2>Da obra cadastrada ao pacote pronto para lancamento.</h2>
+          <p className="eyebrow">Seu próximo lançamento começa aqui</p>
+          <h2>Chegou a hora de colocar sua música em movimento.</h2>
+          <p>Prepare seu lançamento, alcance novas audiências e cuide da sua carreira com uma estrutura profissional.</p>
         </div>
-        <ol>
-          <li>
-            <strong>Compositor cadastra</strong>
-            <span>Letra, audio guia, genero, tema, clima, BPM, voz e autores.</span>
-          </li>
-          <li>
-            <strong>Credito movimenta</strong>
-            <span>Cada acao relevante consome saldo definido pelo admin, sem assinatura mensal.</span>
-          </li>
-          <li>
-            <strong>Operacao valida</strong>
-            <span>A plataforma registra historico, revisao, pendencias e status antes do envio.</span>
-          </li>
-        </ol>
+        <div className="finalCtaActions">
+          <Link className="primaryButton linkButton" href="/lancamentos/novo">Distribuir minha música →</Link>
+          <Link className="ctaTextLink" href="/criar-conta">Criar minha conta</Link>
+        </div>
       </section>
 
-      <section className="plans" id="creditos">
-        <div className="sectionTitle">
-          <p className="eyebrow">Compra de creditos</p>
-          <h2>Pacotes flexiveis para usar conforme a operacao cresce.</h2>
-        </div>
-        <div className="planGrid">
-          {creditPacks.map((pack) => (
-            <article key={pack.name}>
-              <span>{pack.amount}</span>
-              <h3>{pack.name}</h3>
-              <p>{pack.note}</p>
-              <strong>{pack.price}</strong>
-              <Link className="secondaryButton linkButton" href="/creditos">
-                Comprar creditos
-              </Link>
-            </article>
-          ))}
-        </div>
-      </section>
+      <footer className="homeFooter">
+        <strong>Tunix</strong>
+        <span>Música, tecnologia e oportunidades no mesmo ritmo.</span>
+        <nav>
+          <Link href="/legal/termos">Termos</Link>
+          <Link href="/legal/privacidade">Privacidade</Link>
+          <Link href="/suporte">Suporte</Link>
+        </nav>
+      </footer>
     </main>
   );
 }
