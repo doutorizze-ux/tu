@@ -20,24 +20,6 @@ const distributionSteps = [
   },
 ];
 
-const advantages = [
-  {
-    tag: "Distribuição",
-    title: "Um lançamento, centenas de destinos.",
-    text: "Spotify, Apple Music, Deezer, Amazon Music, TikTok, YouTube Music e muitas outras plataformas em um só envio.",
-  },
-  {
-    tag: "Controle",
-    title: "Você sabe exatamente o que está acontecendo.",
-    text: "Acompanhe revisão, pendências, entregas e status sem depender de planilhas ou conversas espalhadas.",
-  },
-  {
-    tag: "Direitos",
-    title: "Créditos e splits organizados desde o início.",
-    text: "Registre participantes, percentuais e informações essenciais para uma operação musical profissional.",
-  },
-];
-
 const platformNames = [
   "Spotify",
   "Apple Music",
@@ -156,22 +138,55 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="advantagesSection" id="recursos">
-        <div className="homeSectionHeading compactHeading">
-          <div>
-            <p className="eyebrow">Estrutura para crescer</p>
-            <h2>Mais que enviar arquivos. Uma operação musical completa.</h2>
-          </div>
+      <section className="composerSection" id="compositores">
+        <div className="composerVisual" aria-label="Documentos disponíveis para compositores">
+          <div className="composerHalo" aria-hidden="true" />
+          <article className="certificatePreview">
+            <header>
+              <span className="documentSeal">T</span>
+              <div><small>TUNIX • REGISTRO DIGITAL</small><strong>Certificado de Composição</strong></div>
+            </header>
+            <div className="certificateBody">
+              <span>OBRA CERTIFICADA</span>
+              <h3>Minha Composição</h3>
+              <p>Autoria e informações da obra organizadas em um documento profissional.</p>
+              <div><i /><i /><i /></div>
+            </div>
+            <footer><span>Certificado verificável</span><strong>✓</strong></footer>
+          </article>
+          <article className="contractPreview">
+            <span className="contractIcon">§</span>
+            <div><small>CONTRATO AUTOMÁTICO</small><strong>Documento pronto</strong><p>Gerado com os dados da composição</p></div>
+            <b>PDF</b>
+          </article>
+          <div className="downloadBadge"><span>↓</span><div><strong>Pronto para baixar</strong><small>Certificado e contrato</small></div></div>
         </div>
-        <div className="advantageGrid">
-          {advantages.map((item, index) => (
-            <article key={item.tag} className={index === 0 ? "featuredAdvantage" : ""}>
-              <span>{item.tag}</span>
-              <h3>{item.title}</h3>
-              <p>{item.text}</p>
-              <div className="advantageDecoration" aria-hidden="true">{index === 0 ? "400+" : index === 1 ? "● ● ●" : "100%"}</div>
+
+        <div className="composerCopy">
+          <p className="eyebrow">Feito também para quem compõe</p>
+          <h2>Sua criação merece identidade, organização e proteção.</h2>
+          <p className="composerIntro">
+            A Tunix ajuda compositores a documentar suas obras, formalizar negociações
+            e apresentar seu repertório de forma profissional para artistas e produtores.
+          </p>
+          <div className="composerBenefits">
+            <article>
+              <span aria-hidden="true">✓</span>
+              <div><h3>Certificado da composição</h3><p>Baixe um certificado organizado com os dados, autoria e informações cadastradas da sua obra.</p></div>
             </article>
-          ))}
+            <article>
+              <span aria-hidden="true">§</span>
+              <div><h3>Contrato gerado automaticamente</h3><p>Transforme os dados da negociação em um contrato pronto para consultar, imprimir e assinar.</p></div>
+            </article>
+            <article>
+              <span aria-hidden="true">♫</span>
+              <div><h3>Repertório em uma vitrine profissional</h3><p>Apresente suas músicas para artistas e produtores procurando a próxima composição.</p></div>
+            </article>
+          </div>
+          <div className="composerActions">
+            <Link className="primaryButton linkButton" href="/composicoes/nova">Cadastrar minha composição →</Link>
+            <Link className="composerTextLink" href="/validar">Validar certificado</Link>
+          </div>
         </div>
       </section>
 
