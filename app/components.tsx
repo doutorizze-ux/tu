@@ -76,20 +76,19 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
       </div>
       {isComposer ? (
         <div>
-          <span>Composições</span>
-          <Link href="/registro">Registrar Obra (Certidões)</Link>
-          <Link href="/composicoes">Minhas obras</Link>
-          <Link href="/interesses">Interesses recebidos</Link>
+          <span>Área Autoral (Obras)</span>
+          <Link href="/registro">Registrar Letra / Obra</Link>
+          <Link href="/composicoes">Minhas Letras / Obras</Link>
+          <Link href="/interesses">Interesses Recebidos</Link>
           <Link href="/validar">Validar Certidão</Link>
         </div>
       ) : null}
       {isArtist ? (
         <div>
-          <span>Artista</span>
-          <Link href="/catalogo">Catálogo de obras</Link>
-          <Link href="/interesses">Interesses enviados</Link>
+          <span>Área do Artista (Distribuição)</span>
+          <Link href="/lancamentos/novo">Subir Lançamento</Link>
           <Link href="/lancamentos">
-            Distribuição
+            Meus Lançamentos
             {!isPublicDistActive && (
               <span
                 style={{
@@ -110,12 +109,14 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
               </span>
             )}
           </Link>
+          <Link href="/catalogo">Encontrar Obras (Catálogo)</Link>
+          <Link href="/interesses">Interesses Enviados</Link>
         </div>
       ) : null}
       {isComposer && !isArtist ? (
         <div>
           <span>Repertório</span>
-          <Link href="/catalogo">Catálogo público</Link>
+          <Link href="/catalogo">Catálogo Público</Link>
         </div>
       ) : null}
       {isAdmin ? (
