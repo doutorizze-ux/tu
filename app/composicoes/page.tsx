@@ -58,7 +58,7 @@ export default async function CompositionsPage({
         </p>
       ) : null}
 
-      <section className="tablePanel">
+      <section className="tablePanel compositionLibraryTable">
         <div className="tableHeader" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <span style={{ flex: 1 }}>Composição</span>
           <span style={{ minWidth: "120px" }}>Status</span>

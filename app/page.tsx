@@ -36,68 +36,50 @@ export default function Home() {
     <main className="shell homeShell">
       <MarketingHeader />
 
-      <section className="hero homeHero">
-        <div className="heroCopy">
-          <div className="heroBadge">
-            <span aria-hidden="true" />
-            Distribuição musical com operação brasileira
-          </div>
-          <h1>
-            Sua música pronta para <em>chegar ao mundo.</em>
-          </h1>
-          <p>
+      <section className="heroStudio" aria-label="Distribuição musical com operação brasileira">
+        <div className="heroStudioCopy">
+          <p className="heroStudioKicker"><span aria-hidden="true">●</span> Distribuição musical com operação brasileira</p>
+          <h1>Sua música pronta para <em>chegar ao mundo.</em></h1>
+          <p className="heroStudioIntro">
             Distribua seus lançamentos para as principais plataformas digitais,
             organize créditos e acompanhe tudo em um painel simples, seguro e profissional.
           </p>
-          <div className="heroActions">
-            <Link className="primaryButton linkButton heroPrimary" href="/lancamentos/novo">
-              Distribuir minha música
-              <span aria-hidden="true">→</span>
+          <div className="heroStudioActions">
+            <Link className="primaryButton linkButton heroStudioPrimary" href="/lancamentos/novo">
+              Distribuir minha música <span aria-hidden="true">→</span>
             </Link>
-            <Link className="secondaryButton linkButton" href="/criar-conta">
-              Criar conta
-            </Link>
+            <Link className="secondaryButton linkButton" href="/criar-conta">Criar conta</Link>
           </div>
-          <div className="heroProof" aria-label="Benefícios da Tunix">
-            <span>✓ Sem mensalidade obrigatória</span>
-            <span>✓ Processo acompanhado</span>
-            <span>✓ Catálogo organizado</span>
+          <div className="heroStudioProof" aria-label="Benefícios da Tunix">
+            <span><b>01</b> Sem mensalidade obrigatória</span>
+            <span><b>02</b> Processo acompanhado</span>
+            <span><b>03</b> Catálogo organizado</span>
           </div>
         </div>
 
-        <section className="distributionPreview" aria-label="Prévia do acompanhamento de um lançamento">
-          <div className="previewGlow" aria-hidden="true" />
-          <div className="releasePreviewCard">
-            <header>
-              <div className="coverArtwork" aria-hidden="true">
-                <span />
-                <span />
-                <span />
-              </div>
-              <div>
-                <small>PRÓXIMO LANÇAMENTO</small>
-                <strong>Meu novo single</strong>
-                <span>Artista independente</span>
-              </div>
-              <b>Em revisão</b>
-            </header>
-            <div className="releaseProgress" aria-label="Progresso do lançamento: 75%">
-              <div><span>Progresso do envio</span><strong>75%</strong></div>
-              <i><span /></i>
-            </div>
-            <div className="previewChecklist">
-              <div className="done"><span>✓</span><p><strong>Áudio e capa</strong><small>Arquivos recebidos</small></p></div>
-              <div className="done"><span>✓</span><p><strong>Créditos e metadados</strong><small>Informações completas</small></p></div>
-              <div className="active"><span>3</span><p><strong>Revisão operacional</strong><small>Em análise pela Tunix</small></p></div>
-              <div><span>4</span><p><strong>Entrega nas plataformas</strong><small>Próxima etapa</small></p></div>
-            </div>
+        <section className="releaseDesk" aria-label="Prévia do acompanhamento de um lançamento">
+          <header className="releaseDeskHeader">
+            <div><span>TUNIX / RELEASE DESK 01</span><strong>Próximo lançamento</strong></div>
+            <b>Em revisão</b>
+          </header>
+          <div className="releaseDeskIdentity">
+            <div className="deskCover" aria-hidden="true"><span /><span /><span /><i /></div>
+            <div><strong>Meu novo single</strong><small>Artista independente</small></div>
           </div>
-          <div className="floatingStat floatingStatTop">
-            <span>↗</span><div><strong>400+</strong><small>plataformas disponíveis</small></div>
+          <div className="deskProgress" aria-label="Progresso do lançamento: 75%">
+            <div><span>Progresso do envio</span><strong>75%</strong></div>
+            <div className="deskProgressTrack"><i /></div>
           </div>
-          <div className="floatingStat floatingStatBottom">
-            <span>✓</span><div><strong>Pacote completo</strong><small>pronto para distribuição</small></div>
+          <div className="deskChecklist">
+            <div className="done"><span>✓</span><p><strong>Áudio e capa</strong><small>Arquivos recebidos</small></p></div>
+            <div className="done"><span>✓</span><p><strong>Créditos e metadados</strong><small>Informações completas</small></p></div>
+            <div className="active"><span>3</span><p><strong>Revisão operacional</strong><small>Em análise pela Tunix</small></p></div>
+            <div><span>4</span><p><strong>Entrega nas plataformas</strong><small>Próxima etapa</small></p></div>
           </div>
+          <footer className="releaseDeskFooter">
+            <span><b>↗</b> 400+ plataformas disponíveis</span>
+            <span><b>✓</b> Pacote completo pronto para distribuição</span>
+          </footer>
         </section>
       </section>
 

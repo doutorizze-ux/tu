@@ -126,7 +126,7 @@ export default async function CreditsPage({
           </div>
           {orders.length ? (
             <div className="tableWrap">
-              <table>
+              <table className="responsiveDataTable">
                 <thead>
                   <tr>
                     <th>Pacote</th>
@@ -138,10 +138,10 @@ export default async function CreditsPage({
                 <tbody>
                   {orders.map((order) => (
                     <tr key={order.id}>
-                      <td>{formatCredits(order.credits)}</td>
-                      <td>{order.status}</td>
-                      <td>{money(order.amount)}</td>
-                      <td>
+                      <td data-label="Pacote">{formatCredits(order.credits)}</td>
+                      <td data-label="Status">{order.status}</td>
+                      <td data-label="Valor">{money(order.amount)}</td>
+                      <td data-label="Pagamento">
                         {order.status === "PAID" ? (
                           "Concluido"
                         ) : order.status === "PROVIDER_ERROR" ? (

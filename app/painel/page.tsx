@@ -189,20 +189,22 @@ export default async function DashboardPage() {
 
   return (
     <AppShell>
-      <section className="commandHero">
+      <div className="panelProposal">
+      <section className="panelProposalHero">
         <div>
-          <p className="eyebrow">Central Tunix</p>
+          <p className="panelProposalKicker"><span aria-hidden="true">♫</span> Central Tunix</p>
           <h1>Escolha o que você quer fazer agora</h1>
           <p>
             Sua conta está como {roleLabel}. Cada módulo abaixo tem um objetivo separado para manter composições,
             repertório, distribuição e operação sem confusão.
           </p>
         </div>
+        <div className="panelProposalNote"><span>SESSÃO ATIVA</span><strong>{roleLabel}</strong><small>Ambiente de trabalho Tunix</small></div>
       </section>
 
-      <section className="moduleGrid">
-        {enabledModules.map((module) => (
-          <article className="moduleCard" key={module.title}>
+      <section className="moduleGrid proposalModuleGrid">
+        {enabledModules.map((module, index) => (
+          <article className="moduleCard proposalModuleCard" key={module.title} data-module-index={String(index + 1).padStart(2, "0")}>
             <span>{module.eyebrow}</span>
             <h2>{module.title}</h2>
             <p>{module.description}</p>
@@ -218,7 +220,7 @@ export default async function DashboardPage() {
         ))}
       </section>
 
-      <section className="dashboardSection">
+      <section className="dashboardSection proposalMetricsSection">
         <div className="blockHeader">
           <h2>Indicadores da sua área</h2>
           <Link href="/notificacoes">Notificações</Link>
@@ -227,8 +229,8 @@ export default async function DashboardPage() {
       </section>
 
       {isAdmin ? (
-        <section className="twoColumn">
-          <article className="panelBlock">
+        <section className="twoColumn proposalTwoColumn">
+          <article className="panelBlock proposalPanelBlock">
             <div className="blockHeader">
               <h2>Esteira operacional</h2>
               <Link href="/admin/lancamentos">Lançamentos</Link>
@@ -237,7 +239,7 @@ export default async function DashboardPage() {
               Aqui ficam revisão, aprovação, envio para distribuidora, status por plataforma e financeiro operacional.
             </p>
           </article>
-          <article className="panelBlock">
+          <article className="panelBlock proposalPanelBlock">
             <div className="blockHeader">
               <h2>Integrações</h2>
               <Link href="/admin/integracoes">Configurar</Link>
@@ -250,8 +252,8 @@ export default async function DashboardPage() {
       ) : null}
 
       {isArtist ? (
-        <section className="twoColumn">
-          <article className="panelBlock">
+        <section className="twoColumn proposalTwoColumn">
+          <article className="panelBlock proposalPanelBlock">
             <div className="blockHeader">
               <h2>Interesses enviados</h2>
               <Link href="/interesses">Ver interesses</Link>
@@ -269,7 +271,7 @@ export default async function DashboardPage() {
             </div>
           </article>
 
-          <article className="panelBlock">
+          <article className="panelBlock proposalPanelBlock">
             <div className="blockHeader">
               <h2>Lançamentos recentes</h2>
               <Link href="/lancamentos">Ver lançamentos</Link>
@@ -287,8 +289,8 @@ export default async function DashboardPage() {
       ) : null}
 
       {isComposer ? (
-        <section className="twoColumn">
-          <article className="panelBlock">
+        <section className="twoColumn proposalTwoColumn">
+          <article className="panelBlock proposalPanelBlock">
             <div className="blockHeader">
               <h2>Interesses recentes</h2>
               <Link href="/interesses">Ver interesses</Link>
@@ -306,7 +308,7 @@ export default async function DashboardPage() {
             </div>
           </article>
 
-          <article className="panelBlock">
+          <article className="panelBlock proposalPanelBlock">
             <div className="blockHeader">
               <h2>Mais salvas</h2>
               <Link href="/catalogo">Abrir catálogo</Link>
@@ -326,7 +328,7 @@ export default async function DashboardPage() {
         </section>
       ) : null}
 
-      <section className="panelBlock dashboardSection">
+      <section className="panelBlock dashboardSection proposalPanelBlock proposalNotifications">
         <div className="blockHeader">
           <h2>Notificações recentes</h2>
           <Link href="/notificacoes">Ver todas</Link>
@@ -340,6 +342,7 @@ export default async function DashboardPage() {
           )) : <p className="mutedText">Nenhuma notificação nova.</p>}
         </div>
       </section>
+      </div>
     </AppShell>
   );
 }

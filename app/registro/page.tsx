@@ -85,7 +85,7 @@ export default async function RegistroPage() {
       </section>
 
       {/* Compositions Table Panel */}
-      <section className="tablePanel" style={{ marginTop: "30px", marginBottom: "40px" }}>
+      <section className="tablePanel responsiveRecordList registrationRecords" style={{ marginTop: "30px", marginBottom: "40px" }}>
         <div className="tableTitleGroup" style={{ padding: "1.5rem" }}>
           <h2 style={{ fontSize: "1.1rem", fontWeight: "700", color: "var(--ink)" }}>Catálogo de Certidões Digitais</h2>
           <p style={{ fontSize: "0.85rem", color: "#6e675d", margin: "5px 0 0 0" }}>
@@ -108,7 +108,7 @@ export default async function RegistroPage() {
 
             return (
               <article className="compositionRow" key={comp.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div style={{ flex: 1.5 }}>
+                <div data-label="Título / Obra" style={{ flex: 1.5 }}>
                   <strong style={{ display: "block" }}>{comp.title}</strong>
                   {hasAudio ? (
                     <span className="audio-status-badge success">Guia anexada</span>
@@ -117,15 +117,15 @@ export default async function RegistroPage() {
                   )}
                 </div>
 
-                <span style={{ flex: 1 }}>{comp.genre}</span>
+                <span data-label="Gênero" style={{ flex: 1 }}>{comp.genre}</span>
 
-                <span style={{ flex: 1.2, fontSize: "0.85rem", color: "#524d45" }}>
+                <span data-label="Data de Registro" style={{ flex: 1.2, fontSize: "0.85rem", color: "#524d45" }}>
                   {new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" }).format(
                     comp.createdAt
                   )}
                 </span>
 
-                <div style={{ flex: 2 }}>
+                <div data-label="Código Hash SHA-256" style={{ flex: 2 }}>
                   {hash ? (
                     <div className="hash-copy-wrapper">
                       <code>{hash.slice(0, 12)}...{hash.slice(-8)}</code>
@@ -136,7 +136,7 @@ export default async function RegistroPage() {
                   )}
                 </div>
 
-                <div style={{ flex: 1.5, display: "flex", gap: "8px", justifyContent: "flex-end", paddingRight: "1rem" }}>
+                <div className="registrationActions" data-label="Ações de Prova" style={{ flex: 1.5, display: "flex", gap: "8px", justifyContent: "flex-end", paddingRight: "1rem" }}>
                   {hasAudio ? (
                     <>
                       <Link

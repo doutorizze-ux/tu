@@ -102,7 +102,7 @@ export default async function DistributionIntegrationsPage({
                 Ative ou desative se a ferramenta de lançamentos e distribuição deve estar liberada para os artistas no painel. Quando desativado, o público verá uma tela de "Em breve".
               </p>
             </div>
-            <form action={togglePublicDistribution} style={{ display: "flex", alignItems: "center", gap: "12px", marginTop: "15px" }}>
+            <form className="publicDistributionForm" action={togglePublicDistribution} style={{ display: "flex", alignItems: "center", gap: "12px", marginTop: "15px" }}>
               <label style={{ display: "flex", alignItems: "center", gap: "10px", fontWeight: "bold", cursor: "pointer" }}>
                 <input
                   type="checkbox"

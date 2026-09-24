@@ -165,7 +165,7 @@ export default async function FinanceiroPage({
       </div>
 
       {/* Earnings History */}
-      <section className="tablePanel" style={{ marginTop: "30px" }}>
+      <section className="tablePanel responsiveRecordList walletEarnings" style={{ marginTop: "30px" }}>
         <div className="tableTitleGroup" style={{ padding: "1.5rem" }}>
           <h2 style={{ fontSize: "1.1rem", fontWeight: "700", color: "var(--ink)" }}>Extrato Detalhado de Royalties</h2>
           <p style={{ fontSize: "0.85rem", color: "#6e675d", margin: "5px 0 0 0" }}>Valores recebidos por música e plataforma.</p>
@@ -180,12 +180,12 @@ export default async function FinanceiroPage({
         {earnings.length ? (
           earnings.map((earning) => (
             <article className="compositionRow" key={earning.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div style={{ flex: 1.5 }}>
+              <div data-label="Lançamento / Música" style={{ flex: 1.5 }}>
                 <strong>{earning.statement.release.title}</strong>
                 <small>{earning.role} ({earning.name})</small>
               </div>
-              <span style={{ flex: 1 }}>{earning.statement.platform}</span>
-              <span style={{ flex: 1.2, fontSize: "0.85rem", color: "#524d45" }}>
+              <span data-label="Plataforma" style={{ flex: 1 }}>{earning.statement.platform}</span>
+              <span data-label="Período" style={{ flex: 1.2, fontSize: "0.85rem", color: "#524d45" }}>
                 {new Intl.DateTimeFormat("pt-BR", { month: "short", year: "2-digit" }).format(
                   earning.statement.periodStart
                 )}{" "}
@@ -194,8 +194,8 @@ export default async function FinanceiroPage({
                   earning.statement.periodEnd
                 )}
               </span>
-              <span style={{ flex: 1 }}>{earning.share}%</span>
-              <span style={{ flex: 1, textAlign: "right", paddingRight: "1rem", fontWeight: "700", color: "#0f6b5f" }}>
+              <span data-label="Sua Participação" style={{ flex: 1 }}>{earning.share}%</span>
+              <span data-label="Valor Creditado" style={{ flex: 1, textAlign: "right", paddingRight: "1rem", fontWeight: "700", color: "#0f6b5f" }}>
                 {formatCurrency(earning.amount)}
               </span>
             </article>
@@ -208,7 +208,7 @@ export default async function FinanceiroPage({
       </section>
 
       {/* Withdrawal Requests List */}
-      <section className="tablePanel" style={{ marginTop: "30px", marginBottom: "40px" }}>
+      <section className="tablePanel responsiveRecordList walletWithdrawals" style={{ marginTop: "30px", marginBottom: "40px" }}>
         <div className="tableTitleGroup" style={{ padding: "1.5rem" }}>
           <h2 style={{ fontSize: "1.1rem", fontWeight: "700", color: "var(--ink)" }}>Solicitações de Saque</h2>
           <p style={{ fontSize: "0.85rem", color: "#6e675d", margin: "5px 0 0 0" }}>Acompanhe o status dos seus pedidos de Pix.</p>
@@ -223,15 +223,15 @@ export default async function FinanceiroPage({
         {withdrawals.length ? (
           withdrawals.map((req) => (
             <article className="compositionRow" key={req.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ flex: 1.5 }}>
+              <span data-label="Data de Solicitação" style={{ flex: 1.5 }}>
                 {new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" }).format(
                   req.createdAt
                 )}
               </span>
-              <span style={{ flex: 1.5, fontFamily: "monospace" }}>{req.pixKey}</span>
-              <span style={{ flex: 1 }}>{req.pixType}</span>
-              <div style={{ flex: 1 }}>{statusLabel(req.status)}</div>
-              <span style={{ flex: 1, textAlign: "right", paddingRight: "1rem", fontWeight: "700" }}>
+              <span data-label="Chave Pix" style={{ flex: 1.5, fontFamily: "monospace" }}>{req.pixKey}</span>
+              <span data-label="Tipo de Chave" style={{ flex: 1 }}>{req.pixType}</span>
+              <div data-label="Status" style={{ flex: 1 }}>{statusLabel(req.status)}</div>
+              <span data-label="Valor do Saque" style={{ flex: 1, textAlign: "right", paddingRight: "1rem", fontWeight: "700" }}>
                 {formatCurrency(req.amount)}
               </span>
             </article>

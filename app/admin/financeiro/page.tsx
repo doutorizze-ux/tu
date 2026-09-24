@@ -83,7 +83,7 @@ export default async function AdminFinanceiroPage({
       ) : null}
 
       {/* Pending Requests Section */}
-      <section className="tablePanel" style={{ marginTop: "20px" }}>
+      <section className="tablePanel withdrawalPending" style={{ marginTop: "20px" }}>
         <div className="tableTitleGroup" style={{ padding: "1.5rem" }}>
           <h2 style={{ fontSize: "1.1rem", fontWeight: "700", color: "var(--danger, #ef4444)" }}>Solicitações Pendentes (Pix a Pagar)</h2>
           <p style={{ fontSize: "0.85rem", color: "#6e675d", margin: "5px 0 0 0" }}>Processar as transferências e atualizar o status abaixo.</p>
@@ -138,7 +138,7 @@ export default async function AdminFinanceiroPage({
       </section>
 
       {/* Processed Requests Section */}
-      <section className="tablePanel" style={{ marginTop: "30px", marginBottom: "40px" }}>
+      <section className="tablePanel responsiveRecordList withdrawalHistory" style={{ marginTop: "30px", marginBottom: "40px" }}>
         <div className="tableTitleGroup" style={{ padding: "1.5rem" }}>
           <h2 style={{ fontSize: "1.1rem", fontWeight: "700", color: "var(--ink)" }}>Histórico de Saques Processados</h2>
           <p style={{ fontSize: "0.85rem", color: "#6e675d", margin: "5px 0 0 0" }}>Registro histórico de saques pagos ou recusados no sistema.</p>
@@ -153,19 +153,19 @@ export default async function AdminFinanceiroPage({
         {processedRequests.length ? (
           processedRequests.map((req) => (
             <article className="compositionRow" key={req.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div style={{ flex: 1.5 }}>
+              <div data-label="Usuário / E-mail" style={{ flex: 1.5 }}>
                 <strong>{req.user.name}</strong>
                 <small>{req.user.email}</small>
               </div>
-              <div style={{ flex: 1.5 }}>
+              <div data-label="Chave Pix" style={{ flex: 1.5 }}>
                 <span style={{ fontSize: "0.8rem", color: "#8a8174" }}>({req.pixType})</span>{" "}
                 <code style={{ fontFamily: "monospace", fontSize: "0.85rem" }}>{req.pixKey}</code>
               </div>
-              <span style={{ flex: 1.2 }}>
+              <span data-label="Processado Em" style={{ flex: 1.2 }}>
                 {new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" }).format(req.updatedAt)}
               </span>
-              <div style={{ flex: 1 }}>{statusLabel(req.status)}</div>
-              <span style={{ flex: 1, textAlign: "right", paddingRight: "1rem", fontWeight: "700" }}>
+              <div data-label="Status" style={{ flex: 1 }}>{statusLabel(req.status)}</div>
+              <span data-label="Valor Pago" style={{ flex: 1, textAlign: "right", paddingRight: "1rem", fontWeight: "700" }}>
                 {formatCurrency(req.amount)}
               </span>
             </article>

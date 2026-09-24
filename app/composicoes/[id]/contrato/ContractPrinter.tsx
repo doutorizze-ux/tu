@@ -71,7 +71,7 @@ export default function ContractPrinter({ composition, composer }: ContractPrint
           <section className="formSection">
             <h2>1. Escolha o Tipo de Contrato</h2>
             <div className="formGrid">
-              <label style={{ gridColumn: "span 2" }}>
+              <label className="formGridFull" style={{ gridColumn: "span 2" }}>
                 Tipo de Contrato
                 <select
                   value={contractType}
@@ -141,7 +141,7 @@ export default function ContractPrinter({ composition, composer }: ContractPrint
                   <option value="Outro">Outro</option>
                 </select>
               </label>
-              <label style={{ gridColumn: "span 2" }}>
+              <label className="formGridFull" style={{ gridColumn: "span 2" }}>
                 Endereço Completo do Artista
                 <input
                   type="text"
@@ -470,6 +470,56 @@ export default function ContractPrinter({ composition, composer }: ContractPrint
           padding-bottom: 4px;
           margin-bottom: 8px;
           margin-top: 15px;
+        }
+
+        @media screen and (max-width: 640px) {
+          .cert-page-container {
+            padding: 8px 0 24px !important;
+          }
+
+          .cert-actions {
+            flex-direction: column;
+            gap: 10px;
+          }
+
+          .cert-actions button {
+            width: 100%;
+            min-height: 44px;
+            justify-content: center;
+          }
+
+          .certificate-sheet {
+            padding: 8px;
+          }
+
+          .cert-border-outer {
+            padding: 5px;
+          }
+
+          .cert-border-inner {
+            padding: 20px 14px;
+          }
+
+          .cert-main-title {
+            font-size: clamp(1.1rem, 5.3vw, 1.45rem);
+            line-height: 1.15;
+            overflow-wrap: anywhere;
+          }
+
+          .cert-subtitle {
+            font-size: 0.65rem;
+            letter-spacing: 0.08em;
+          }
+
+          .cert-body-content {
+            text-align: left !important;
+            overflow-wrap: anywhere;
+          }
+
+          .signaturesRow {
+            flex-direction: column;
+            gap: 32px !important;
+          }
         }
 
         /* Print Media Queries */

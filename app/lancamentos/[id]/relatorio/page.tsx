@@ -175,10 +175,10 @@ export default async function ReleaseReportPage({
             </div>
             {release.assets.map((asset) => (
               <div className="reportTableRow" key={asset.id}>
-                <span>{asset.type}</span>
-                <span>{asset.fileName}</span>
-                <span>{fileSize(asset.sizeBytes)}</span>
-                <span>{asset.checksum || "Pendente"}</span>
+                <span data-label="Tipo">{asset.type}</span>
+                <span data-label="Arquivo">{asset.fileName}</span>
+                <span data-label="Tamanho">{fileSize(asset.sizeBytes)}</span>
+                <span data-label="Checksum">{asset.checksum || "Pendente"}</span>
               </div>
             ))}
           </div>
@@ -194,15 +194,15 @@ export default async function ReleaseReportPage({
             </div>
             {release.contributors.map((contributor) => (
               <div className="reportTableRow three" key={contributor.id}>
-                <span>{contributor.name}</span>
-                <span>{contributor.role}</span>
-                <span>{contributor.royaltyShare ?? 0}%</span>
+                <span data-label="Nome">{contributor.name}</span>
+                <span data-label="Funcao">{contributor.role}</span>
+                <span data-label="Split">{contributor.royaltyShare ?? 0}%</span>
               </div>
             ))}
             <div className="reportTableRow three total">
-              <span>Total</span>
-              <span>Participacao declarada</span>
-              <span>{splitTotal}%</span>
+              <span data-label="Nome">Total</span>
+              <span data-label="Funcao">Participacao declarada</span>
+              <span data-label="Split">{splitTotal}%</span>
             </div>
           </div>
         </section>
@@ -216,8 +216,8 @@ export default async function ReleaseReportPage({
             </div>
             {release.platforms.map((platform) => (
               <div className="reportTableRow two" key={platform.id}>
-                <span>{platformLabel(platform.platform)}</span>
-                <span>{platformStatusLabel(platform.status)}</span>
+                <span data-label="Plataforma">{platformLabel(platform.platform)}</span>
+                <span data-label="Status">{platformStatusLabel(platform.status)}</span>
               </div>
             ))}
           </div>

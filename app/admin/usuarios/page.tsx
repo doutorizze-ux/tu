@@ -104,7 +104,7 @@ export default async function AdminUsersPage({
           </div>
 
           <div className="tableWrap">
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <table className="responsiveDataTable userDataTable" style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
                 <tr style={{ borderBottom: "1px solid var(--border)", textAlign: "left" }}>
                   <th style={{ padding: "0.75rem 1rem", fontSize: "0.85rem", opacity: 0.8 }}>Nome / E-mail</th>
@@ -118,11 +118,11 @@ export default async function AdminUsersPage({
                   const balance = balancesMap.get(u.id) ?? 0;
                   return (
                     <tr key={u.id} style={{ borderBottom: "1px solid var(--border)" }}>
-                      <td style={{ padding: "1rem" }}>
+                      <td data-label="Nome / E-mail" style={{ padding: "1rem" }}>
                         <strong style={{ display: "block", fontSize: "0.95rem" }}>{u.name}</strong>
                         <span style={{ fontSize: "0.8rem", opacity: 0.7 }}>{u.email}</span>
                       </td>
-                      <td style={{ padding: "1rem" }}>
+                      <td data-label="Papéis" style={{ padding: "1rem" }}>
                         <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap" }}>
                           {u.roles.map((r) => (
                             <span 
@@ -140,12 +140,12 @@ export default async function AdminUsersPage({
                           ))}
                         </div>
                       </td>
-                      <td style={{ padding: "1rem", fontWeight: "bold" }}>
+                      <td data-label="Saldo" style={{ padding: "1rem", fontWeight: "bold" }}>
                         <span style={{ color: balance >= 0 ? "var(--success)" : "var(--danger)" }}>
                           {formatCredits(balance)}
                         </span>
                       </td>
-                      <td style={{ padding: "1rem", textAlign: "right" }}>
+                      <td data-label="Ações" style={{ padding: "1rem", textAlign: "right" }}>
                         <div style={{ display: "flex", gap: "0.5rem", justifyContent: "flex-end" }}>
                           <Link 
                             href={`/admin/usuarios?editUserId=${u.id}`} 
@@ -207,7 +207,7 @@ export default async function AdminUsersPage({
 
       {/* Modal: Editar Usuário */}
       {editUser && (
-        <div style={{
+        <div className="adminUserModalOverlay" style={{
           position: "fixed",
           top: 0,
           left: 0,
@@ -220,7 +220,7 @@ export default async function AdminUsersPage({
           justifyContent: "center",
           zIndex: 1000
         }}>
-          <div style={{
+          <div className="adminUserModal" style={{
             background: "var(--paper, #fffdf8)",
             border: "1px solid var(--line, #ded6ca)",
             borderRadius: "12px",
@@ -296,7 +296,7 @@ export default async function AdminUsersPage({
 
       {/* Modal: Ajustar Créditos */}
       {adjustUser && (
-        <div style={{
+        <div className="adminUserModalOverlay" style={{
           position: "fixed",
           top: 0,
           left: 0,
@@ -309,7 +309,7 @@ export default async function AdminUsersPage({
           justifyContent: "center",
           zIndex: 1000
         }}>
-          <div style={{
+          <div className="adminUserModal" style={{
             background: "var(--paper, #fffdf8)",
             border: "1px solid var(--line, #ded6ca)",
             borderRadius: "12px",

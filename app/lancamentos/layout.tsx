@@ -23,7 +23,7 @@ export default async function ReleasesLayout({
     if (!isEnabled) {
       return (
         <AppShell>
-          <div className="emptyState" style={{ maxWidth: "600px", margin: "80px auto", textAlign: "center" }}>
+          <div className="emptyState distributionLocked" style={{ maxWidth: "600px", margin: "80px auto", textAlign: "center" }}>
             <div style={{ fontSize: "4.5rem", marginBottom: "20px" }}>🚀</div>
             <h2 style={{ fontSize: "2.2rem", fontWeight: "800", color: "var(--ink)", marginBottom: "15px", letterSpacing: "-0.5px" }}>
               Distribuição Digital (Em Breve)

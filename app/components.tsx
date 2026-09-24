@@ -2,6 +2,7 @@ import Link from "next/link";
 import { logoutUser } from "./actions";
 import { getCurrentUser } from "./lib/auth";
 import { prisma } from "./lib/prisma";
+import { MobileDrawer, PanelNavLink } from "./mobile-drawer";
 
 export function Brand() {
   return (
@@ -15,8 +16,19 @@ export function Brand() {
 
 export async function MarketingHeader() {
   const user = await getCurrentUser();
+  const accessHref = user ? "/painel" : "/entrar";
+  const accessLabel = user ? "Acessar Painel" : "Entrar";
   return (
-    <header className="topbar">
+    <header className="topbar marketingTopbar">
+      <MobileDrawer>
+        <nav className="marketingDrawerNav" aria-label="Navegação pública">
+          <Link href="/#distribuicao">Como funciona</Link>
+          <Link href="/catalogo">Catálogo</Link>
+          <Link href="/creditos">Créditos</Link>
+          <Link href="/lancamentos/novo">Distribuir música</Link>
+          <Link className="primaryButton linkButton marketingDrawerAction" href={accessHref}>{accessLabel}</Link>
+        </nav>
+      </MobileDrawer>
       <Brand />
       <nav className="nav">
         <Link href="/#distribuicao">Como funciona</Link>
@@ -25,12 +37,12 @@ export async function MarketingHeader() {
         <Link href="/lancamentos/novo">Distribuir música</Link>
       </nav>
       {user ? (
-        <Link className="primaryButton linkButton" href="/painel" style={{ padding: "8px 16px", textDecoration: "none" }}>
-          Acessar Painel
+        <Link className="primaryButton linkButton" href={accessHref} style={{ padding: "8px 16px", textDecoration: "none" }}>
+          {accessLabel}
         </Link>
       ) : (
-        <Link className="ghostButton linkButton" href="/entrar">
-          Entrar
+        <Link className="ghostButton linkButton" href={accessHref}>
+          {accessLabel}
         </Link>
       )}
     </header>
@@ -63,31 +75,31 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
     <>
       <div>
         <span>Central</span>
-        <Link href="/painel">Painel inicial</Link>
-        {user ? <Link href="/perfil">Meu Perfil</Link> : null}
-        {user ? <Link href="/creditos">Créditos</Link> : null}
-        {user && (isArtist || isAdmin) ? <Link href="/financeiro">Carteira & Royalties</Link> : null}
-        {user ? <Link href="/suporte">Suporte</Link> : null}
+        <PanelNavLink href="/painel">Painel inicial</PanelNavLink>
+        {user ? <PanelNavLink href="/perfil">Meu Perfil</PanelNavLink> : null}
+        {user ? <PanelNavLink href="/creditos">Créditos</PanelNavLink> : null}
+        {user && (isArtist || isAdmin) ? <PanelNavLink href="/financeiro">Carteira & Royalties</PanelNavLink> : null}
+        {user ? <PanelNavLink href="/suporte">Suporte</PanelNavLink> : null}
         {user ? (
-          <Link href="/notificacoes">
+          <PanelNavLink href="/notificacoes">
             Notificações{unreadNotifications ? ` (${unreadNotifications})` : ""}
-          </Link>
+          </PanelNavLink>
         ) : null}
       </div>
       {isComposer ? (
         <div>
           <span>Área Autoral (Obras)</span>
-          <Link href="/registro">Registrar Letra / Obra</Link>
-          <Link href="/composicoes">Minhas Letras / Obras</Link>
-          <Link href="/interesses">Interesses Recebidos</Link>
-          <Link href="/validar">Validar Certidão</Link>
+          <PanelNavLink href="/registro">Registrar Letra / Obra</PanelNavLink>
+          <PanelNavLink href="/composicoes">Minhas Letras / Obras</PanelNavLink>
+          <PanelNavLink href="/interesses">Interesses Recebidos</PanelNavLink>
+          <PanelNavLink href="/validar">Validar Certidão</PanelNavLink>
         </div>
       ) : null}
       {isArtist ? (
         <div>
           <span>Área do Artista (Distribuição)</span>
-          <Link href="/lancamentos/novo">Subir Lançamento</Link>
-          <Link href="/lancamentos">
+          <PanelNavLink href="/lancamentos/novo">Subir Lançamento</PanelNavLink>
+          <PanelNavLink href="/lancamentos">
             Meus Lançamentos
             {!isPublicDistActive && (
               <span
@@ -108,28 +120,28 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
                 Em breve
               </span>
             )}
-          </Link>
-          <Link href="/catalogo">Encontrar Obras (Catálogo)</Link>
-          <Link href="/interesses">Interesses Enviados</Link>
+          </PanelNavLink>
+          <PanelNavLink href="/catalogo">Encontrar Obras (Catálogo)</PanelNavLink>
+          <PanelNavLink href="/interesses">Interesses Enviados</PanelNavLink>
         </div>
       ) : null}
       {isComposer && !isArtist ? (
         <div>
           <span>Repertório</span>
-          <Link href="/catalogo">Catálogo Público</Link>
+          <PanelNavLink href="/catalogo">Catálogo Público</PanelNavLink>
         </div>
       ) : null}
       {isAdmin ? (
         <div>
           <span>Operação</span>
-          <Link href="/admin/composicoes">Admin composições</Link>
-          <Link href="/admin/lancamentos">Admin lançamentos</Link>
-          <Link href="/admin/financeiro">Admin Saques Pix</Link>
-          <Link href="/admin/solicitacoes">Solicitações</Link>
-          <Link href="/admin/auditoria">Auditoria</Link>
-          <Link href="/admin/integracoes">Admin integrações</Link>
-          <Link href="/admin/creditos">Admin créditos</Link>
-          <Link href="/admin/usuarios">Usuários e Créditos</Link>
+          <PanelNavLink href="/admin/composicoes">Admin composições</PanelNavLink>
+          <PanelNavLink href="/admin/lancamentos">Admin lançamentos</PanelNavLink>
+          <PanelNavLink href="/admin/financeiro">Admin Saques Pix</PanelNavLink>
+          <PanelNavLink href="/admin/solicitacoes">Solicitações</PanelNavLink>
+          <PanelNavLink href="/admin/auditoria">Auditoria</PanelNavLink>
+          <PanelNavLink href="/admin/integracoes">Admin integrações</PanelNavLink>
+          <PanelNavLink href="/admin/creditos">Admin créditos</PanelNavLink>
+          <PanelNavLink href="/admin/usuarios">Usuários e Créditos</PanelNavLink>
         </div>
       ) : null}
     </>
@@ -152,14 +164,13 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
     <main className="appShell">
       <aside className="sidebar">
         <div className="sidebarTop">
-          <Brand />
-          <details className="mobileMenu">
-            <summary>Menu</summary>
+          <MobileDrawer>
             <div className="mobileMenuPanel">
               <nav className="sideNav">{navigation}</nav>
               {account}
             </div>
-          </details>
+          </MobileDrawer>
+          <Brand />
         </div>
         <nav className="sideNav desktopNav">{navigation}</nav>
         <div className="desktopAccount">{account}</div>

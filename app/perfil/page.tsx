@@ -100,7 +100,7 @@ export default async function ProfilePage({
                   placeholder="Ex: 000.000.000-00"
                 />
               </label>
-              <label style={{ gridColumn: "span 2" }}>
+              <label className="formGridFull" style={{ gridColumn: "span 2" }}>
                 Nome Completo da Mãe
                 <input
                   name="motherName"
@@ -132,7 +132,7 @@ export default async function ProfilePage({
                   maxLength={2}
                 />
               </label>
-              <label style={{ gridColumn: "span 2" }}>
+              <label className="formGridFull" style={{ gridColumn: "span 2" }}>
                 Website / Link Profissional
                 <input
                   name="website"

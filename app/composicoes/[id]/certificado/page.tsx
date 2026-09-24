@@ -498,6 +498,88 @@ export default async function CertificatePage({
             text-align: justify;
           }
 
+          @media screen and (max-width: 640px) {
+            .cert-page-container {
+              padding: 16px 10px 28px;
+            }
+
+            .cert-actions {
+              gap: 10px;
+              margin-bottom: 12px;
+            }
+
+            .cert-back-btn,
+            .cert-print-btn {
+              min-height: 44px;
+              justify-content: center;
+              padding: 9px 12px;
+              text-align: center;
+            }
+
+            .certificate-sheet {
+              padding: 8px;
+            }
+
+            .cert-border-outer {
+              padding: 5px;
+            }
+
+            .cert-border-inner {
+              padding: 22px 16px;
+            }
+
+            .cert-main-title {
+              font-size: clamp(1.1rem, 5.4vw, 1.5rem);
+              line-height: 1.16;
+              letter-spacing: 0.02em;
+              overflow-wrap: anywhere;
+            }
+
+            .cert-subtitle {
+              font-size: 0.65rem;
+              letter-spacing: 0.08em;
+            }
+
+            .cert-intro {
+              text-align: left;
+            }
+
+            .cert-table,
+            .cert-table tbody,
+            .cert-table tr,
+            .cert-table th,
+            .cert-table td {
+              display: block;
+              width: 100%;
+            }
+
+            .cert-table tr {
+              border-bottom: 1px solid #e9e2d5;
+              padding: 9px 0;
+            }
+
+            .cert-table th,
+            .cert-table td {
+              border: 0;
+              padding: 2px 0;
+              text-align: left;
+              overflow-wrap: anywhere;
+            }
+
+            .cert-table th {
+              font-size: 0.73rem;
+              text-transform: uppercase;
+              letter-spacing: 0.04em;
+            }
+
+            .cert-hash-code,
+            .cert-code,
+            .cert-link {
+              overflow-wrap: anywhere;
+              word-break: break-word;
+            }
+          }
+
           /* Print Media Queries */
           @media print {
             @page {

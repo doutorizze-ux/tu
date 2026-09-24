@@ -298,7 +298,7 @@ export default async function AdminCreditsPage({
           </div>
         </div>
         <div className="tableWrap">
-          <table>
+          <table className="responsiveDataTable">
             <thead>
               <tr>
                 <th>Cliente</th>
@@ -311,11 +311,11 @@ export default async function AdminCreditsPage({
             <tbody>
               {orders.map((order) => (
                 <tr key={order.id}>
-                  <td>{order.user.name}</td>
-                  <td>{formatCredits(order.credits)}</td>
-                  <td>{money(order.amount)}</td>
-                  <td><span className="statusPill">{statusLabel(order.status)}</span></td>
-                  <td>{order.providerPaymentId ?? "Pendente"}</td>
+                  <td data-label="Cliente">{order.user.name}</td>
+                  <td data-label="Créditos">{formatCredits(order.credits)}</td>
+                  <td data-label="Valor">{money(order.amount)}</td>
+                  <td data-label="Status"><span className="statusPill">{statusLabel(order.status)}</span></td>
+                  <td data-label="Pagamento">{order.providerPaymentId ?? "Pendente"}</td>
                 </tr>
               ))}
             </tbody>
