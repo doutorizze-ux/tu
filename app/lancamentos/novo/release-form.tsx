@@ -2,6 +2,7 @@
 
 import { useState, useRef, FormEvent } from "react";
 import { createRelease } from "../../actions";
+import { MasterUploadField } from "../master-upload-field";
 
 interface PlatformOption {
   value: string;
@@ -280,11 +281,7 @@ export function ReleaseForm({
       <section className="formSection">
         <h2>Arquivos do lançamento</h2>
         <div className="formGrid">
-          <label>
-            Master final
-            <input name="master" type="file" accept="audio/flac,.flac" />
-            <small>Arquivo FLAC obrigatório para a entrega oficial.</small>
-          </label>
+          <MasterUploadField label="Master final" />
           <label>
             Capa
             <input name="cover" type="file" accept="image/*" />

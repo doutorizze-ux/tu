@@ -17,6 +17,7 @@ import type { PartnerDeliveryResult } from "./lib/distribution-provider";
 import { createTooLostAuthorizeUrl, deleteTooLostRelease, isTooLostOAuthConfigured } from "./lib/toolost";
 import { prisma } from "./lib/prisma";
 import { saveReleaseAsset } from "./lib/release-storage";
+import { prepareReleaseMaster } from "./lib/release-audio-conversion";
 import { validateReleasePackage } from "./lib/release-validator";
 import { parseRoyaltyImportCsv } from "./lib/royalty-import";
 import { COMPOSITION_AUTHORSHIP_ASSERTIONS, LEGAL_VERSIONS, RELEASE_RIGHTS_ASSERTIONS } from "./lib/legal";
@@ -766,6 +767,7 @@ export async function createRelease(formData: FormData) {
   const requestUpcAssignment = formData.get("requestUpcAssignment") === "on";
   const notes = formString(formData, "notes");
   const masterFile = formData.get("master");
+  const convertMasterToFlac = formData.get("convertMasterToFlac") === "yes";
   const coverFile = formData.get("cover");
   const platforms = formData.getAll("platforms").map(String).filter(Boolean).map(normalizePlatformValue);
   const contributorNames = formData.getAll("contributorName").map(String);
@@ -781,6 +783,8 @@ export async function createRelease(formData: FormData) {
   if (!acceptedRights || !acceptedDistribution) {
     redirect("/lancamentos/novo?erro=declaracao");
   }
+
+  const preparedMasterFile = await prepareReleaseMaster(masterFile, convertMasterToFlac);
 
   const release = await prisma.$transaction(async (tx) => {
     const createdRelease = await tx.release.create({
@@ -808,7 +812,7 @@ export async function createRelease(formData: FormData) {
         upc: upc || null,
         requestIsrcAssignment: !isrc && requestIsrcAssignment,
         requestUpcAssignment: !upc && requestUpcAssignment,
-        masterFileName: masterFile instanceof File && masterFile.size > 0 ? masterFile.name : null,
+        masterFileName: preparedMasterFile instanceof File && preparedMasterFile.size > 0 ? preparedMasterFile.name : null,
         coverFileName: coverFile instanceof File && coverFile.size > 0 ? coverFile.name : null,
         status: "REVIEW",
         notes: notes || null,
@@ -913,7 +917,7 @@ export async function createRelease(formData: FormData) {
 
   const releaseAssets = (
     await Promise.all([
-      upsertReleaseAsset(release.id, masterFile, "MASTER"),
+      upsertReleaseAsset(release.id, preparedMasterFile, "MASTER"),
       upsertReleaseAsset(release.id, coverFile, "COVER"),
     ])
   ).filter(isStoredReleaseAsset);
@@ -967,6 +971,7 @@ export async function updateRelease(formData: FormData) {
   const requestUpcAssignment = formData.get("requestUpcAssignment") === "on";
   const notes = formString(formData, "notes");
   const masterFile = formData.get("master");
+  const convertMasterToFlac = formData.get("convertMasterToFlac") === "yes";
   const coverFile = formData.get("cover");
   const platforms = formData.getAll("platforms").map(String).filter(Boolean).map(normalizePlatformValue);
   const contributorNames = formData.getAll("contributorName").map(String);
@@ -1000,9 +1005,16 @@ export async function updateRelease(formData: FormData) {
     redirect(`/lancamentos/${release.id}/editar?erro=declaracao`);
   }
 
+  let preparedMasterFile: FormDataEntryValue | null;
+  try {
+    preparedMasterFile = await prepareReleaseMaster(masterFile, convertMasterToFlac);
+  } catch {
+    redirect(`/lancamentos/${release.id}/editar?erro=audio`);
+  }
+
   const uploadedAssets = (
     await Promise.all([
-      upsertReleaseAsset(release.id, masterFile, "MASTER"),
+      upsertReleaseAsset(release.id, preparedMasterFile, "MASTER"),
       upsertReleaseAsset(release.id, coverFile, "COVER"),
     ])
   ).filter(isStoredReleaseAsset);
@@ -1033,7 +1045,7 @@ export async function updateRelease(formData: FormData) {
         upc: upc || null,
         requestIsrcAssignment: !isrc && requestIsrcAssignment,
         requestUpcAssignment: !upc && requestUpcAssignment,
-        masterFileName: masterFile instanceof File && masterFile.size > 0 ? masterFile.name : release.masterFileName,
+        masterFileName: preparedMasterFile instanceof File && preparedMasterFile.size > 0 ? preparedMasterFile.name : release.masterFileName,
         coverFileName: coverFile instanceof File && coverFile.size > 0 ? coverFile.name : release.coverFileName,
         status: "REVIEW",
         notes: notes || null,
@@ -3192,6 +3204,4 @@ export async function updateProfile(formData: FormData) {
   revalidatePath("/components");
   redirect("/perfil?sucesso=salvo");
 }
-
-
 

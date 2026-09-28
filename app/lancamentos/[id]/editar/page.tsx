@@ -7,6 +7,7 @@ import { getAvailableDistributionPlatforms } from "../../../lib/distribution-pla
 import { releaseStatusLabel } from "../../../lib/format";
 import { normalizePlatformValue } from "../../../lib/platforms";
 import { prisma } from "../../../lib/prisma";
+import { MasterUploadField } from "../../master-upload-field";
 
 export const dynamic = "force-dynamic";
 
@@ -105,6 +106,8 @@ export default async function EditReleasePage({
                 ? "Este pacote nao pode mais ser editado por ja estar em envio."
                 : query.erro === "declaracao"
                   ? "Confirme novamente a declaracao de titularidade antes de reenviar."
+                  : query.erro === "audio"
+                    ? "Não foi possível converter o áudio. Confira o formato e o limite de 200 MB ou envie um FLAC pronto."
                   : "Informe titulo, artista, genero e pelo menos uma plataforma."}
             </p>
           ) : null}
@@ -258,11 +261,7 @@ export default async function EditReleasePage({
               </div>
             </div>
             <div className="formGrid">
-              <label>
-                Substituir master final
-                <input name="master" type="file" accept="audio/flac,.flac" />
-                <small>Arquivo FLAC obrigatório para a entrega oficial.</small>
-              </label>
+              <MasterUploadField label="Substituir master final" />
               <label>
                 Substituir capa
                 <input name="cover" type="file" accept="image/*" />

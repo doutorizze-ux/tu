@@ -18,6 +18,7 @@ revisao juridica, banco de producao, storage profissional, monitoramento e homol
 - Desenvolvimento: `storage/audio` e `storage/releases`.
 - Staging/producao: S3 compativel configurado por `S3_BUCKET`, `S3_ENDPOINT`, `S3_REGION`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` e `S3_FORCE_PATH_STYLE`.
 - O sistema ja valida MIME type, tamanho, nome sanitizado, checksum e assinatura basica de audio/imagem.
+- A conversao opcional de masters para FLAC usa o binario de `ffmpeg-static` instalado junto com as dependencias Node. O build do servidor deve executar os scripts de instalacao do pacote na propria plataforma de destino; `FFMPEG_PATH` permite apontar para outro binario quando necessario. A conversao roda no servidor e usa espaco temporario para o arquivo original e o FLAC gerado (ate 200 MB cada).
 - Obrigatorio antes de cliente real: URL assinada, antivirus/scan assíncrono, backup e politica de retencao.
 
 ## 3. Seguranca
